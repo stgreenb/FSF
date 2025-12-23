@@ -87,3 +87,8 @@ wilderness.jpg
 *_final_*.json
 *_fix*.json
 fvtt-Actor-*.json
+
+# Debug and backup files (keep local, hide from GitHub)
+*_debug.json
+*.backup
+*.bak
