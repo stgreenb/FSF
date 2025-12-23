@@ -1,0 +1,3820 @@
+{
+  "name": "Swami",
+  "type": "hero",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "stamina": {
+      "value": 20,
+      "temporary": 0
+    },
+    "characteristics": {
+      "might": {
+        "value": 2
+      },
+      "agility": {
+        "value": 0
+      },
+      "reason": {
+        "value": 2
+      },
+      "intuition": {
+        "value": 1
+      },
+      "presence": {
+        "value": 0
+      }
+    },
+    "combat": {
+      "save": {
+        "threshold": 6,
+        "bonus": ""
+      },
+      "size": {
+        "value": 1,
+        "letter": "M"
+      },
+      "stability": 0,
+      "turns": 1
+    },
+    "biography": {
+      "value": "",
+      "director": "",
+      "languages": [],
+      "height": {
+        "units": "in",
+        "value": null
+      },
+      "weight": {
+        "units": "lb",
+        "value": null
+      }
+    },
+    "movement": {
+      "value": 6,
+      "types": [
+        "walk"
+      ],
+      "hover": false,
+      "disengage": 1
+    },
+    "damage": {
+      "immunities": {
+        "all": 0,
+        "acid": 0,
+        "cold": 0,
+        "corruption": 0,
+        "fire": 0,
+        "holy": 0,
+        "lightning": 0,
+        "poison": 0,
+        "psychic": 0,
+        "sonic": 0
+      },
+      "weaknesses": {
+        "all": 0,
+        "acid": 0,
+        "cold": 0,
+        "corruption": 0,
+        "fire": 0,
+        "holy": 0,
+        "lightning": 0,
+        "poison": 0,
+        "psychic": 0,
+        "sonic": 0
+      }
+    },
+    "recoveries": {
+      "value": 8,
+      "max": 0
+    },
+    "hero": {
+      "primary": {
+        "value": 0
+      },
+      "epic": {
+        "value": 0
+      },
+      "surges": 0,
+      "xp": 0,
+      "victories": 0,
+      "renown": 0,
+      "wealth": 1,
+      "skills": [
+        "Endurance",
+        "Handle Animals",
+        "Track",
+        "Sneak",
+        "Persuade",
+        "Navigate",
+        "Alertness",
+        "Lead",
+        "Blacksmithing",
+        "Search"
+      ],
+      "preferredKit": null
+    }
+  },
+  "items": [
+    {
+      "folder": "vI2lXvZhkhwHKLrz",
+      "name": "Devil",
+      "type": "ancestry",
+      "_id": "VfIna2d0jNXwKNaT",
+      "img": "icons/creatures/unholy/demon-fire-horned-mask.webp",
+      "system": {
+        "description": {
+          "value": "<p>The native ancestry of the Seven Cities of Hell, devils are humanoids with red or blue skin expressed in a wide variety of hues, from bright crimson to deep purple. Each devil is born with some <em>hellmark</em>-horns, a tail, cloven hooves, a forked tongue, fanged incisors, or even wings.</p><p>Hell is dominated by the Seven Cities of Hell, each ruled by a different archdevil who constantly plots and schemes against the others in the hope of ascending to the Throne of Hell.</p><p>Those devils who join \"the trade,\" as their civil service is called, spend their days in bureaucratic service hoping or scheming for promotion. Devils looking for a quick path up the bureaucratic ladder sign up for the Exchange, whereby mortals in the mundane world who perform the right rituals can summon a devil, who bargains with the supplicant on behalf of their archdevil. Archdevils can grant temporary worldly power in exchange for a supplicant's soul, with the summoned devil acting as the broker.</p><p>On rare occasions, though, the summoning goes wrong and the supplicant dies before the deal can be struck, stranding the summoned devil on Orden permanently. Some stranded devils seek to return to Hell, but most prefer life in Orden, where the phrase \"stabbed in the back by a colleague\" is usually a metaphor.</p><p>The majority of devils in Orden are not from, nor have ever been to, the Seven Cities. They are descendants of devils who were stranded in the mundane world decades, centuries, even millennia ago.</p><h4>Devil Traits</h4><p>Devil heroes have access to the following traits.</p><p>Signature Trait: @UUID[Compendium.draw-steel.origins.Item.Ch6TwaIZ8MxXYzbn]{Silver Tongue}</p><h4>Purchased Devil Traits</h4><p>You have 3 ancestry points to spend on the following traits. (Quick Build: Beast Legs, Impressive Horns.)</p><p>@UUID[Compendium.draw-steel.origins.Item.HZ79OavAF7SpzMYt]{Barbed Tail (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.IWD4Pua2f8rKLLY3]{Beast Legs (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.npLTlAWa8PqdUN0N]{Glowing Eyes (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.2UBV1KK9O20000ty]{Hellsight (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.YK7TDv4d7ZgODY3U]{Impressive Horns (2 Points)}</p><p>@UUID[Compendium.draw-steel.origins.Item.nXmsu9ClzQpdQE0e]{Prehensile Tail (2 Points)}</p><p>@UUID[Compendium.draw-steel.origins.Item.J3ctTvIiRbzAEDw1]{Wings (2 Points)}</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "26",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "devil",
+        "advancements": {
+          "naZdlT1bVvunetMK": {
+            "type": "itemGrant",
+            "_id": "naZdlT1bVvunetMK",
+            "name": "Signature Trait",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.Ch6TwaIZ8MxXYzbn"
+              }
+            ],
+            "img": null,
+            "description": "",
+            "requirements": {
+              "level": null
+            },
+            "chooseN": null
+          },
+          "og8i2kLFkS6stO04": {
+            "name": "Purchased Traits",
+            "img": "icons/skills/social/trading-injustice-scale-gray.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": null
+            },
+            "_id": "og8i2kLFkS6stO04",
+            "description": "<p>You have 3 ancestry points to spend on the following traits. (<em>Quick Build:</em> Beast Legs, Impressive Horns.)</p>",
+            "chooseN": 3,
+            "additional": {
+              "type": "ancestryTrait"
+            },
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.HZ79OavAF7SpzMYt"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.IWD4Pua2f8rKLLY3"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.npLTlAWa8PqdUN0N"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.2UBV1KK9O20000ty"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.YK7TDv4d7ZgODY3U"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.nXmsu9ClzQpdQE0e"
+              },
+              {
+                "uuid": "Compendium.draw-steel.origins.Item.J3ctTvIiRbzAEDw1"
+              }
+            ]
+          }
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "draw-steel": {
+          "advancement": {}
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1754426041998,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!VfIna2d0jNXwKNaT"
+    },
+    {
+      "folder": "eTVTaGVRRrrni84u",
+      "name": "Silver Tongue",
+      "type": "ancestryTrait",
+      "_id": "Ch6TwaIZ8MxXYzbn",
+      "img": "icons/skills/social/theft-pickpocket-bribery-brown.webp",
+      "system": {
+        "description": {
+          "value": "<p>Your innate magic allows you to twist how your words are perceived to get a better read on people and convince them to see things your way. You have one skill of your choice from the interpersonal skill group (see Skills in Chapter 9: Tests), and you gain an edge on tests when attempting to discover an NPC's motivations and pitfalls during a negotiation (see Chapter 11: Negotiation).</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "27",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "silver-tongue",
+        "advancements": {
+          "phloB0LxDAmAb2Ri": {
+            "type": "skill",
+            "_id": "phloB0LxDAmAb2Ri",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "interpersonal"
+              ],
+              "choices": []
+            },
+            "name": "",
+            "img": null,
+            "description": "",
+            "requirements": {
+              "level": null
+            }
+          }
+        },
+        "points": null
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754426041998,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!Ch6TwaIZ8MxXYzbn"
+    },
+    {
+      "folder": "eTVTaGVRRrrni84u",
+      "name": "Barbed Tail",
+      "type": "ancestryTrait",
+      "_id": "HZ79OavAF7SpzMYt",
+      "img": "icons/creatures/abilities/stinger-poison-green.webp",
+      "system": {
+        "description": {
+          "value": "<p>Your pointy tail allows you to punctuate all your actions. Once per round when you make a melee strike, you can deal extra damage with the strike equal to [[/damage max(@M,@A,@R,@I,@P)]]{your highest characteristic score.}</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "27",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "barbed-tail",
+        "advancements": {},
+        "points": 1
+      },
+      "effects": [],
+      "sort": 50000,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754457351853,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!HZ79OavAF7SpzMYt"
+    },
+    {
+      "folder": "eTVTaGVRRrrni84u",
+      "name": "Glowing Eyes",
+      "type": "ancestryTrait",
+      "_id": "npLTlAWa8PqdUN0N",
+      "img": "icons/creatures/eyes/humanoid-single-red-brown.webp",
+      "system": {
+        "description": {
+          "value": "<p>Your eyes are a solid, vibrant color that flares to show your excitement or rage. Whenever you take damage from a creature, you can use a triggered action to deal that creature psychic damage equal to [[/damage 1d10+@level]]{1d10 + your level}</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "27",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "glowing-eyes",
+        "advancements": {},
+        "points": 1
+      },
+      "effects": [],
+      "sort": 87500,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754457383108,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!npLTlAWa8PqdUN0N"
+    },
+    {
+      "folder": "eTVTaGVRRrrni84u",
+      "name": "Hellsight",
+      "type": "ancestryTrait",
+      "_id": "2UBV1KK9O20000ty",
+      "img": "icons/creatures/eyes/humanoid-single-blind.webp",
+      "system": {
+        "description": {
+          "value": "<p>Your eyes let you see through darkness, fog, and other obscuring effects. You don't take a bane on strikes made against creatures with concealment.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "27",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "hellsight",
+        "advancements": {},
+        "points": 1
+      },
+      "effects": [],
+      "sort": 100000,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754457393977,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!2UBV1KK9O20000ty"
+    },
+    {
+      "folder": "nD7JFE93WSpXnadB",
+      "name": "Mercenary band",
+      "type": "culture",
+      "_id": "zd3FNMf4BZqDPQhi",
+      "img": "icons/skills/melee/swords-parry-block-blue.webp",
+      "system": {
+        "description": {
+          "value": "Nomadic, bureaucratic, martial.",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "53",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "mercenary-band",
+        "advancements": {
+          "anyLang000000000": {
+            "type": "language",
+            "chooseN": 1,
+            "name": "Any Language",
+            "description": "<p>You know the language of your chosen culture.</p>",
+            "requirements": {
+              "level": null
+            },
+            "_id": "anyLang000000000",
+            "img": null,
+            "languages": []
+          },
+          "NytOBOONMRE7ata0": {
+            "type": "skill",
+            "name": "Nomadic",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "exploration",
+                "interpersonal"
+              ],
+              "choices": []
+            },
+            "_id": "NytOBOONMRE7ata0"
+          },
+          "Hteuncn7X1VpYDHk": {
+            "type": "skill",
+            "name": "Bureaucratic",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "interpersonal",
+                "intrigue"
+              ],
+              "choices": []
+            },
+            "_id": "Hteuncn7X1VpYDHk"
+          },
+          "p95yKfG4JUxDhVGU": {
+            "type": "skill",
+            "name": "Martial",
+            "chooseN": 1,
+            "skills": {
+              "groups": [],
+              "choices": [
+                "blacksmithing",
+                "fletching",
+                "climb",
+                "endurance",
+                "ride",
+                "intimidate",
+                "alertness",
+                "track",
+                "monsters",
+                "strategy"
+              ]
+            },
+            "_id": "p95yKfG4JUxDhVGU"
+          }
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "draw-steel": {
+          "advancement": {
+            "anyLang000000000": {
+              "selected": [
+                "anjali"
+              ]
+            },
+            "NytOBOONMRE7ata0": {
+              "selected": [
+                "persuade",
+                "endurance",
+                "lead",
+                "navigate"
+              ]
+            },
+            "Hteuncn7X1VpYDHk": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "persuade",
+                "lead",
+                "track",
+                "search"
+              ]
+            },
+            "p95yKfG4JUxDhVGU": {
+              "selected": [
+                "blacksmithing",
+                "endurance",
+                "alertness",
+                "track"
+              ]
+            }
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754485298166,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!zd3FNMf4BZqDPQhi"
+    },
+    {
+      "name": "Tactician",
+      "type": "class",
+      "img": "icons/skills/melee/strike-weapons-orange.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "174",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "tactician",
+        "description": {
+          "value": "<p>Strategist. Defender. Leader. With weapon in hand, you lead allies into the maw of battle, barking out commands that inspire your fellow heroes to move faster and strike more precisely. All the while, you stand between your compatriots and death, taunting the followers of evil to best you if they can.</p><p>As a tactician, you have abilities that heal your allies and grant them increased damage, movement, and attacks, even as you leave your enemies struggling to respond.</p>",
+          "director": ""
+        },
+        "advancements": {
+          "KoGp0Q93aEXIiQxx": {
+            "type": "itemGrant",
+            "_id": "KoGp0Q93aEXIiQxx",
+            "requirements": {
+              "level": 3
+            },
+            "name": "Out of Position",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.UMi9OOllnmMinI9h"
+              }
+            ],
+            "description": "<p>Even before battle begins, your enemies struggle to keep up with your tactics.</p>",
+            "sort": 16000
+          },
+          "ZYrQ1MTL4PPJq1un": {
+            "name": "Skill",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "ZYrQ1MTL4PPJq1un",
+            "skills": {
+              "choices": [
+                "lead"
+              ]
+            },
+            "description": "<p>You gain the Lead skill.</p>",
+            "sort": 22000
+          },
+          "lffZjjuNWAvfmliT": {
+            "name": "Skills",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "lffZjjuNWAvfmliT",
+            "skills": {
+              "choices": [
+                "architecture",
+                "blacksmithing",
+                "fletching",
+                "mechanics",
+                "brag",
+                "empathize",
+                "alertness",
+                "search",
+                "culture",
+                "monsters",
+                "strategy"
+              ],
+              "groups": [
+                "exploration"
+              ]
+            },
+            "chooseN": 2,
+            "description": "<p>Choose any two skills from Alertness, Architecture, Blacksmithing, Brag, Culture, Empathize, Fletching, Mechanics, Monsters, Search, Strategy, or the skills of the exploration skill group. (<em>Quick Build</em>: Monsters, Strategy.)</p>",
+            "sort": 26000
+          },
+          "TPNKDjRP9rjsZfdo": {
+            "name": "Tactical Doctrine",
+            "img": "icons/sundries/documents/document-sealed-red-tan.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "TPNKDjRP9rjsZfdo",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.VfwdbL1GG2Dx0zv7"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.aYjVEZyiYqtdGGPS"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.OjWhetKz8boQxExU"
+              }
+            ],
+            "chooseN": 1,
+            "description": "<p>Warfare is as old as civilization\u2014and perhaps even older. As battle became ever more complex, military leaders invented tactical doctrine, outlining how combatants should be structured, used, and deployed. Doctrine can be learned at war colleges passing on ancient martial traditions, or directly through blood and sweat on the battlefield. Whatever path brought you to your mastery of historically proven tactics, you choose a tactical doctrine from the following options, each of which grants you a skill. (<em>Quick Build</em>: Vanguard and the Intimidate skill.)</p><p>Your tactical doctrine is your subclass, and your choice of doctrine determines many of the features you\u2019ll gain as you gain new levels.</p>",
+            "sort": 28000
+          },
+          "QbsiJwC2zZCfmQej": {
+            "name": "Focus",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "QbsiJwC2zZCfmQej",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.BsbaqvmoNmQLIhkS"
+              }
+            ],
+            "description": "<p>The ring of steel panics others but brings order to your mind, granting you a Heroic Resource called focus.</p>",
+            "sort": 12000
+          },
+          "7k50JsLsnWjsjUNC": {
+            "name": "Field Arsenal",
+            "img": "icons/skills/melee/spear-tips-quintuple-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "7k50JsLsnWjsjUNC",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.dNGmfuNuaML5TRQL"
+              }
+            ],
+            "description": "<p>You have drilled with a broad array of weapons and have developed techniques to optimize their use. Whenever you select or change your kit, you can select an additional kit and gain the benefits of both kits, including both their signature abilities. See Kits for more information. (<em>Quick Build:</em> Shining Armor, Sniper)</p>",
+            "chooseN": null,
+            "sort": 11000
+          },
+          "MP2iZkK0a0TBrk2f": {
+            "name": "Mark",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "MP2iZkK0a0TBrk2f",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.zyd6C7phOZr6EAQ9"
+              }
+            ],
+            "description": "<p>You know how to focus the attention of your allies as you push them toward victory.</p>",
+            "sort": 14000
+          },
+          "GaCGwCaDeZ0tIzEW": {
+            "name": "Strike Now",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "GaCGwCaDeZ0tIzEW",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.x4b14J5PNuHHSOvy"
+              }
+            ],
+            "description": "<p>You have the following ability.</p>",
+            "sort": 27000
+          },
+          "v3lv8gpmAuGMFZeL": {
+            "name": "3 Focus",
+            "img": "icons/magic/symbols/runes-triangle-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "v3lv8gpmAuGMFZeL",
+            "description": "<p>Choose one heroic ability from the following options, each of which costs 3 focus to use. (<em>Quick Build</em>: Inspiring Strike.)</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.tNLgOK3NPEmKPT8N"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.S3iGPafawIlrjPLQ"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.yYQqS6yLeI1vSq5F"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.KgIMq4mGRFmij4yK"
+              }
+            ],
+            "sort": 1000
+          },
+          "gxX5Ov4NXyFqjz7Y": {
+            "name": "5 Focus",
+            "img": "icons/magic/symbols/runes-star-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "gxX5Ov4NXyFqjz7Y",
+            "description": "<p>Choose one heroic ability from the following options, each of which costs 5 focus to use. (<em>Quick Build:</em> Hammer and Anvil.)</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.lNJCFKdUV1fjYmhC"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.tpi0fKQDK1dEDwWw"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.qHiPuCKH4WNHCYgO"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.eiwrW9TL342wPNea"
+              }
+            ],
+            "sort": 2000
+          },
+          "ypbZTcMPbIMvHBh4": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 2
+            },
+            "_id": "ypbZTcMPbIMvHBh4",
+            "description": "<p>You gain one exploration, interpersonal, or intrigue perk of your choice.</p>",
+            "chooseN": 1,
+            "additional": {
+              "type": "perk",
+              "perkType": [
+                "exploration",
+                "interpersonal",
+                "intrigue"
+              ]
+            },
+            "sort": 17000
+          },
+          "o9nuiB0R6xyDLyeq": {
+            "name": "7 Focus Ability",
+            "img": "icons/magic/symbols/runes-star-pentagon-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 3
+            },
+            "_id": "o9nuiB0R6xyDLyeq",
+            "description": "<p>Choose one heroic ability from the following options, each of which costs 7 focus to use.</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.5bp7i0Ohsqjh9V8b"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.Oa2nhKmYgCO8ko1e"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.7nIlMpcNp099D7qU"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.LK3bFBBEUL44o7FG"
+              }
+            ],
+            "sort": 3000
+          },
+          "xNHyFFc7jN1Stbxe": {
+            "name": "",
+            "img": null,
+            "type": "characteristic",
+            "requirements": {
+              "level": 4
+            },
+            "_id": "xNHyFFc7jN1Stbxe",
+            "description": "<p>Your Might and Reason scores each increase to 3.</p>",
+            "characteristics": {
+              "might": 1,
+              "reason": 1
+            },
+            "sort": 5000
+          },
+          "mbh82wJVgbnvv8or": {
+            "name": "",
+            "img": null,
+            "type": "characteristic",
+            "requirements": {
+              "level": 7
+            },
+            "_id": "mbh82wJVgbnvv8or",
+            "description": "<p>Each of your characteristic scores increases by 1, to a maximum of 4.</p>",
+            "max": 4,
+            "characteristics": {
+              "might": 1,
+              "agility": 1,
+              "reason": 1,
+              "intuition": 1,
+              "presence": 1
+            },
+            "sort": 6000
+          },
+          "zYEInq4FXtwupYWN": {
+            "name": "",
+            "img": null,
+            "type": "characteristic",
+            "requirements": {
+              "level": 10
+            },
+            "_id": "zYEInq4FXtwupYWN",
+            "description": "<p>Your Might and Reason scores each increase to 5.</p>",
+            "characteristics": {
+              "might": 1,
+              "reason": 1
+            },
+            "max": 5,
+            "sort": 7000
+          },
+          "tbCrwC96tQ8SDe4N": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 4
+            },
+            "_id": "tbCrwC96tQ8SDe4N",
+            "description": "<p>You gain one perk of your choice.</p>",
+            "chooseN": 1,
+            "additional": {
+              "type": "perk"
+            },
+            "sort": 18000
+          },
+          "6HohsaQF3JEgjZUJ": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 6
+            },
+            "_id": "6HohsaQF3JEgjZUJ",
+            "description": "<p>You gain one exploration, interpersonal, or intrigue perk of your choice.</p>",
+            "chooseN": 1,
+            "additional": {
+              "type": "perk",
+              "perkType": [
+                "exploration",
+                "interpersonal",
+                "intrigue"
+              ]
+            },
+            "sort": 19000
+          },
+          "L9f2tZP6FyF3Hal2": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 8
+            },
+            "_id": "L9f2tZP6FyF3Hal2",
+            "description": "<p>You gain one perk of your choice.</p>",
+            "chooseN": 1,
+            "additional": {
+              "type": "perk"
+            },
+            "sort": 20000
+          },
+          "IxyX5vyAOE0dJNGL": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 10
+            },
+            "_id": "IxyX5vyAOE0dJNGL",
+            "description": "<p>You gain one exploration, interpersonal, or intrigue perk of your choice.</p>",
+            "chooseN": 1,
+            "additional": {
+              "type": "perk",
+              "perkType": [
+                "exploration",
+                "interpersonal",
+                "intrigue"
+              ]
+            },
+            "sort": 21000
+          },
+          "9DII7O1t4kYUT2y1": {
+            "name": "Features",
+            "img": "icons/magic/symbols/runes-star-magenta.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 4
+            },
+            "_id": "9DII7O1t4kYUT2y1",
+            "description": "<p>You gain the following features.</p>",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.ACHrTZSh4pTg9qcx"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.jeYF2wW2iFTHKzAo"
+              }
+            ],
+            "sort": 8000
+          },
+          "PnuYwZSGtg5kXrNV": {
+            "name": "9 Focus Ability",
+            "img": "icons/magic/symbols/runes-star-pentagon-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 5
+            },
+            "_id": "PnuYwZSGtg5kXrNV",
+            "description": "<p>Choose one heroic ability from the following options, each of which costs 9 focus to use.</p>",
+            "sort": 4000
+          },
+          "XjVFdrkrQJsy8DHa": {
+            "name": "Skill",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 4
+            },
+            "_id": "XjVFdrkrQJsy8DHa",
+            "description": "<p>You gain one skill of your choice.</p>",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "crafting",
+                "exploration",
+                "interpersonal",
+                "intrigue",
+                "lore"
+              ]
+            },
+            "sort": 23000
+          },
+          "OItEzNHHo2zLQHlw": {
+            "name": "Master of Arms",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 6
+            },
+            "_id": "OItEzNHHo2zLQHlw",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.xN89ednpkwIs2ux5"
+              }
+            ],
+            "description": "<p>Your expertise with weapons has grown to true mastery.</p>",
+            "sort": 15000
+          },
+          "xY4xKvivXADV14H3": {
+            "name": "Features",
+            "img": "icons/magic/symbols/runes-star-magenta.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 7
+            },
+            "_id": "xY4xKvivXADV14H3",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.8wldDjeBnQMSiSph"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.bKy4SNKoutOKaTCH"
+              }
+            ],
+            "description": "<p>You gain the following features.</p>",
+            "sort": 9000
+          },
+          "zWfWcWwuBihI6kCJ": {
+            "name": "",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 7
+            },
+            "_id": "zWfWcWwuBihI6kCJ",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "crafting",
+                "exploration",
+                "interpersonal",
+                "intrigue",
+                "lore"
+              ]
+            },
+            "sort": 24000
+          },
+          "aXzw2XDQhkQq6S99": {
+            "name": "11 Focus Ability",
+            "img": "icons/magic/symbols/runes-star-pentagon-orange.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 8
+            },
+            "_id": "aXzw2XDQhkQq6S99",
+            "description": "<p>Choose one heroic ability from the following options, each of which costs 11 focus to use.</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.sm3HDDOZP8secxv5"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.SB871Q5LIzWzP6h1"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.sqNSpzjkYUdpYdC6"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.KhPbwY2ufb5gsS8e"
+              }
+            ]
+          },
+          "sPPS79Yakw5H3nYK": {
+            "name": "Grandmaster of Arms",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 9
+            },
+            "_id": "sPPS79Yakw5H3nYK",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.3U1SslP94KYeUN06"
+              }
+            ],
+            "description": "<p>Your expertise with weapons has grown to true mastery.</p>",
+            "sort": 13000
+          },
+          "2VTkkY6SVyrwjsi9": {
+            "name": "",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 10
+            },
+            "_id": "2VTkkY6SVyrwjsi9",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "crafting",
+                "exploration",
+                "interpersonal",
+                "intrigue",
+                "lore"
+              ]
+            },
+            "description": "<p>You gain one skill of your choice.</p>",
+            "sort": 25000
+          },
+          "KKAk0tFoQ8stNcfo": {
+            "name": "Features",
+            "img": "icons/magic/symbols/runes-star-magenta.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 10
+            },
+            "_id": "KKAk0tFoQ8stNcfo",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.XsbLeLYRNuZu9eVA"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.RtkS9S3xj54b9Kza"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.9egsUsOVLxEjWsXq"
+              }
+            ],
+            "description": "<p>You gain the following features.</p>",
+            "sort": 10000
+          }
+        },
+        "level": 1,
+        "primary": "Focus",
+        "turnGain": "2",
+        "minimum": "0",
+        "characteristics": {
+          "core": [
+            "might",
+            "reason"
+          ]
+        },
+        "stamina": {
+          "starting": 21,
+          "level": 9
+        },
+        "recoveries": 10,
+        "epic": "Command"
+      },
+      "effects": [],
+      "folder": "kCN3c3aC6ziHDp5c",
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "draw-steel": {
+          "advancement": {
+            "ZYrQ1MTL4PPJq1un": {
+              "selected": [
+                "lead"
+              ]
+            },
+            "lffZjjuNWAvfmliT": {
+              "selected": [
+                "endurance",
+                "navigate"
+              ]
+            },
+            "XjVFdrkrQJsy8DHa": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "persuade",
+                "endurance",
+                "lead",
+                "track",
+                "blacksmithing",
+                "search",
+                "navigate"
+              ]
+            },
+            "zWfWcWwuBihI6kCJ": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "persuade",
+                "endurance",
+                "lead",
+                "track",
+                "blacksmithing",
+                "search",
+                "navigate"
+              ]
+            },
+            "2VTkkY6SVyrwjsi9": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "persuade",
+                "endurance",
+                "lead",
+                "track",
+                "blacksmithing",
+                "search",
+                "navigate"
+              ]
+            }
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1751140107957,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_id": "Y6rtfW6EfHszGqhG",
+      "sort": 0,
+      "_key": "!items!Y6rtfW6EfHszGqhG"
+    },
+    {
+      "folder": "78pbwV8U2xiEUz57",
+      "name": "Focus",
+      "type": "feature",
+      "_id": "BsbaqvmoNmQLIhkS",
+      "img": "icons/magic/perception/eye-ringed-glow-angry-red.webp",
+      "system": {
+        "description": {
+          "value": "<p>The ring of steel panics others but brings order to your mind, granting you a Heroic Resource called focus.</p><h4>Focus in Combat</h4><p>At the start of a combat encounter or some other stressful situation tracked in combat rounds (as determined by the Director), you gain focus equal to your Victories. At the start of each of your turns during combat, you gain 2 focus.</p><p>Additionally, the first time each combat round that you or any ally damages a creature marked by you (see @UUID[Compendium.draw-steel.abilities.Item.zyd6C7phOZr6EAQ9]{Mark}), you gain 1 focus. The first time in a combat round that any ally within 10 squares of you uses a heroic ability, you gain 1 focus.</p><p>You lose any remaining focus at the end of the encounter.</p><h4>Focus Outside of Combat</h4><p>Though you can't gain focus outside of combat, you can use your heroic abilities and effects that cost focus without spending it. Whenever you use an ability or effect outside of combat that costs focus, you can't use that same ability or effect outside of combat again until you earn 1 or more Victories or finish a respite.</p><p>When you use an ability outside of combat that lets you spend unlimited focus on its effect, you can use it as if you had spent an amount of focus equal to your Victories.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "175",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "focus",
+        "type": {
+          "value": "",
+          "subtype": ""
+        },
+        "prerequisites": {
+          "value": ""
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1751140343168,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!BsbaqvmoNmQLIhkS"
+    },
+    {
+      "folder": "78pbwV8U2xiEUz57",
+      "name": "Field Arsenal",
+      "type": "feature",
+      "_id": "dNGmfuNuaML5TRQL",
+      "img": "icons/skills/melee/spear-tips-quintuple-orange.webp",
+      "system": {
+        "description": {
+          "value": "<p>You have drilled with a broad array of arms and armor, and have developed techniques to optimize their use. You can use and gain the benefits of two kits, including both their signature abilities. Whenever you would choose or change one kit, you can choose or change your second kit as well. See Chapter 6: Kits for more information. (<em>Quick Build:</em> Shining Armor, Sniper.)</p><p>If both kits grant you the same benefit, you take one or the other and can't change your choice until you finish a respite. (This usually means taking the higher of two bonuses.)</p><p>For example, if you take the Shining Armor and Sniper kits, you gain the following benefits overall:</p><ul><li><p>Stamina Bonus: +12 per echelon</p></li><li><p>Stability Bonus: +1</p></li><li><p>Melee Damage Bonus: +2/+2/+2</p></li><li><p>Ranged Damage Bonus: +0/+0/+4</p></li><li><p>Speed Bonus: +1</p></li><li><p>Ranged Distance Bonus: +10</p></li><li><p>Disengage Bonus: +1</p></li><li><p>You can use the Patient Shot and Protective Attack signature abilities.</p></li></ul><p>Kit signature abilities have their kit's bonuses already applied, which might require you to adjust the bonuses of the signature abilities you gain from a kit. For example, you might take the Martial Artist kit, which gives a melee weapon damage bonus of +2/+2/+2, and the Mountain kit, which gives a melee weapon damage bonus of +0/+0/+4. If you choose to use the Mountain kit's damage bonus, then the Battle Grace signature ability from the Martial Artist kit loses the +2/+2/+2 bonus from that kit, reducing its usual 5/8/11 damage for its tier 1, tier 2, and tier 3 outcomes to 3/6/9. It then gains the +0/+0/+4 of the Mountain kit to deal 3/6/13 damage.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "177",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "field-arsenal",
+        "type": {
+          "value": "",
+          "subtype": ""
+        },
+        "prerequisites": {
+          "value": ""
+        },
+        "advancements": {
+          "gEH78hKaAR0nWzRs": {
+            "name": "Kit",
+            "img": "icons/containers/bags/pack-leather-black-brown.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "gEH78hKaAR0nWzRs",
+            "chooseN": 2,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.DfUznZyAwRkgQ7Cq"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.dFKiwPs0hVo7uWei"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.eQsxbl59pEjHEyB7"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.26dSN2U5BPYxURBl"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.ZQVco8CZprfeqPp6"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.49hPWhEliTnRbuxT"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.x41mBdtcCGTj8Quy"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.jHJnlHyRRNf9V5hm"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.uEExxUnkmJ1whpCz"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.jBAKshrCTStqX7yI"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.IWcztYRBrAMdRQyf"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.tfBbJyfk0ARRiPJU"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.RhaBwqKzijzbJcCQ"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.JE0Q1L35MuOGLVVJ"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.B07q1yyc5HSCnAf7"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.74X1pEcNgz1OQC2x"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.UWjNAZn9cBAMUWB0"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.ZoWDIjHoCJjr1uo1"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.NkzAlCFgDeGuTnzr"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.AOCz8Nufy6kbg85v"
+              },
+              {
+                "uuid": "Compendium.draw-steel.character-options.Item.zW9eM46rG8tUhTaA"
+              }
+            ],
+            "additional": {
+              "type": "kit"
+            },
+            "description": ""
+          }
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1751140422449,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!dNGmfuNuaML5TRQL"
+    },
+    {
+      "folder": "namgjInmC0X7jtJb",
+      "name": "Mark",
+      "type": "ability",
+      "img": "icons/skills/targeting/crosshair-pointed-orange.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "177",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "mark",
+        "story": "You draw your allies\u2019 attention to a specific foe\u2014with devastating effect.",
+        "keywords": [
+          "ranged"
+        ],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 10
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>The target is [[/apply YW2JEdoDPd0XlaII]]{marked} by you until the end of the encounter, until you are dying, or until you use this ability again. You can willingly end your mark on a creature (no action required), and if another tactician marks a creature, your mark on that creature ends. When a creature marked by you is reduced to 0 Stamina, you can use a free triggered action to mark a new target within distance.</p><p>You can initially mark only one creature using this ability, though other tactician abilities allow you to mark additional creatures at the same time. The mastermind tactical doctrine\u2019s Anticipation feature allows you to target additional creatures with this ability starting at 5th level.</p><p>While a creature marked by you is within your line of effect, you and allies within your line of effect gain an edge on power rolls made against that creature. Additionally, whenever you or any ally uses an ability to deal rolled damage to a creature marked by you, you can spend 1 focus to gain one of the following benefits as a free triggered action:</p><ul><li><p>The ability deals [[/damage 2*@R]]{extra damage equal to twice your Reason score}.</p></li><li><p>The creature dealing the damage can spend a Recovery.</p></li><li><p>The creature dealing the damage can shift up to a number of squares equal to your Reason score.</p></li><li><p>If you damage a creature marked by you with a melee ability, the creature is [[/apply taunted turn]] by you until the end of their next turn.</p></li></ul><p>You can\u2019t gain more than one benefit from the same trigger</p>",
+          "after": ""
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        },
+        "description": {
+          "value": "<p>The target is [[/apply YW2JEdoDPd0XlaII]]{marked} by you until the end of the encounter, until you are dying, or until you use this ability again. You can willingly end your mark on a creature (no action required), and if another tactician marks a creature, your mark on that creature ends. When a creature marked by you is reduced to 0 Stamina, you can use a free triggered action to mark a new target within distance.</p><p>You can initially mark only one creature using this ability, though other tactician abilities allow you to mark additional creatures at the same time. The mastermind tactical doctrine's Anticipation feature allows you to target additional creatures with this ability starting at 5th level.</p><p>While a creature marked by you is within your line of effect, you and allies within your line of effect gain an edge on power rolls made against that creature. Additionally, whenever you or any ally uses an ability to deal rolled damage to a creature marked by you, you can spend 1 focus to gain one of the following benefits as a free triggered action:</p><ul><li><p>The ability deals [[/damage 2*@R]]{extra damage equal to twice your Reason score}.</p></li><li><p>The creature dealing the damage can spend a Recovery.</p></li><li><p>The creature dealing the damage can shift up to a number of squares equal to your Reason score.</p></li><li><p>If you damage a creature marked by you with a melee ability, the creature is [[/apply taunted turn]] by you until the end of their next turn.</p></li></ul><p>You can't gain more than one benefit from the same trigger</p>",
+          "director": ""
+        }
+      },
+      "effects": [
+        {
+          "name": "Mark",
+          "img": "icons/skills/targeting/crosshair-pointed-orange.webp",
+          "type": "base",
+          "origin": "Compendium.draw-steel.abilities.Item.zyd6C7phOZr6EAQ9",
+          "transfer": false,
+          "_id": "YW2JEdoDPd0XlaII",
+          "system": {
+            "end": {
+              "type": "encounter",
+              "roll": "1d10 + @combat.save.bonus"
+            }
+          },
+          "changes": [],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0,
+          "flags": {},
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.350",
+            "systemId": "draw-steel",
+            "systemVersion": "0.9.0",
+            "createdTime": 1762372213702,
+            "modifiedTime": null,
+            "lastModifiedBy": null
+          },
+          "_key": "!items.effects!zyd6C7phOZr6EAQ9.YW2JEdoDPd0XlaII"
+        }
+      ],
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1755474003234,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_id": "zyd6C7phOZr6EAQ9",
+      "sort": 0,
+      "_key": "!items!zyd6C7phOZr6EAQ9"
+    },
+    {
+      "name": "Mark: Trigger",
+      "type": "ability",
+      "img": "icons/svg/mystery-man.svg",
+      "system": {
+        "_dsid": null,
+        "description": {
+          "value": "No description available",
+          "director": ""
+        },
+        "keywords": [],
+        "type": "triggered",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "effect": {
+          "before": "",
+          "after": ""
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.1",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "folder": "namgjInmC0X7jtJb",
+      "name": "\"Strike Now!\"",
+      "type": "ability",
+      "img": "icons/skills/targeting/target-strike-triple-blue.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "177",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "strike-now",
+        "story": "Your foe left an opening. You point this out to an ally!",
+        "keywords": [
+          "ranged"
+        ],
+        "type": "main",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 10
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "ally",
+          "value": 1
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>The target can use a signature ability as a free triggered action.</p>",
+          "after": ""
+        },
+        "spend": {
+          "text": "You target two allies instead of one.",
+          "value": 5
+        },
+        "description": {
+          "value": "<p>The target can use a signature ability as a free triggered action.</p>",
+          "director": ""
+        }
+      },
+      "effects": [],
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1755474002285,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_id": "x4b14J5PNuHHSOvy",
+      "sort": 0,
+      "_key": "!items!x4b14J5PNuHHSOvy"
+    },
+    {
+      "folder": "DNgMG9rHu4ULguZr",
+      "name": "Soldier",
+      "type": "career",
+      "_id": "y63JszkYGerkvHFz",
+      "img": "icons/environment/people/infantry.webp",
+      "system": {
+        "description": {
+          "value": "<p>In your formative years, you fought tirelessly in skirmishes and campaigns against enemy forces. In defining your career, think about the following questions:</p><ul><li><p>In which army and company did you serve?</p></li><li><p>What conflicts were you a part of ?</p></li><li><p>What rank did you achieve?</p></li><li><p>What heroics did you perform in the heat of battle?</p></li></ul><p>You gain the following career benefits:</p><p><strong>Skills:</strong> One skill from the exploration skill group and one skill from the intrigue group (Quick Build: Alertness, Endurance.)</p><p><strong>Languages:</strong> Two languages</p><p><strong>Renown:</strong> +1</p><p><strong>Perk:</strong> One exploration perk (Quick Build: Teamwork.)</p><h5>Inciting Incident</h5><p>@UUID[Compendium.draw-steel.tables.RollTable.hVK7CxZv0jW1gmu3]{Soldier - Inciting Incident}</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "66",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "soldier",
+        "advancements": {
+          "V8CodbJBID0xVDtR": {
+            "name": "Skill (Exploration)",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": null
+            },
+            "_id": "V8CodbJBID0xVDtR",
+            "skills": {
+              "groups": [
+                "exploration"
+              ]
+            },
+            "chooseN": 1
+          },
+          "oViST8ZDfKp0UKfc": {
+            "name": "Skill (Intrigue)",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": null
+            },
+            "_id": "oViST8ZDfKp0UKfc",
+            "chooseN": 1,
+            "skills": {
+              "groups": [
+                "intrigue"
+              ]
+            }
+          },
+          "69AHOn85TSUwc2JK": {
+            "name": "2 Languages",
+            "img": null,
+            "type": "language",
+            "requirements": {
+              "level": null
+            },
+            "_id": "69AHOn85TSUwc2JK",
+            "chooseN": 2
+          },
+          "2l0eIkltgaCcuYoC": {
+            "name": "Perk",
+            "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": null
+            },
+            "_id": "2l0eIkltgaCcuYoC",
+            "chooseN": 1,
+            "description": "<p>One exploration perk (<em>Quick Build:</em> Teamwork.)</p>",
+            "additional": {
+              "type": "perk",
+              "perkType": [
+                "exploration"
+              ]
+            }
+          }
+        },
+        "projectPoints": 0,
+        "renown": 1,
+        "wealth": 0
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "draw-steel": {
+          "advancement": {
+            "V8CodbJBID0xVDtR": {
+              "selected": [
+                "endurance",
+                "navigate"
+              ]
+            },
+            "oViST8ZDfKp0UKfc": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "track",
+                "search"
+              ]
+            },
+            "69AHOn85TSUwc2JK": {
+              "selected": [
+                "high kuric",
+                "szetch"
+              ]
+            }
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1754497307695,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!y63JszkYGerkvHFz"
+    },
+    {
+      "folder": "XSiTcTleGKKWNgo2",
+      "name": "Renowned Warrior",
+      "type": "feature",
+      "_id": "HpjysV2B3Lxm62Vf",
+      "img": "icons/commodities/treasure/medal-ribbon-gold-blue.webp",
+      "system": {
+        "description": {
+          "value": "<p>You earn 1 Renown.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "343",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "renowned-warrior",
+        "advancements": {}
+      },
+      "effects": [
+        {
+          "name": "Active Effect",
+          "img": "icons/commodities/treasure/medal-ribbon-gold-blue.webp",
+          "type": "base",
+          "origin": "Compendium.draw-steel.rewards.Item.HpjysV2B3Lxm62Vf",
+          "_id": "BVO70T7BgfFwHzka",
+          "system": {
+            "end": {
+              "type": "",
+              "roll": "1d10 + @combat.save.bonus"
+            }
+          },
+          "changes": [
+            {
+              "key": "system.hero.renown",
+              "mode": 2,
+              "value": "1",
+              "priority": null
+            }
+          ],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "transfer": true,
+          "statuses": [],
+          "sort": 0,
+          "flags": {},
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.350",
+            "systemId": "draw-steel",
+            "systemVersion": "0.9.0",
+            "createdTime": 1761081276239,
+            "modifiedTime": null,
+            "lastModifiedBy": null
+          },
+          "_key": "!items.effects!HpjysV2B3Lxm62Vf.BVO70T7BgfFwHzka"
+        }
+      ],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1761080829478,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!HpjysV2B3Lxm62Vf"
+    },
+    {
+      "folder": "mzSNysm6QOCvrFN3",
+      "name": "Monster Whisperer",
+      "type": "perk",
+      "img": "icons/creatures/unholy/demons-horned-glowing-pink.webp",
+      "system": {
+        "description": {
+          "value": "<p>You can use the Handle Animals skill to interact with nonsapient creatures who are not animals.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "228",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "monster-whisperer",
+        "advancements": {},
+        "perkType": "exploration"
+      },
+      "effects": [],
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754509665461,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_id": "jwEjhK8PLA9NmX1e",
+      "sort": 0,
+      "_key": "!items!jwEjhK8PLA9NmX1e"
+    },
+    {
+      "folder": "86F9T9t6YK1WafzV",
+      "name": "Insurgent",
+      "type": "subclass",
+      "_id": "VfwdbL1GG2Dx0zv7",
+      "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+      "system": {
+        "description": {
+          "value": "<p>Doing your duty, playing fair, and dying honorably in battle is your opponent's job. You'll do whatever it takes to keep your allies alive. You gain a skill from the intrigue skill group.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "175",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "insurgent",
+        "advancements": {
+          "QQg5A5q2b8qHuVnX": {
+            "name": "Doctrine Feature",
+            "img": null,
+            "type": "itemGrant",
+            "_id": "QQg5A5q2b8qHuVnX",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.ajeWFtiJThAAAVQc"
+              }
+            ],
+            "requirements": {
+              "level": 1
+            }
+          },
+          "UqAJEoau20jVXcxc": {
+            "name": "Skill (Intrigue)",
+            "img": null,
+            "type": "skill",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "UqAJEoau20jVXcxc",
+            "skills": {
+              "groups": [
+                "intrigue"
+              ]
+            },
+            "chooseN": 1
+          },
+          "rWyQCkQjYe7BdqnS": {
+            "name": "Infiltration Tactics",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 2
+            },
+            "_id": "rWyQCkQjYe7BdqnS",
+            "description": "<p>Your tactical doctrine grants you the following feature.</p>",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.h9n9hOvO9ivTHDDl"
+              }
+            ]
+          },
+          "7NLicUQgElWYE5q0": {
+            "name": "2nd-Level Insurgent Ability",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 2
+            },
+            "_id": "7NLicUQgElWYE5q0",
+            "description": "<p>Choose one of the following abilities.</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.onCIPNSevgNVx7wF"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.Dtlh3rkTZZ6mNwNu"
+              }
+            ]
+          },
+          "LnKdMaAAxu1aWbVh": {
+            "name": "Doctrine Triggered Action",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": 1
+            },
+            "_id": "LnKdMaAAxu1aWbVh",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.Ww4AaolCBsUJMeDA"
+              }
+            ]
+          },
+          "XKpnpm3mFWQlngc6": {
+            "name": "5th-Level Insurgent Features",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 5
+            },
+            "_id": "XKpnpm3mFWQlngc6",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.1eAnXPUgOPngDnWH"
+              },
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.BVNHunFr5bizG57z"
+              }
+            ],
+            "description": "<p>Your tactical doctrine grants you two features, as shown on the 5th-Level Doctrine Features table.</p>"
+          },
+          "b9xDkdgt5H53hDNx": {
+            "name": "6th-Level Insurgent Ability",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 6
+            },
+            "_id": "b9xDkdgt5H53hDNx",
+            "description": "<p>Your tactical doctrine grants your choice of one of two heroic abilities.</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.M4eCJN6BLJgiWPgP"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.mrbCXwMP2jnrirj0"
+              }
+            ]
+          },
+          "DBdcxPFhcegErAaV": {
+            "name": "7th-Level Insurgent Feature",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 7
+            },
+            "_id": "DBdcxPFhcegErAaV",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.LrI1ukTNpHIdxBnN"
+              }
+            ],
+            "description": "<p>Your tactical doctrine grants you a feature</p>"
+          },
+          "drdJD9mlRUMJafEd": {
+            "name": "8th-Level Insurgent Feature",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 8
+            },
+            "_id": "drdJD9mlRUMJafEd",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.classes.Item.23zQ0bg25ITt4IMn"
+              }
+            ],
+            "description": "<p>Your tactical doctrine grants you a feature</p>"
+          },
+          "HnH38tDhgzvK4tEj": {
+            "name": "9th-Level Insrugent Ability",
+            "img": "icons/magic/perception/silhouette-stealth-shadow.webp",
+            "type": "itemGrant",
+            "requirements": {
+              "level": 9
+            },
+            "_id": "HnH38tDhgzvK4tEj",
+            "description": "<p>Your tactical doctrine grants your choice of one of two heroic abilities.</p>",
+            "chooseN": 1,
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.RsAMnydR1JwqIYGQ"
+              },
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.h6aDBmqcW9wAXMzt"
+              }
+            ]
+          }
+        },
+        "classLink": "tactician"
+      },
+      "effects": [],
+      "sort": 100000,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "draw-steel": {
+          "advancement": {
+            "UqAJEoau20jVXcxc": {
+              "selected": [
+                "alertness",
+                "sneak",
+                "track",
+                "search"
+              ]
+            }
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1752598011662,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!VfwdbL1GG2Dx0zv7"
+    },
+    {
+      "folder": "71KLGY8ZFgHTFLl5",
+      "name": "Covert Operations",
+      "type": "feature",
+      "_id": "ajeWFtiJThAAAVQc",
+      "img": "icons/magic/unholy/silhouette-robe-evil-power.webp",
+      "system": {
+        "description": {
+          "value": "<p>While in your presence or working according to your plans, each of your allies gains an edge on tests using any skill from the intrigue skill group. Additionally, you can use the Lead skill to assist another creature with any test made using a skill from the intrigue group.</p><p>At the Director's discretion, you and your allies can use skills from the intrigue skill group to attempt research or reconnaissance during a negotiation instead of outside of a negotiation.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "176",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "covert-operations",
+        "type": {
+          "value": "",
+          "subtype": ""
+        },
+        "prerequisites": {
+          "value": ""
+        }
+      },
+      "effects": [],
+      "sort": 100000,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1751141847868,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!ajeWFtiJThAAAVQc"
+    },
+    {
+      "name": "Advanced Tactics",
+      "type": "ability",
+      "img": "icons/sundries/gaming/chess-knight-white-glass.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "176",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "advanced-tactics",
+        "keywords": [
+          "ranged"
+        ],
+        "type": "triggered",
+        "category": "signature",
+        "resource": null,
+        "trigger": "The target deals damage to another creature.",
+        "distance": {
+          "type": "ranged",
+          "primary": 10,
+          "secondary": 0,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": null
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>The target [[/surge 2]], which they can use on the triggering damage.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": 1,
+          "text": "If the damage has any potency effect associated with it, the potency is increased by 1"
+        },
+        "story": "Your leadership aids an ally.",
+        "description": {
+          "value": "<p>The target [[/surge 2]], which they can use on the triggering damage.</p>",
+          "director": ""
+        }
+      },
+      "effects": [],
+      "folder": "G3UBn4UI2HQ6Kdom",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1751141724065,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "Ww4AaolCBsUJMeDA",
+      "sort": 100000,
+      "_key": "!items!Ww4AaolCBsUJMeDA"
+    },
+    {
+      "name": "Raider",
+      "type": "kit",
+      "_id": "jBAKshrCTStqX7yI",
+      "img": "icons/weapons/swords/shortsword-guard-steel-worn.webp",
+      "system": {
+        "description": {
+          "value": "<p>The Raider kit keeps you protected while granting you full mobility, providing a boost to speed and distance that lets you run around the battlefield like a Viking warrior.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "221",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "raider",
+        "advancements": {
+          "MnyFftZXJ6tA47bc": {
+            "name": "Raider\u2019s Awe",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": null
+            },
+            "_id": "MnyFftZXJ6tA47bc",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.9qEPqlWu8YaKeYl7"
+              }
+            ]
+          }
+        },
+        "equipment": {
+          "armor": "light",
+          "weapon": [
+            "light"
+          ],
+          "shield": true
+        },
+        "bonuses": {
+          "melee": {
+            "damage": {
+              "tier1": 1,
+              "tier2": 1,
+              "tier3": 1
+            },
+            "distance": null
+          },
+          "ranged": {
+            "damage": {
+              "tier1": 1,
+              "tier2": 1,
+              "tier3": 1
+            },
+            "distance": 5
+          },
+          "stamina": 6,
+          "speed": 1,
+          "stability": null,
+          "disengage": 1
+        }
+      },
+      "effects": [],
+      "folder": "IHZh1CqtnYYID2QA",
+      "sort": 103125,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1754362714511,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!jBAKshrCTStqX7yI"
+    },
+    {
+      "folder": "9MmUCFDVEUEgDY04",
+      "name": "Raider\u2019s Awe",
+      "type": "ability",
+      "_id": "9qEPqlWu8YaKeYl7",
+      "img": "icons/skills/ranged/arrow-flying-gray-brown.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "221",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "raiders-awe",
+        "story": "You execute a brutal strike that leaves your foe reeling",
+        "keywords": [
+          "melee",
+          "ranged",
+          "strike",
+          "weapon"
+        ],
+        "type": "main",
+        "category": "signature",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "meleeRanged",
+          "primary": 1,
+          "secondary": 5
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": [
+              "might",
+              "agility"
+            ]
+          },
+          "effects": {
+            "OlwlVM5uitUAcIrg": {
+              "name": "Damage",
+              "img": null,
+              "type": "damage",
+              "_id": "OlwlVM5uitUAcIrg",
+              "damage": {
+                "tier2": {
+                  "value": "5 + @chr"
+                },
+                "tier3": {
+                  "value": "7 + @chr"
+                }
+              }
+            }
+          }
+        },
+        "effect": {
+          "before": "",
+          "after": "<p>The target takes a bane on their next power roll made before the end of their next turn</p>"
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.350",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754422026019,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!9qEPqlWu8YaKeYl7"
+    },
+    {
+      "name": "Ranger",
+      "type": "kit",
+      "_id": "IWcztYRBrAMdRQyf",
+      "img": "icons/weapons/bows/bow-ornamental-silver-black.webp",
+      "system": {
+        "description": {
+          "value": "<p>The Ranger kit outfits you with light armor and weapons for every challenge, letting you easily switch between melee and ranged combat. This kit provides a good balance of bonuses to defense and offense to create a hero who is a jack-of-all-trades.</p>",
+          "director": ""
+        },
+        "source": {
+          "book": "Heroes",
+          "page": "221",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "ranger",
+        "advancements": {
+          "1gjFknWi9Pf8rjv1": {
+            "name": "Hamstring Shot",
+            "img": null,
+            "type": "itemGrant",
+            "requirements": {
+              "level": null
+            },
+            "_id": "1gjFknWi9Pf8rjv1",
+            "pool": [
+              {
+                "uuid": "Compendium.draw-steel.abilities.Item.gnF2ThmDpSNTnjhE"
+              }
+            ]
+          }
+        },
+        "equipment": {
+          "armor": "medium",
+          "weapon": [
+            "bow",
+            "medium"
+          ],
+          "shield": false
+        },
+        "bonuses": {
+          "melee": {
+            "damage": {
+              "tier1": 1,
+              "tier2": 1,
+              "tier3": 1
+            },
+            "distance": null
+          },
+          "ranged": {
+            "damage": {
+              "tier1": 1,
+              "tier2": 1,
+              "tier3": 1
+            },
+            "distance": 5
+          },
+          "stamina": 6,
+          "speed": 1,
+          "stability": null,
+          "disengage": 1
+        }
+      },
+      "effects": [],
+      "folder": "IHZh1CqtnYYID2QA",
+      "sort": 101563,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754362822405,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!IWcztYRBrAMdRQyf"
+    },
+    {
+      "folder": "9MmUCFDVEUEgDY04",
+      "name": "Hamstring Shot",
+      "type": "ability",
+      "_id": "gnF2ThmDpSNTnjhE",
+      "img": "icons/skills/wounds/bone-broken-knee-beam.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "221",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "hamstring-shot",
+        "story": "A well-placed shot leaves your enemy struggling to move",
+        "keywords": [
+          "ranged",
+          "strike",
+          "weapon"
+        ],
+        "type": "main",
+        "category": "signature",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 5
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": [
+              "might",
+              "agility"
+            ]
+          },
+          "effects": {
+            "dz26cT1hJwbDuWg1": {
+              "name": "Damage",
+              "img": null,
+              "type": "damage",
+              "_id": "dz26cT1hJwbDuWg1",
+              "damage": {
+                "tier2": {
+                  "value": "4 + @chr"
+                },
+                "tier3": {
+                  "value": "6 + @chr"
+                }
+              }
+            },
+            "NsGLHSzmKm8kX34F": {
+              "name": "Slow",
+              "img": null,
+              "type": "applied",
+              "_id": "NsGLHSzmKm8kX34F",
+              "applied": {
+                "tier3": {
+                  "display": "{{potency}}, slowed (save ends)",
+                  "effects": {
+                    "slowed": {
+                      "condition": "failure",
+                      "end": "save"
+                    }
+                  }
+                },
+                "tier1": {
+                  "effects": {
+                    "slowed": {
+                      "condition": "failure",
+                      "end": "save"
+                    }
+                  },
+                  "display": "{{potency}}, slowed (save ends)",
+                  "potency": {
+                    "characteristic": "agility"
+                  }
+                },
+                "tier2": {
+                  "effects": {
+                    "slowed": {
+                      "condition": "failure",
+                      "end": "save"
+                    }
+                  },
+                  "display": "{{potency}}, slowed (save ends)"
+                }
+              }
+            }
+          }
+        },
+        "effect": {
+          "before": "",
+          "after": ""
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1754424173898,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!gnF2ThmDpSNTnjhE"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Advance",
+      "type": "ability",
+      "_id": "ucR2C7lMvXrKIMZ7",
+      "img": "icons/skills/movement/feet-bladed-boots-fire.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "272",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "advance",
+        "story": "",
+        "keywords": [],
+        "type": "move",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self"
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "custom": ""
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>When a creature takes the Advance move action, they move a number of squares up to their speed. They can break up this movement with their maneuver and main action however they wish.</p>",
+          "after": ""
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.348",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1758665540843,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!ucR2C7lMvXrKIMZ7"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Aid Attack",
+      "type": "ability",
+      "img": "icons/skills/social/diplomacy-handshake-blue.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "273",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "aid-attack",
+        "keywords": [],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "enemy",
+          "value": 1
+        },
+        "effect": {
+          "before": "<p>Choose an enemy adjacent to you. The next ability power roll an ally who makes against that creature before the start of your next turn has an edge.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702842093,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "Xb3S5N1fZyICD58D",
+      "sort": 100000,
+      "_key": "!items!Xb3S5N1fZyICD58D"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Catch Breath",
+      "type": "ability",
+      "img": "icons/magic/life/heart-hand-gold-green-light.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "273",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "catch-breath",
+        "keywords": [],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self",
+          "primary": null,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "value": null
+        },
+        "effect": {
+          "before": "<p>A creature who uses the Catch Breath maneuver spends a Recovery and regains Stamina equal to their recovery value.</p><p>A creature who is dying can\u2019t use the Catch Breath maneuver, but other creatures can help them spend Recoveries in other ways.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702842697,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "nYPJN8Ce2dX9H09K",
+      "sort": 200000,
+      "_key": "!items!nYPJN8Ce2dX9H09K"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Charge",
+      "type": "ability",
+      "img": "icons/skills/movement/feet-bladed-boots-fire.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "274",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "charge",
+        "keywords": [
+          "charge",
+          "melee",
+          "weapon"
+        ],
+        "type": "action",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "enemy",
+          "value": 1
+        },
+        "effect": {
+          "before": "<p>When a creature takes the Charge main action, they move up to their speed in a straight line, then make a @UUID[Compendium.draw-steel.abilities.Item.wU69Y06G9lYFrvp6]{melee free strike} against a target when they end their move. If the creature has an ability with the Charge keyword, they can use that ability against the target instead of a free strike.</p><p>A creature can\u2019t move through difficult terrain or shift when they charge. They can fly or burrow as part of the Charge main action if they have that movement available to them, but they can\u2019t climb or swim while charging unless they can automatically use that movement at full speed.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702843297,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "wNqJWJbgAbnJBqZf",
+      "sort": 300000,
+      "_key": "!items!wNqJWJbgAbnJBqZf"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Defend",
+      "type": "ability",
+      "img": "icons/skills/melee/shield-block-fire-orange.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "274",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "defend",
+        "keywords": [],
+        "type": "action",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self",
+          "primary": null,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "value": null
+        },
+        "effect": {
+          "before": "<p>When a creature takes the Defend main action, ability rolls made against them have a double bane until the start of their next turn. Additionally, you have a double edge on tests when called for to resist environmental effects or a creature\u2019s traits or abilities. A creature gains no benefit from this action while another creature is taunted by them.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702844092,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "fjtY7RKBGWx2u5tK",
+      "sort": 400000,
+      "_key": "!items!fjtY7RKBGWx2u5tK"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Disengage",
+      "type": "ability",
+      "_id": "vBlTvHRZ5JBXWYt6",
+      "img": "icons/skills/movement/feet-spurred-boots-brown.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "272",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "disengage",
+        "story": "",
+        "keywords": [],
+        "type": "move",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self"
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "custom": ""
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>When a creature takes the Disengage move action, they can shift 1 square. Certain class features, kits, and other rules allow a creature to shift more than 1 square when they disengage. A creature who does so can break up their shift with their maneuver and main action however they wish.</p>",
+          "after": ""
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.348",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1758665655715,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!vBlTvHRZ5JBXWYt6"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Escape Grab",
+      "type": "ability",
+      "img": "icons/magic/unholy/hand-claw-fog-green.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "273",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "escape-grab",
+        "keywords": [],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "enemy",
+          "value": 1
+        },
+        "effect": {
+          "before": "<p>A creature who is grabbed by another creature, an object, or an effect (see Grab below) can attempt to escape by using the following ability.</p>",
+          "after": "<p>You take a bane on this maneuver if your size is smaller than the size of the creature, object, or effect that has you grabbed.</p>"
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "characteristics": [
+              "might",
+              "agility"
+            ],
+            "formula": "@chr"
+          },
+          "effects": {
+            "9IqHcvFKmPUnGT2i": {
+              "type": "other",
+              "_id": "9IqHcvFKmPUnGT2i",
+              "other": {
+                "tier1": {
+                  "display": "No Effect.",
+                  "potency": {
+                    "value": "@potency.weak",
+                    "characteristic": "none"
+                  }
+                },
+                "tier2": {
+                  "display": "You can escape the grab, but if you do, a creature who has you grabbed can make a melee free strike against you before you are no longer grabbed.",
+                  "potency": {
+                    "value": "@potency.average",
+                    "characteristic": ""
+                  }
+                },
+                "tier3": {
+                  "display": "You are no longer grabbed.",
+                  "potency": {
+                    "value": "@potency.strong",
+                    "characteristic": ""
+                  }
+                }
+              },
+              "name": ""
+            }
+          }
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702844706,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "iD1SlB15GXJFALya",
+      "sort": 500000,
+      "_key": "!items!iD1SlB15GXJFALya"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Grab",
+      "type": "ability",
+      "img": "icons/magic/control/debuff-chains-shackle-movement-red.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "273",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "grab",
+        "keywords": [
+          "melee",
+          "weapon"
+        ],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "effect": {
+          "before": "<p>A creature seeking to keep a foe close and locked down can attempt to grab a creature using the following ability</p>",
+          "after": "<p>You can usually target only creatures of your size or smaller. If your Might score is 2 or higher, you can target any creature with a size equal to or less than your Might score.</p>"
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "characteristics": [
+              "might"
+            ],
+            "formula": "@chr"
+          },
+          "effects": {
+            "2SbphbZofGVQUQlD": {
+              "name": "",
+              "img": null,
+              "type": "applied",
+              "_id": "2SbphbZofGVQUQlD",
+              "applied": {
+                "tier1": {
+                  "display": "No effect."
+                },
+                "tier2": {
+                  "display": "You can grab the target, but if you do, the target can make a melee free strike against you before they are grabbed",
+                  "effects": {
+                    "grabbed": {
+                      "condition": "always",
+                      "end": ""
+                    }
+                  }
+                },
+                "tier3": {
+                  "effects": {
+                    "grabbed": {
+                      "condition": "always",
+                      "end": ""
+                    }
+                  },
+                  "display": "The target is grabbed by you."
+                }
+              }
+            }
+          }
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702845310,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "oxaISpgVoCfo6fmt",
+      "sort": 600000,
+      "_key": "!items!oxaISpgVoCfo6fmt"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Heal",
+      "type": "ability",
+      "img": "icons/magic/life/cross-beam-green.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "274",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "heal",
+        "keywords": [],
+        "type": "action",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "effect": {
+          "before": "<p>A creature who uses the Heal main action employs medicine or inspiring words to make an adjacent creature feel better and stay in the fight. The target creature can spend a Recovery to regain Stamina, or can make a saving throw against one effect they are suffering that is ended by a saving throw.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702846114,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "2qWHDVB7SBS9anLB",
+      "sort": 700000,
+      "_key": "!items!2qWHDVB7SBS9anLB"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Knockback",
+      "type": "ability",
+      "img": "icons/skills/melee/shield-block-bash-yellow.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "273",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "knockback",
+        "keywords": [
+          "melee",
+          "weapon"
+        ],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creature",
+          "value": 1
+        },
+        "effect": {
+          "after": "<p>You can usually target only creatures of your size or smaller. If your Might score is 2 or higher, you can target any creature with a size equal to or less than your Might score.</p>",
+          "before": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "power": {
+          "effects": {
+            "qFLB10tC0nvXHhg8": {
+              "type": "forced",
+              "_id": "qFLB10tC0nvXHhg8",
+              "forced": {
+                "tier2": {
+                  "distance": "2",
+                  "display": "{{forced}}",
+                  "movement": [
+                    "push"
+                  ],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.average",
+                    "characteristic": ""
+                  }
+                },
+                "tier3": {
+                  "distance": "3",
+                  "display": "{{forced}}",
+                  "movement": [
+                    "push"
+                  ],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.strong",
+                    "characteristic": ""
+                  }
+                },
+                "tier1": {
+                  "display": "{{forced}}",
+                  "movement": [
+                    "push"
+                  ],
+                  "distance": "1",
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.weak",
+                    "characteristic": "none"
+                  }
+                }
+              },
+              "name": ""
+            }
+          },
+          "roll": {
+            "characteristics": [
+              "might"
+            ],
+            "formula": "@chr"
+          }
+        },
+        "story": ""
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702848693,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "emug9cXuwndDrWzu",
+      "sort": 900000,
+      "_key": "!items!emug9cXuwndDrWzu"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Melee Free Strike",
+      "type": "ability",
+      "img": "icons/skills/melee/hand-grip-sword-strike-orange.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "275",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "melee-free-strike",
+        "keywords": [
+          "charge",
+          "melee",
+          "strike",
+          "weapon"
+        ],
+        "type": "action",
+        "category": "freeStrike",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "melee",
+          "primary": 1,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creatureObject",
+          "value": 1
+        },
+        "effect": {
+          "before": "",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "power": {
+          "roll": {
+            "characteristics": [
+              "might",
+              "agility"
+            ],
+            "formula": "@chr"
+          },
+          "effects": {
+            "uMnGIJk7i9wqGwXp": {
+              "type": "damage",
+              "_id": "uMnGIJk7i9wqGwXp",
+              "damage": {
+                "tier2": {
+                  "potency": {
+                    "characteristic": "none",
+                    "value": "@potency.average"
+                  },
+                  "value": "5 + @chr",
+                  "types": [],
+                  "properties": []
+                },
+                "tier3": {
+                  "potency": {
+                    "characteristic": "none",
+                    "value": "@potency.strong"
+                  },
+                  "value": "7 + @chr",
+                  "types": [],
+                  "properties": []
+                },
+                "tier1": {
+                  "value": "2 + @chr",
+                  "types": [],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.weak",
+                    "characteristic": "none"
+                  }
+                }
+              },
+              "name": ""
+            }
+          }
+        },
+        "story": ""
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702850267,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "wU69Y06G9lYFrvp6",
+      "sort": 1100000,
+      "_key": "!items!wU69Y06G9lYFrvp6"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Ranged Free Strike",
+      "type": "ability",
+      "img": "icons/skills/ranged/arrow-barbed-flying-gray.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "275",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "ranged-free-strike",
+        "keywords": [
+          "ranged",
+          "strike",
+          "weapon"
+        ],
+        "type": "action",
+        "category": "freeStrike",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 5,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "creatureObject",
+          "value": 1
+        },
+        "effect": {
+          "before": "",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "power": {
+          "effects": {
+            "vrLUf6HZjoRuPz0h": {
+              "type": "damage",
+              "_id": "vrLUf6HZjoRuPz0h",
+              "damage": {
+                "tier2": {
+                  "value": "4 + @chr",
+                  "types": [],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.average",
+                    "characteristic": ""
+                  }
+                },
+                "tier3": {
+                  "value": "6 + @chr",
+                  "types": [],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.strong",
+                    "characteristic": ""
+                  }
+                },
+                "tier1": {
+                  "value": "2 + @chr",
+                  "types": [],
+                  "properties": [],
+                  "potency": {
+                    "value": "@potency.weak",
+                    "characteristic": "none"
+                  }
+                }
+              },
+              "name": ""
+            }
+          },
+          "roll": {
+            "characteristics": [
+              "might",
+              "agility"
+            ],
+            "formula": "@chr"
+          }
+        },
+        "story": ""
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702850876,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "eqUobBcm81mqZVgJ",
+      "sort": 1200000,
+      "_key": "!items!eqUobBcm81mqZVgJ"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Ride",
+      "type": "ability",
+      "_id": "QXOkflcYF6DITJE3",
+      "img": "icons/environment/people/cavalry.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "272",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "ride",
+        "story": "",
+        "keywords": [],
+        "type": "move",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self"
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "custom": ""
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "<p>A creature can take the Ride move action only while mounted on another creature. When a creature takes the Ride move action, they cause their mount to move up to the mount\u2019s speed, taking the rider with them. Alternatively, a creature can use the Ride move action to have their mount use the Disengage move action as a free triggered action. A creature can use the Ride move action only once per round. A mounted creature can only have this move action applied to them once per round. This movement can be broken up with the rider\u2019s maneuver and main action however they wish.</p>",
+          "after": ""
+        },
+        "spend": {
+          "text": "",
+          "value": null
+        }
+      },
+      "effects": [],
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.348",
+        "systemId": "draw-steel",
+        "systemVersion": "0.9.0",
+        "createdTime": 1758665687967,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items!QXOkflcYF6DITJE3"
+    },
+    {
+      "folder": "YKzQ5cCX8knW8fAc",
+      "name": "Stand Up",
+      "type": "ability",
+      "img": "icons/skills/movement/figure-running-gray.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "274",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "stand-up",
+        "keywords": [],
+        "type": "maneuver",
+        "category": "",
+        "resource": null,
+        "trigger": "",
+        "distance": {
+          "type": "self",
+          "primary": null,
+          "secondary": null,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "self",
+          "value": null
+        },
+        "effect": {
+          "before": "<p>A creature can use the Stand Up maneuver to stand up if they are prone, ending that condition. Alternatively, they can use this maneuver to make a willing adjacent prone creature stand up.</p>",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "",
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        }
+      },
+      "effects": [],
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1749702853442,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "XeUU0Blvi0fy0b2G",
+      "sort": 125000,
+      "_key": "!items!XeUU0Blvi0fy0b2G"
+    },
+    {
+      "name": "Battle Cry",
+      "type": "ability",
+      "img": "icons/creatures/abilities/lion-roar-yellow.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "178",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "tactician-ability-1",
+        "keywords": [
+          "ranged"
+        ],
+        "type": "maneuver",
+        "category": "heroic",
+        "resource": 3,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 10,
+          "secondary": 0,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "ally",
+          "value": 3
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": [
+              "reason"
+            ]
+          },
+          "effects": {
+            "rcbUjWpmoFSi1wS4": {
+              "name": "",
+              "img": null,
+              "type": "other",
+              "_id": "rcbUjWpmoFSi1wS4",
+              "other": {
+                "tier1": {
+                  "display": "Each target gains 1 surge."
+                },
+                "tier2": {
+                  "display": "Each target gains 2 surges."
+                },
+                "tier3": {
+                  "display": "Each target gains 3 surges."
+                }
+              }
+            }
+          }
+        },
+        "effect": {
+          "before": "",
+          "after": ""
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "You shout a phrase that galvanizes your team.",
+        "_source_level": 1,
+        "_is_selected": true,
+        "description": {
+          "value": "<p>You shout a phrase that galvanizes your team.</p>",
+          "director": ""
+        }
+      },
+      "effects": [],
+      "folder": "rTZbhhWgJJlUsz0q",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1751140619879,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "tNLgOK3NPEmKPT8N",
+      "sort": 100000,
+      "_key": "!items!tNLgOK3NPEmKPT8N"
+    },
+    {
+      "name": "This Is What We Planned For",
+      "type": "ability",
+      "img": "icons/tools/navigation/map-chart-tan.webp",
+      "system": {
+        "source": {
+          "book": "Heroes",
+          "page": "178",
+          "license": "Draw Steel Creator License"
+        },
+        "_dsid": "tactician-ability-8",
+        "keywords": [
+          "ranged"
+        ],
+        "type": "maneuver",
+        "category": "heroic",
+        "resource": 5,
+        "trigger": "",
+        "distance": {
+          "type": "ranged",
+          "primary": 10,
+          "secondary": 0,
+          "tertiary": null
+        },
+        "damageDisplay": "melee",
+        "target": {
+          "type": "ally",
+          "value": 2
+        },
+        "power": {
+          "roll": {
+            "formula": "@chr",
+            "characteristics": []
+          },
+          "effects": {}
+        },
+        "effect": {
+          "before": "",
+          "after": "<p>Each target who hasn\u2019t acted yet this round can take their turn in any order immediately after yours.</p>"
+        },
+        "spend": {
+          "value": null,
+          "text": ""
+        },
+        "story": "All those coordination drills you made them do finally pay off.",
+        "_source_level": 1,
+        "_is_selected": true,
+        "description": {
+          "value": "<p>All those coordination drills you made them do finally pay off.</p>",
+          "director": ""
+        }
+      },
+      "effects": [],
+      "folder": "qqy4D1GA6B5jsNJH",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.347",
+        "systemId": "draw-steel",
+        "systemVersion": "0.8.0",
+        "createdTime": 1751140784198,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      },
+      "_id": "eiwrW9TL342wPNea",
+      "sort": 0,
+      "_key": "!items!eiwrW9TL342wPNea"
+    }
+  ]
+}

@@ -1,0 +1,998 @@
+"""
+===============================================================================
+CONVERTER MODULES - INTERNAL USE ONLY
+===============================================================================
+
+These are internal modules for the forgesteel converter.
+DO NOT RUN THESE MODULES DIRECTLY!
+
+USE THE MAIN CONVERSION SCRIPT:
+    python forgesteel_converter.py input.ds-hero output.json
+
+See forgesteel_converter.py for proper usage instructions.
+===============================================================================
+"""
+
+import json
+import os
+import urllib.request
+import urllib.error
+import zipfile
+import tempfile
+import shutil
+import time
+import random
+from pathlib import Path
+from datetime import datetime
+
+# GitHub repository details for Draw Steel
+GITHUB_REPO = "MetaMorphic-Digital/draw-steel"
+GITHUB_BRANCH = "release-0.9.2"
+GITHUB_RELEASE_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+GITHUB_ZIP_URL = f"https://api.github.com/repos/{GITHUB_REPO}/zipball/{GITHUB_BRANCH}"
+GITHUB_RAW_URL = (
+    f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}/src/packs"
+)
+GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/contents/src/packs"
+VERSION_CACHE_FILE = Path.home() / ".cache" / "forgesteel-converter" / "version.json"
+ETAG_CACHE_FILE = Path.home() / ".cache" / "forgesteel-converter" / "etags.json"
+
+# Pack structure mapping for organized loading
+PACK_STRUCTURE = {
+    "ability": "abilities",
+    "ancestry": "origins/Ancestries",
+    "career": "origins/Backgrounds",
+    "culture": "origins/Backgrounds",
+    "class": "classes",
+    "perk": "character-options/Perks",
+    "project": "rewards/Downtime_Projects",
+    "treasure": "rewards/Treasures",
+    "subclass": "classes",
+    "complication": "character-options/Complications",
+    "kit": "character-options/Kits",
+    "feature": "monster-features",
+}
+
+
+def load_forgesteel_character(file_path):
+    """Loads a forgesteel character from a .ds-hero file."""
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _monitor_rate_limits(response, verbose=False):
+    """Monitors and reports GitHub API rate limits from response headers."""
+    try:
+        remaining = response.headers.get("X-RateLimit-Remaining")
+        limit = response.headers.get("X-RateLimit-Limit")
+        reset_time = response.headers.get("X-RateLimit-Reset")
+
+        if remaining and limit and verbose:
+            print(f"DEBUG: Rate limit: {remaining}/{limit} requests remaining")
+            if reset_time:
+                reset_datetime = datetime.fromtimestamp(int(reset_time))
+                print(f"DEBUG: Rate limit resets at: {reset_datetime}")
+
+            # Warn if running low on requests
+            if int(remaining) < 10:
+                print(f"WARNING: Low on API requests ({remaining} remaining)")
+
+    except Exception as e:
+        if verbose:
+            print(f"DEBUG: Could not parse rate limit headers: {e}")
+
+
+def _exponential_backoff_retry(attempt, max_attempts=3, base_delay=1):
+    """Implements exponential backoff with jitter for retrying failed requests."""
+    if attempt >= max_attempts:
+        return False
+
+    delay = base_delay * (2**attempt) + random.uniform(0, 1)
+    time.sleep(delay)
+    return True
+
+
+def make_github_request(url, timeout=10, max_retries=3, verbose=False):
+    """Makes a GitHub API request with rate limit monitoring and retry logic."""
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "forgesteel-converter",
+    }
+
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                _monitor_rate_limits(response, verbose)
+
+                # Check for rate limiting
+                if response.status == 429:
+                    if verbose:
+                        print("DEBUG: Rate limited, waiting with exponential backoff")
+                    if not _exponential_backoff_retry(attempt, max_retries):
+                        raise urllib.error.HTTPError(
+                            url, 429, "Rate limit exceeded", response.headers, None
+                        )
+                    continue
+
+                # Check for other HTTP errors
+                if response.status >= 400:
+                    raise urllib.error.HTTPError(
+                        url, response.status, response.reason, response.headers, None
+                    )
+
+                return response
+
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                if verbose:
+                    print(f"DEBUG: HTTP {e.code} on attempt {attempt + 1}, retrying...")
+                if not _exponential_backoff_retry(attempt, max_retries):
+                    raise
+            elif e.code >= 500 and attempt < max_retries - 1:
+                if verbose:
+                    print(
+                        f"DEBUG: Server error {e.code} on attempt {attempt + 1}, retrying..."
+                    )
+                if not _exponential_backoff_retry(attempt, max_retries):
+                    raise
+            else:
+                raise
+        except Exception as e:
+            if attempt < max_retries - 1:
+                if verbose:
+                    print(
+                        f"DEBUG: Request failed on attempt {attempt + 1}: {e}, retrying..."
+                    )
+                if not _exponential_backoff_retry(attempt, max_retries):
+                    raise
+            else:
+                raise
+
+    raise urllib.error.URLError("Max retries exceeded")
+
+
+def _get_latest_release_version():
+    """Gets the latest release version from GitHub."""
+    try:
+        response = make_github_request(GITHUB_RELEASE_API, timeout=10, verbose=False)
+        release_data = json.loads(response.read().decode("utf-8"))
+        return release_data.get("tag_name", "").lstrip("v")
+    except Exception as e:
+        if os.getenv("DEBUG"):
+            print(f"DEBUG: Could not get latest release version: {e}")
+        return None
+
+
+def _get_cached_version():
+    """Gets the cached version from local storage."""
+    try:
+        if VERSION_CACHE_FILE.exists():
+            with open(VERSION_CACHE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("version")
+    except Exception:
+        return None
+
+
+def _cache_version(version):
+    """Caches the version to local storage."""
+    try:
+        VERSION_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(VERSION_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump({"version": version, "cached_at": datetime.now().isoformat()}, f)
+    except Exception:
+        pass
+
+
+def _should_update_compendium(local_path, verbose=False):
+    """Checks if compendium should be updated based on version with better error handling."""
+
+    # Check if we have a newer release available
+    latest_version = _get_latest_release_version()
+    if not latest_version:
+        if verbose:
+            print(
+                "DEBUG: Could not determine latest version, will use cache/local only"
+            )
+        return False
+
+    cached_version = _get_cached_version()
+    if verbose:
+        print(
+            f"DEBUG: Latest version: {latest_version}, Cached version: {cached_version}"
+        )
+
+    # If we haven't cached a version, or versions don't match, we should update
+    if cached_version != latest_version:
+        if verbose:
+            print(
+                f"DEBUG: New version available: {latest_version} (cached: {cached_version})"
+            )
+        return True
+
+    # Check local compendium system versions if available
+    if local_path and Path(local_path).exists():
+        system_versions = []
+        try:
+            for root, _, files in os.walk(local_path):
+                for file in files:
+                    if file.endswith(".json"):
+                        try:
+                            file_path = os.path.join(root, file)
+                            with open(file_path, "r", encoding="utf-8") as f:
+                                data = json.load(f)
+                                if data.get("system", {}).get("systemVersion"):
+                                    system_versions.append(
+                                        data["system"]["systemVersion"]
+                                    )
+                        except (json.JSONDecodeError, UnicodeDecodeError, OSError):
+                            continue
+
+            if system_versions:
+                local_version = max(system_versions)
+                if verbose:
+                    print(f"DEBUG: Local compendium version: {local_version}")
+
+                # Simple version comparison (assumes semantic versioning)
+                if _version_compare(local_version, latest_version) < 0:
+                    if verbose:
+                        print(
+                            f"DEBUG: Local compendium {local_version} is older than latest {latest_version}"
+                        )
+                    return True
+        except Exception as e:
+            if verbose:
+                print(f"DEBUG: Error checking local versions: {e}")
+
+    return False
+
+
+def _version_compare(v1, v2):
+    """Compares two semantic version strings."""
+    try:
+
+        def normalize(v):
+            return [int(x) for x in v.split(".")]
+
+        return (normalize(v1) > normalize(v2)) - (normalize(v1) < normalize(v2))
+    except Exception:
+        return 0
+
+
+def _clear_cache():
+    """Clears the compendium cache to force refresh."""
+    try:
+        cache_dir = Path.home() / ".cache" / "forgesteel-converter" / "compendium"
+        if cache_dir.exists():
+            import shutil
+
+            shutil.rmtree(cache_dir)
+            VERSION_CACHE_FILE.unlink(missing_ok=True)
+    except Exception:
+        pass
+
+
+def _get_cached_etag(resource_url):
+    """Gets cached ETag for a GitHub resource URL."""
+    try:
+        if ETAG_CACHE_FILE.exists():
+            with open(ETAG_CACHE_FILE, "r", encoding="utf-8") as f:
+                etags = json.load(f)
+                return etags.get(resource_url)
+    except Exception:
+        pass
+    return None
+
+
+def _cache_etag(resource_url, etag):
+    """Caches ETag for a GitHub resource URL."""
+    try:
+        ETAG_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        etags = {}
+        if ETAG_CACHE_FILE.exists():
+            with open(ETAG_CACHE_FILE, "r", encoding="utf-8") as f:
+                etags = json.load(f)
+        etags[resource_url] = etag
+        with open(ETAG_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(etags, f)
+    except Exception:
+        pass
+
+
+def _fetch_github_files_as_zip(verbose=False, max_retries=3):
+    """Fetches entire Draw Steel repository as ZIP file to avoid API rate limits.
+
+    Uses conditional requests to avoid unnecessary downloads when repository hasn't changed.
+    Includes robust error handling and retry logic.
+
+    Returns a dict of {dsid: item_data} loaded from GitHub.
+    """
+    items = {}
+
+    if verbose:
+        print("DEBUG: Fetching compendium from GitHub (ZIP download)...")
+
+    for attempt in range(max_retries):
+        try:
+            # Check for cached ETag to use conditional request
+            cached_etag = _get_cached_etag(GITHUB_ZIP_URL)
+
+            headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "forgesteel-converter",
+            }
+
+            # Add conditional request header if we have a cached ETag
+            if cached_etag:
+                headers["If-None-Match"] = cached_etag
+                if verbose:
+                    print(f"DEBUG: Using conditional request with ETag: {cached_etag}")
+
+            req = urllib.request.Request(GITHUB_ZIP_URL, headers=headers)
+
+            try:
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    _monitor_rate_limits(response, verbose)
+
+                    # Check if we got a 304 Not Modified response
+                    if response.status == 304:
+                        if verbose:
+                            print(
+                                "DEBUG: Repository unchanged (304 Not Modified), using cache"
+                            )
+                        # Return items from cache directory
+                        cache_dir = (
+                            Path.home()
+                            / ".cache"
+                            / "forgesteel-converter"
+                            / "compendium"
+                        )
+                        if cache_dir.exists():
+                            cached_items = {}
+                            for file in cache_dir.glob("*.json"):
+                                _load_json_item(str(file), cached_items, verbose)
+                            if cached_items and verbose:
+                                print(
+                                    f"DEBUG: Loaded {len(cached_items)} items from cache"
+                                )
+                            return cached_items
+                        # If no cache exists, fall through to full download
+                        if verbose:
+                            print(
+                                "DEBUG: No cache available, proceeding with full download"
+                            )
+                    elif response.status == 429:
+                        if verbose:
+                            print("DEBUG: Rate limited, waiting before retry...")
+                        if not _exponential_backoff_retry(attempt, max_retries):
+                            break
+                        continue
+                    elif response.status != 200:
+                        if verbose:
+                            print(f"DEBUG: Unexpected status code: {response.status}")
+                        if attempt < max_retries - 1:
+                            if not _exponential_backoff_retry(attempt, max_retries):
+                                break
+                            continue
+                        else:
+                            raise urllib.error.HTTPError(
+                                GITHUB_ZIP_URL,
+                                response.status,
+                                f"HTTP {response.status}",
+                                response.headers,
+                                None,
+                            )
+
+                    # Cache the new ETag if available
+                    response_etag = response.headers.get("ETag")
+                    if response_etag:
+                        _cache_etag(GITHUB_ZIP_URL, response_etag)
+                        if verbose:
+                            print(f"DEBUG: Cached new ETag: {response_etag}")
+
+                    zip_data = response.read()
+
+            except urllib.error.HTTPError as e:
+                if e.code == 304:
+                    # Handle 304 Not Modified
+                    if verbose:
+                        print(
+                            "DEBUG: Repository unchanged (304 Not Modified), using cache"
+                        )
+                    cache_dir = (
+                        Path.home() / ".cache" / "forgesteel-converter" / "compendium"
+                    )
+                    if cache_dir.exists():
+                        cached_items = {}
+                        for file in cache_dir.glob("*.json"):
+                            _load_json_item(str(file), cached_items, verbose)
+                        if cached_items and verbose:
+                            print(f"DEBUG: Loaded {len(cached_items)} items from cache")
+                        return cached_items
+                    # If no cache, proceed with full download
+                    continue
+                elif e.code == 429:
+                    if verbose:
+                        print(
+                            f"DEBUG: Rate limited on attempt {attempt + 1}, retrying..."
+                        )
+                    if not _exponential_backoff_retry(attempt, max_retries):
+                        raise
+                    continue
+                else:
+                    # Re-raise other HTTP errors
+                    raise
+
+            # Process the ZIP data
+            items = _process_zip_data(zip_data, verbose)
+            if items:
+                if verbose:
+                    print(f"DEBUG: ZIP fetch complete: {len(items)} items loaded")
+                return items
+
+        except urllib.error.URLError as e:
+            if verbose:
+                print(f"DEBUG: Network error on attempt {attempt + 1}: {e}")
+            if attempt < max_retries - 1:
+                if not _exponential_backoff_retry(attempt, max_retries):
+                    break
+            else:
+                print(
+                    f"Warning: Could not fetch ZIP from GitHub after {max_retries} attempts: {e}"
+                )
+                if verbose:
+                    print("DEBUG: Falling back to API method...")
+                return _fetch_github_files_api(verbose)
+        except Exception as e:
+            if verbose:
+                print(f"DEBUG: Error on attempt {attempt + 1}: {e}")
+            if attempt < max_retries - 1:
+                if not _exponential_backoff_retry(attempt, max_retries):
+                    break
+            else:
+                print(
+                    f"Warning: Error fetching GitHub ZIP after {max_retries} attempts: {e}"
+                )
+                if verbose:
+                    print("DEBUG: Falling back to API method...")
+                return _fetch_github_files_api(verbose)
+
+    # If we get here, all retries failed
+    return {}
+
+
+def _process_zip_data(zip_data, verbose=False):
+    """Processes ZIP data content and extracts compendium items."""
+    items = {}
+
+    try:
+        # Extract to temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            zip_path = Path(temp_dir) / "repo.zip"
+            with open(zip_path, "wb") as f:
+                f.write(zip_data)
+
+            # Extract ZIP
+            try:
+                with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                    zip_ref.extractall(temp_dir)
+            except zipfile.BadZipFile as e:
+                if verbose:
+                    print(f"DEBUG: Invalid ZIP file: {e}")
+                return {}
+
+            # Find the extracted directory (GitHub ZIPs have variable prefix)
+            extracted_dirs = [
+                d
+                for d in Path(temp_dir).iterdir()
+                if d.is_dir() and d.name != "repo.zip"
+            ]
+            if not extracted_dirs:
+                if verbose:
+                    print("DEBUG: Could not find extracted repository directory")
+                return {}
+
+            repo_root = extracted_dirs[0]
+            packs_dir = repo_root / "src" / "packs"
+
+            if not packs_dir.exists():
+                if verbose:
+                    print("DEBUG: Could not find src/packs directory in repository")
+                return {}
+
+            # Process all JSON files in the packs directory
+            json_files_processed = 0
+            for json_file in packs_dir.rglob("*.json"):
+                # Skip files with empty names or invalid paths
+                if (
+                    not json_file
+                    or not json_file.name
+                    or json_file.name.startswith(".")
+                ):
+                    if verbose:
+                        print(f"DEBUG: Skipping invalid file: {json_file}")
+                    continue
+
+                try:
+                    with open(json_file, "r", encoding="utf-8") as f:
+                        file_data = json.load(f)
+                        if "_dsid" in file_data.get("system", {}):
+                            dsid = file_data["system"]["_dsid"]
+                            if dsid not in items:
+                                items[dsid] = file_data
+                                if verbose:
+                                    print(
+                                        f"DEBUG: Loaded {dsid} from {json_file.relative_to(repo_root)}"
+                                    )
+                except (json.JSONDecodeError, UnicodeDecodeError, OSError) as e:
+                    if verbose:
+                        print(f"DEBUG: Could not load {json_file.name}: {e}")
+                except Exception as e:
+                    if verbose:
+                        print(f"DEBUG: Unexpected error loading {json_file.name}: {e}")
+                json_files_processed += 1
+
+            if verbose:
+                print(
+                    f"DEBUG: Processed {json_files_processed} JSON files, loaded {len(items)} unique items"
+                )
+
+        return items
+
+    except Exception as e:
+        if verbose:
+            print(f"DEBUG: Error processing ZIP data: {e}")
+        return {}
+    except Exception as e:
+        print(f"Warning: Error fetching GitHub ZIP: {e}")
+        if verbose:
+            print("DEBUG: Falling back to API method...")
+        return _fetch_github_files_api(verbose)
+
+
+def _fetch_github_files_api(verbose=False):
+    """Fallback method: Fetches JSON files from Draw Steel GitHub repository using API.
+
+    Uses improved error handling and rate limit monitoring.
+
+    Returns a dict of {dsid: item_data} loaded from GitHub.
+    """
+    items = {}
+    items_loaded = 0
+
+    if verbose:
+        print("DEBUG: Fetching compendium from GitHub (API method)...")
+
+    try:
+        # Get list of pack directories with improved request handling
+        response = make_github_request(GITHUB_API_URL, timeout=10, verbose=verbose)
+        packs = json.loads(response.read().decode("utf-8"))
+
+        for pack in packs:
+            if pack["type"] != "dir":
+                continue
+
+            pack_name = pack["name"]
+            if verbose:
+                print(f"DEBUG: Fetching pack directory: {pack_name}")
+
+            # Recursively get files from this pack directory
+            _fetch_pack_files(pack["url"], items, pack_name, verbose)
+
+        if verbose:
+            print(f"DEBUG: GitHub fetch complete: {len(items)} items loaded")
+        return items
+
+    except urllib.error.URLError as e:
+        print(f"Warning: Network error fetching from GitHub: {e}")
+        return {}
+    except json.JSONDecodeError as e:
+        print(f"Warning: Invalid JSON response from GitHub: {e}")
+        return {}
+    except Exception as e:
+        print(f"Warning: Error fetching GitHub files: {e}")
+        return {}
+
+
+def _fetch_pack_files(api_url, items_dict, pack_name, verbose=False, depth=0):
+    """Recursively fetches JSON files from a GitHub API directory URL with improved error handling."""
+    if depth > 10:  # Increase depth limit for nested directories
+        return
+
+    try:
+        response = make_github_request(api_url, timeout=10, verbose=verbose)
+        items = json.loads(response.read().decode("utf-8"))
+
+        if verbose:
+            print(
+                f"DEBUG: Processing {len(items)} items in {pack_name} (depth {depth})"
+            )
+
+        for item in items:
+            if item["type"] == "file" and item["name"].endswith(".json"):
+                # Download the file
+                raw_url = item["download_url"]
+                try:
+                    with urllib.request.urlopen(raw_url, timeout=10) as file_response:
+                        file_data = json.loads(file_response.read().decode("utf-8"))
+                        if "_dsid" in file_data.get("system", {}):
+                            dsid = file_data["system"]["_dsid"]
+                            if dsid not in items_dict:
+                                items_dict[dsid] = file_data
+                                if verbose:
+                                    print(f"DEBUG: Loaded {dsid} from {item['name']}")
+                except (
+                    urllib.error.URLError,
+                    json.JSONDecodeError,
+                    UnicodeDecodeError,
+                ) as e:
+                    if verbose:
+                        print(f"DEBUG: Could not load {item['name']}: {e}")
+                except Exception as e:
+                    if verbose:
+                        print(f"DEBUG: Unexpected error loading {item['name']}: {e}")
+
+            elif item["type"] == "dir":
+                # Recurse into subdirectory
+                if verbose:
+                    print(f"DEBUG: Recursing into directory: {item['name']}")
+                _fetch_pack_files(
+                    item["url"], items_dict, pack_name, verbose, depth + 1
+                )
+
+    except urllib.error.URLError as e:
+        if verbose:
+            print(f"DEBUG: Could not access {pack_name} directory: {e}")
+    except json.JSONDecodeError as e:
+        if verbose:
+            print(f"DEBUG: Invalid JSON in {pack_name} directory listing: {e}")
+    except Exception as e:
+        if verbose:
+            print(f"DEBUG: Error processing {pack_name}: {e}")
+
+
+def _ensure_compendium_path(compendium_path):
+    """Ensures compendium path exists, fetching from GitHub if needed."""
+    compendium_path = Path(compendium_path)
+
+    # If local path exists, use it
+    if compendium_path.exists():
+        return str(compendium_path)
+
+    # Try cache
+    cache_dir = Path.home() / ".cache" / "forgesteel-converter" / "compendium"
+    if cache_dir.exists() and list(cache_dir.glob("*.json")):
+        return str(cache_dir)
+
+    # Return the default path anyway (will be handled by caller)
+    return str(compendium_path)
+
+
+def _organize_items_by_type(items):
+    """Organizes loaded items by type for efficient lookups."""
+    organized = {}
+    for dsid, item_data in items.items():
+        item_type = item_data.get("type", "unknown")
+        if item_type not in organized:
+            organized[item_type] = {}
+        organized[item_type][dsid] = item_data
+    return organized
+
+
+def _find_ancestries_directory(packs_path):
+    """Find the actual ancestries directory with ID suffix."""
+    origins_dir = packs_path / "origins"
+    if origins_dir.exists():
+        # Look for directory starting with "Ancestries"
+        for item in origins_dir.iterdir():
+            if item.is_dir() and item.name.startswith("Ancestries"):
+                return item
+    return None
+
+
+def _load_pack_items_from_directory(packs_path, target_pack=None, verbose=False):
+    """Loads items from a specific pack directory or all packs if target_pack is None."""
+    items = {}
+    packs_path = Path(packs_path)
+
+    if target_pack:
+        # Load specific pack
+        pack_dir = packs_path / target_pack
+        if pack_dir.exists():
+            if verbose:
+                print(f"DEBUG: Loading from pack: {target_pack}")
+            for json_file in pack_dir.rglob("*.json"):
+                _load_json_item(str(json_file), items, verbose)
+        elif verbose:
+            print(f"DEBUG: Pack directory not found: {pack_dir}")
+
+            # Special handling for ancestry-related packs with ID suffixes
+            if target_pack in ["ancestry", "ancestrytrait", "abilities", "ability"]:
+                ancestries_dir = _find_ancestries_directory(packs_path)
+                if ancestries_dir:
+                    if verbose:
+                        print(
+                            f"DEBUG: Found ancestries directory: {ancestries_dir.name}"
+                        )
+                        print(f"DEBUG: Searching {ancestries_dir} for items...")
+
+                    # Load all items from ancestry subdirectories
+                    for json_file in ancestries_dir.rglob("*.json"):
+                        _load_json_item(str(json_file), items, verbose)
+
+                    if verbose:
+                        print(
+                            f"DEBUG: Loaded {len(items)} items from ancestry directories"
+                        )
+                else:
+                    if verbose:
+                        print(f"DEBUG: No ancestries directory found")
+    else:
+        # Load all packs
+        if verbose:
+            print(f"DEBUG: Loading all packs from {packs_path}")
+        for root, _, files in os.walk(packs_path):
+            for file in files:
+                if file.endswith(".json"):
+                    file_path = os.path.join(root, file)
+                    _load_json_item(file_path, items, verbose)
+
+    return items
+
+
+def load_compendium_items(
+    compendium_path, verbose=False, force_update=False, target_types=None
+):
+    """Loads all items from the compendium packs with pack-aware optimization.
+
+    Uses a hybrid approach with version checking:
+    1. Check if newer version is available
+    2. If newer available or force_update, clear cache and fetch from GitHub
+    3. Local compendium (if available and up-to-date)
+    4. Cache (if available and up-to-date)
+    5. GitHub (with automatic caching)
+
+    When duplicate _dsids are encountered, prefers:
+    1. Non-heroic abilities (category not "heroic")
+    2. Items from basic/core compendium packs
+
+    Args:
+        compendium_path: Path to the draw_steel_repo/src/packs directory
+        verbose: Enable verbose logging for debugging
+        force_update: Force refresh from GitHub regardless of version
+        target_types: List of item types to load (e.g., ["ability", "ancestry"]). If None, loads all.
+
+    Returns:
+        dict: {dsid: item_data} and if target_types specified, also organized by type
+    """
+    items = {}
+    items_loaded = 0
+
+    compendium_path = Path(compendium_path)
+    cache_dir = Path.home() / ".cache" / "forgesteel-converter" / "compendium"
+
+    # Check if we should update the compendium
+    should_update = force_update or _should_update_compendium(
+        str(compendium_path), verbose
+    )
+
+    # If target_types specified, determine which packs to load
+    target_packs = None
+    if target_types:
+        target_packs = set(PACK_STRUCTURE.get(t, t) for t in target_types)
+        if verbose:
+            print(f"DEBUG: Target types {target_types} -> packs {target_packs}")
+
+    if should_update:
+        if verbose:
+            print("DEBUG: Updating compendium from latest version...")
+        _clear_cache()
+
+        # Fetch latest from GitHub
+        github_items = _fetch_github_files_as_zip(verbose)
+
+        if github_items:
+            # Cache the downloaded items
+            try:
+                cache_dir.mkdir(parents=True, exist_ok=True)
+                if verbose:
+                    print(f"DEBUG: Caching {len(github_items)} items to {cache_dir}")
+                for dsid, item_data in github_items.items():
+                    cache_file = cache_dir / f"{dsid}.json"
+                    with open(cache_file, "w", encoding="utf-8") as f:
+                        json.dump(item_data, f)
+
+                # Update version cache
+                latest_version = _get_latest_release_version()
+                if latest_version:
+                    _cache_version(latest_version)
+
+                if verbose:
+                    print(f"DEBUG: Cached {len(github_items)} items to {cache_dir}")
+            except Exception as e:
+                if verbose:
+                    print(f"DEBUG: Could not cache items: {e}")
+
+            items_loaded = len(github_items)
+            if verbose:
+                print(
+                    f"DEBUG: Compendium stats: {items_loaded} items loaded from GitHub"
+                )
+
+            # Return organized if target_types specified
+            if target_types:
+                return _organize_items_by_type(github_items)
+            return github_items
+
+    # Try local path first (if not updating)
+    if compendium_path.exists() and compendium_path.is_dir():
+        if verbose:
+            print(f"DEBUG: Loading local compendium from {compendium_path}")
+
+        if target_packs:
+            # Enhanced loading for target_types to handle nested directory structures
+            for target_type in target_types:
+                if verbose:
+                    print(f"DEBUG: Loading items for type: {target_type}")
+                
+                # Always search ancestry subdirectories for ability and ancestryTrait types
+                if target_type in ["ability", "ancestrytrait", "ancestry"]:
+                    ancestries_dir = _find_ancestries_directory(compendium_path)
+                    if ancestries_dir:
+                        if verbose:
+                            print(f"DEBUG: Searching ancestry directory for {target_type} items...")
+                        for json_file in ancestries_dir.rglob("*.json"):
+                            _load_json_item(str(json_file), items, verbose)
+                
+                # Also load from main packs
+                pack_name = PACK_STRUCTURE.get(target_type, target_type)
+                pack_items = _load_pack_items_from_directory(
+                    compendium_path, pack_name, verbose
+                )
+                items.update(pack_items)
+        else:
+# Load all packs
+                for root, _, files in os.walk(compendium_path):
+                    for file in files:
+                        if file.endswith(".json"):
+                            file_path = os.path.join(root, file)
+                            _load_json_item(file_path, items, verbose)
+
+if items:
+                items_loaded = len(items)
+                if verbose:
+                    print(
+                        f"DEBUG: Compendium stats: {items_loaded} items loaded from local"
+                    )
+
+                # Return organized if target_types specified
+                if target_types:
+                    return _organize_items_by_type(items)
+                return items
+
+    # Try cache next
+        if cache_dir.exists() and cache_dir.is_dir():
+        if verbose:
+            print(f"DEBUG: Loading compendium from cache...")
+
+        for file in cache_dir.glob("*.json"):
+            # Filter by type if target_types specified
+            if target_types:
+                try:
+                    with open(file, "r", encoding="utf-8") as f:
+                        item_data = json.load(f)
+                        item_type = item_data.get("type", "")
+                        if item_type in target_types:
+                            _load_json_item(str(file), items, verbose)
+                except Exception:
+                    continue
+            else:
+                _load_json_item(str(file), items, verbose)
+
+        if items:
+            items_loaded = len(items)
+            if verbose:
+                print(
+                    f"DEBUG: Compendium stats: {items_loaded} items loaded from cache"
+                )
+
+            # Return organized if target_types specified
+            if target_types:
+                return _organize_items_by_type(items)
+            return items
+
+    # Fall back to GitHub if nothing else worked
+    if verbose:
+        print(f"DEBUG: Local and cache not available, fetching from GitHub...")
+
+    github_items = _fetch_github_files_as_zip(verbose)
+
+    if github_items:
+        # Cache the downloaded items
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            for dsid, item_data in github_items.items():
+                cache_file = cache_dir / f"{dsid}.json"
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(item_data, f)
+
+            # Update version cache
+            latest_version = _get_latest_release_version()
+            if latest_version:
+                _cache_version(latest_version)
+
+            if verbose:
+                print(f"DEBUG: Cached {len(github_items)} items to {cache_dir}")
+        except Exception as e:
+            if verbose:
+                print(f"DEBUG: Could not cache items: {e}")
+
+        items_loaded = len(github_items)
+        if verbose:
+            print(f"DEBUG: Compendium stats: {items_loaded} items loaded from GitHub")
+
+        # Return organized if target_types specified
+        if target_types:
+            return _organize_items_by_type(github_items)
+        return github_items
+
+    # If nothing worked, return empty
+    print("Warning: Could not load compendium from local, cache, or GitHub")
+    return {}
+
+
+def _load_json_item(file_path, items_dict, verbose=False):
+    """Loads a single JSON item and adds it to items_dict."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            item_data = json.load(f)
+
+            # Fix action types to be lowercase for Foundry compatibility
+            if (
+                item_data.get("type") == "ability"
+                and "system" in item_data
+                and "type" in item_data["system"]
+            ):
+                current_type = item_data["system"]["type"]
+                if isinstance(current_type, str):
+                    item_data["system"]["type"] = current_type.lower()
+
+            if "_dsid" in item_data.get("system", {}):
+                dsid = item_data["system"]["_dsid"]
+                item_type = item_data.get("type", "")
+
+                # If we haven't seen this dsid yet, add it
+                if dsid not in items_dict:
+                    items_dict[dsid] = item_data
+                    if verbose:
+                        print(f"DEBUG: Loaded {dsid} ({item_type})")
+                else:
+                    existing_item = items_dict[dsid]
+                    existing_type = existing_item.get("type", "")
+
+                    # If different item types with same DSID, create separate entries
+                    if existing_type != item_type:
+                        # Create type-specific key to allow both to coexist
+                        type_specific_key = f"{dsid}_{item_type}"
+                        if verbose:
+                            print(
+                                f"DEBUG: Different types for {dsid}: keeping {existing_type} and adding {item_type} as {type_specific_key}"
+                            )
+                        items_dict[type_specific_key] = item_data
+                    else:
+                        # Same type, apply heroic preference logic
+                        existing_category = existing_item.get("system", {}).get(
+                            "category", ""
+                        )
+                        new_category = item_data.get("system", {}).get("category", "")
+
+                        # Prefer non-heroic (empty category) over heroic
+                        if existing_category == "heroic" and new_category != "heroic":
+                            if verbose:
+                                print(
+                                    f"DEBUG: Duplicate {dsid}: preferring {item_data.get('name')} (non-heroic) over existing (heroic)"
+                                )
+                            items_dict[dsid] = item_data
+    except json.JSONDecodeError:
+        print(f"Warning: Could not decode JSON from {file_path}")

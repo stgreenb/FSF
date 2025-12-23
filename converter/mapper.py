@@ -608,7 +608,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         skills_list = []
         for char in class_data["characteristics"]:
             if "skills" in char:
-                skills_list.extend(char.get("skills", []))
+                skills_list.extend([_normalize_skill_name(s) for s in char.get("skills", [])])
         if skills_list:
             # Add skills to hero section
             foundry_character["system"]["hero"]["skills"] = skills_list
@@ -720,7 +720,7 @@ def _normalize_skill_name(skill_name):
     """Convert skill name from Forgesteel format (Title Case) to Foundry format (camelCase)."""
     if not skill_name:
         return skill_name
-    
+
     # Special cases
     special_map = {
         "Read Person": "readPerson",
@@ -730,13 +730,23 @@ def _normalize_skill_name(skill_name):
         "Melee Free Strike": "meleeFreeStrike",
         "Ranged Free Strike": "rangedFreeStrike",
         "Stand Up": "standUp",
+        "Handle Animals": "handleAnimals",
     }
-    
+
     if skill_name in special_map:
         return special_map[skill_name]
-    
-    # General case: convert to lowercase
-    return skill_name.lower()
+
+    # General case: convert to camelCase
+    # Split by spaces and capitalize each word except the first
+    words = skill_name.split()
+    if not words:
+        return skill_name
+
+    # First word is lowercase, rest are capitalized
+    first_word = words[0].lower()
+    other_words = [word.capitalize() for word in words[1:]]
+
+    return first_word + "".join(other_words)
 
 
 def _populate_advancement_selections(character_data, source_data, compendium_items):
@@ -982,13 +992,13 @@ def _process_skills_from_advancements(character_data, source_data):
         if feature.get("type") == "Skill Choice":
             skills = feature.get("data", {}).get("selected", [])
             if skills:
-                collected_skills.extend(skills)
+                collected_skills.extend([_normalize_skill_name(s) for s in skills])
         elif feature.get("type") == "Multiple Features":
             for sub_feature in feature.get("data", {}).get("features", []):
                 if sub_feature.get("type") == "Skill Choice":
                     skills = sub_feature.get("data", {}).get("selected", [])
                     if skills:
-                        collected_skills.extend(skills)
+                        collected_skills.extend([_normalize_skill_name(s) for s in skills])
 
     # Extract skills from culture sections (language, environment, organization, upbringing)
     culture = source_data.get("culture", {})
@@ -999,7 +1009,7 @@ def _process_skills_from_advancements(character_data, source_data):
                 if section.get("type") == "Skill Choice":
                     skills = section.get("data", {}).get("selected", [])
                     if skills:
-                        collected_skills.extend(skills)
+                        collected_skills.extend([_normalize_skill_name(s) for s in skills])
     
     # Extract skills from subclass features (only selected subclass)
     class_data = source_data.get("class", {})
@@ -1015,14 +1025,14 @@ def _process_skills_from_advancements(character_data, source_data):
                     if feature.get("type") == "Skill Choice":
                         skills = feature.get("data", {}).get("selected", [])
                         if skills:
-                            collected_skills.extend(skills)
+                            collected_skills.extend([_normalize_skill_name(s) for s in skills])
                     # Check for nested features (like Multiple Features)
                     elif feature.get("type") == "Multiple Features":
                         for sub_feature in feature.get("data", {}).get("features", []):
                             if sub_feature.get("type") == "Skill Choice":
                                 skills = sub_feature.get("data", {}).get("selected", [])
                                 if skills:
-                                    collected_skills.extend(skills)
+                                    collected_skills.extend([_normalize_skill_name(s) for s in skills])
 
     # Extract skills from source character data (ancestry, culture, career, class)
     for data_type in ["ancestry", "culture", "career", "class"]:
@@ -1036,36 +1046,36 @@ def _process_skills_from_advancements(character_data, source_data):
                         if feature.get("type") == "Skill Choice":
                             skills = feature.get("data", {}).get("selected", [])
                             if skills:
-                                collected_skills.extend(skills)
+                                collected_skills.extend([_normalize_skill_name(s) for s in skills])
                         # Check for nested features (like Multiple Features)
                         elif feature.get("type") == "Multiple Features":
                             for sub_feature in feature.get("data", {}).get("features", []):
                                 if sub_feature.get("type") == "Skill Choice":
                                     skills = sub_feature.get("data", {}).get("selected", [])
                                     if skills:
-                                        collected_skills.extend(skills)
+                                        collected_skills.extend([_normalize_skill_name(s) for s in skills])
             else:
                 # Check for skill features (including nested ones)
                 for feature in data_section.get("features", []):
                     if feature.get("type") == "Skill Choice":
                         skills = feature.get("data", {}).get("selected", [])
                         if skills:
-                            collected_skills.extend(skills)
+                            collected_skills.extend([_normalize_skill_name(s) for s in skills])
                     # Check for nested features (like Multiple Features)
                     elif feature.get("type") == "Multiple Features":
                         for sub_feature in feature.get("data", {}).get("features", []):
                             if sub_feature.get("type") == "Skill Choice":
                                 skills = sub_feature.get("data", {}).get("selected", [])
                                 if skills:
-                                    collected_skills.extend(skills)
+                                    collected_skills.extend([_normalize_skill_name(s) for s in skills])
                     # Check skill choices in characteristics
                 if "characteristics" in data_section:
                     for char_feature in data_section["characteristics"]:
                         if "skills" in char_feature:
-                            collected_skills.extend(char_feature.get("skills", []))
+                            collected_skills.extend([_normalize_skill_name(s) for s in char_feature.get("skills", [])])
                 # Check for direct skills array
                 if "skills" in data_section:
-                    collected_skills.extend(data_section["skills"])
+                    collected_skills.extend([_normalize_skill_name(s) for s in data_section["skills"]])
     
     # Also check converted items for advancements (for compendium items)
     for item in character_data.get("items", []):
@@ -1074,7 +1084,7 @@ def _process_skills_from_advancements(character_data, source_data):
                 if advancement.get("type") == "skill":
                     # Check if there's a selected field
                     if "selected" in advancement:
-                        collected_skills.extend(advancement["selected"])
+                        collected_skills.extend([_normalize_skill_name(s) for s in advancement["selected"]])
     
     # Add skills to hero section (avoid duplicates)
     if collected_skills:
