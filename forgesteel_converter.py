@@ -25,7 +25,7 @@ from converter.mapper import convert_character
 from converter.writer import write_foundry_character
 
 # Version
-__version__ = "1.7.0"
+__version__ = "1.8.0"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
