@@ -13,7 +13,15 @@ The easiest way to use the converter is the graphical interface. No experience r
 3. Select **Download ZIP**
 4. Open the downloaded `.zip` file and **extract all** to a folder of your choice (e.g. your Desktop or Documents)
 
-### Step 2: Run
+### Step 2: Unblock the Script
+
+Windows may block files downloaded from the internet. Before running:
+
+1. Right-click **`Run-ForgesteelGUI.ps1`** and select **Properties**
+2. At the bottom of the General tab, check the **Unblock** checkbox
+3. Click **Apply** then **OK**
+
+### Step 3: Run
 
 1. Open the extracted folder
 2. Right-click **`Run-ForgesteelGUI.ps1`** and select **"Run with PowerShell"**
