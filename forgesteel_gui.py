@@ -361,9 +361,15 @@ class ForgesteelGUI(tk.Tk):
     # Logger
     # ------------------------------------------------------------------
     def _attach_logger(self):
+        root_logger = logging.getLogger()
+
+        # Remove any existing TextHandler instances to avoid duplicate log messages
+        root_logger.handlers = [
+            h for h in root_logger.handlers if not isinstance(h, TextHandler)
+        ]
+
         handler = TextHandler(self.log_text)
         handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-        root_logger = logging.getLogger()
         root_logger.addHandler(handler)
         root_logger.setLevel(logging.INFO)
 
