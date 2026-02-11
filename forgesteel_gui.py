@@ -8,7 +8,6 @@ from tkinter import ttk, filedialog, messagebox
 import threading
 import logging
 import json
-import sys
 from pathlib import Path
 
 from converter.loader import load_forgesteel_character, load_compendium_items
