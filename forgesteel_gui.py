@@ -37,6 +37,45 @@ HELP_BTN = "#bb9af7"
 HELP_BTN_HOVER = "#cba6ff"
 
 
+def _resolve_fonts():
+    """Pick the first available font families, falling back to universal defaults."""
+    try:
+        import tkinter.font as tkfont
+        _probe = tk.Tk()
+        _probe.withdraw()
+        available = set(tkfont.families())
+        _probe.destroy()
+    except Exception:
+        available = set()
+
+    ui = "TkDefaultFont"
+    for candidate in ("Segoe UI", "Helvetica Neue", "Helvetica", "Arial", "DejaVu Sans"):
+        if candidate in available:
+            ui = candidate
+            break
+
+    mono = "TkFixedFont"
+    for candidate in ("Consolas", "SF Mono", "DejaVu Sans Mono", "Liberation Mono", "Courier New"):
+        if candidate in available:
+            mono = candidate
+            break
+
+    return ui, mono
+
+
+FONT_FAMILY, MONO_FAMILY = _resolve_fonts()
+FONT = (FONT_FAMILY, 10)
+FONT_SM = (FONT_FAMILY, 9)
+FONT_LG = (FONT_FAMILY, 12)
+FONT_BOLD = (FONT_FAMILY, 10, "bold")
+FONT_BOLD_SM = (FONT_FAMILY, 9, "bold")
+FONT_BOLD_LG = (FONT_FAMILY, 11, "bold")
+FONT_BOLD_XL = (FONT_FAMILY, 14, "bold")
+FONT_HEADER = (FONT_FAMILY, 18, "bold")
+MONO = (MONO_FAMILY, 10)
+MONO_SM = (MONO_FAMILY, 9)
+
+
 class TextHandler(logging.Handler):
     """Route log records into a Tkinter Text widget."""
 
@@ -82,7 +121,7 @@ class HoverButton(tk.Canvas):
         width=160,
         height=38,
         radius=8,
-        font=("Segoe UI Semibold", 10),
+        font=FONT_BOLD,
         **kw,
     ):
         # Resolve parent background: try tk widget key, fall back to default
@@ -187,16 +226,16 @@ class ForgesteelGUI(tk.Tk):
         style.configure(".", background=BG_DARK, foreground=FG_PRIMARY, fieldbackground=BG_INPUT)
         style.configure("TFrame", background=BG_DARK)
         style.configure("Card.TFrame", background=BG_CARD)
-        style.configure("TLabel", background=BG_DARK, foreground=FG_PRIMARY, font=("Segoe UI", 10))
-        style.configure("Card.TLabel", background=BG_CARD, foreground=FG_PRIMARY, font=("Segoe UI", 10))
-        style.configure("Header.TLabel", background=BG_DARK, foreground=FG_ACCENT, font=("Segoe UI Semibold", 18))
-        style.configure("Sub.TLabel", background=BG_DARK, foreground=FG_DIM, font=("Segoe UI", 9))
-        style.configure("Section.TLabel", background=BG_DARK, foreground=FG_ACCENT, font=("Segoe UI Semibold", 11))
+        style.configure("TLabel", background=BG_DARK, foreground=FG_PRIMARY, font=FONT)
+        style.configure("Card.TLabel", background=BG_CARD, foreground=FG_PRIMARY, font=FONT)
+        style.configure("Header.TLabel", background=BG_DARK, foreground=FG_ACCENT, font=FONT_HEADER)
+        style.configure("Sub.TLabel", background=BG_DARK, foreground=FG_DIM, font=FONT_SM)
+        style.configure("Section.TLabel", background=BG_DARK, foreground=FG_ACCENT, font=FONT_BOLD_LG)
         style.configure(
             "TCheckbutton",
             background=BG_CARD,
             foreground=FG_PRIMARY,
-            font=("Segoe UI", 10),
+            font=FONT,
             indicatorcolor=BG_INPUT,
         )
         style.map(
@@ -231,7 +270,7 @@ class ForgesteelGUI(tk.Tk):
             width=36,
             height=36,
             radius=18,
-            font=("Segoe UI Bold", 14),
+            font=FONT_BOLD_XL,
         )
         self.help_btn.pack(side="right")
 
@@ -248,31 +287,31 @@ class ForgesteelGUI(tk.Tk):
         # Input row
         ttk.Label(file_card, text="Input file", style="Card.TLabel").grid(row=0, column=0, sticky="w", padx=(0, 12))
         self.input_var = tk.StringVar()
-        inp_entry = ttk.Entry(file_card, textvariable=self.input_var, font=("Consolas", 10))
+        inp_entry = ttk.Entry(file_card, textvariable=self.input_var, font=MONO)
         inp_entry.grid(row=0, column=1, sticky="ew", ipady=4)
         inp_browse = HoverButton(
             file_card, text="Browse\u2026", command=self._browse_input, canvas_bg=BG_CARD,
-            width=90, height=32, radius=6, font=("Segoe UI", 9),
+            width=90, height=32, radius=6, font=FONT_SM,
         )
         inp_browse.grid(row=0, column=2, padx=(8, 0))
 
         ext_lbl = ttk.Label(file_card, text=".ds-hero", style="Card.TLabel", foreground=FG_DIM,
-                            font=("Consolas", 9))
+                            font=MONO_SM)
         ext_lbl.grid(row=1, column=1, sticky="w", pady=(2, 8))
 
         # Output row
         ttk.Label(file_card, text="Output file", style="Card.TLabel").grid(row=2, column=0, sticky="w", padx=(0, 12))
         self.output_var = tk.StringVar()
-        out_entry = ttk.Entry(file_card, textvariable=self.output_var, font=("Consolas", 10))
+        out_entry = ttk.Entry(file_card, textvariable=self.output_var, font=MONO)
         out_entry.grid(row=2, column=1, sticky="ew", ipady=4)
         out_browse = HoverButton(
             file_card, text="Browse\u2026", command=self._browse_output, canvas_bg=BG_CARD,
-            width=90, height=32, radius=6, font=("Segoe UI", 9),
+            width=90, height=32, radius=6, font=FONT_SM,
         )
         out_browse.grid(row=2, column=2, padx=(8, 0))
 
         ext_lbl2 = ttk.Label(file_card, text=".json", style="Card.TLabel", foreground=FG_DIM,
-                             font=("Consolas", 9))
+                             font=MONO_SM)
         ext_lbl2.grid(row=3, column=1, sticky="w", pady=(2, 0))
 
         # ---- Options card ----
@@ -306,11 +345,11 @@ class ForgesteelGUI(tk.Tk):
         ttk.Label(opt_card, text="Compendium path", style="Card.TLabel").grid(
             row=row, column=0, sticky="w", padx=(0, 12)
         )
-        comp_entry = ttk.Entry(opt_card, textvariable=self.compendium_var, font=("Consolas", 10))
+        comp_entry = ttk.Entry(opt_card, textvariable=self.compendium_var, font=MONO)
         comp_entry.grid(row=row, column=1, sticky="ew", ipady=4)
         comp_browse = HoverButton(
             opt_card, text="Browse\u2026", command=self._browse_compendium, canvas_bg=BG_CARD,
-            width=90, height=32, radius=6, font=("Segoe UI", 9),
+            width=90, height=32, radius=6, font=FONT_SM,
         )
         comp_browse.grid(row=row, column=2, padx=(8, 0))
 
@@ -326,7 +365,7 @@ class ForgesteelGUI(tk.Tk):
             width=180,
             height=42,
             radius=10,
-            font=("Segoe UI Semibold", 12),
+            font=FONT_LG,
         )
         self.convert_btn.pack(side="left")
 
@@ -344,7 +383,7 @@ class ForgesteelGUI(tk.Tk):
             bg=BG_INPUT,
             fg=FG_PRIMARY,
             insertbackground=FG_PRIMARY,
-            font=("Consolas", 9),
+            font=MONO_SM,
             wrap="word",
             state="disabled",
             borderwidth=0,
@@ -537,7 +576,7 @@ class ForgesteelGUI(tk.Tk):
             pad,
             bg=BG_MID,
             fg=FG_PRIMARY,
-            font=("Segoe UI", 10),
+            font=FONT,
             wrap="word",
             borderwidth=0,
             padx=14,
@@ -549,10 +588,10 @@ class ForgesteelGUI(tk.Tk):
         )
         txt.pack(fill="x")
 
-        txt.tag_configure("heading", foreground=FG_ACCENT, font=("Segoe UI Semibold", 11), spacing1=10)
-        txt.tag_configure("body", foreground=FG_PRIMARY, font=("Segoe UI", 10))
-        txt.tag_configure("dim", foreground=FG_DIM, font=("Segoe UI", 9))
-        txt.tag_configure("warn", foreground=FG_WARN, font=("Segoe UI", 10))
+        txt.tag_configure("heading", foreground=FG_ACCENT, font=FONT_BOLD_LG, spacing1=10)
+        txt.tag_configure("body", foreground=FG_PRIMARY, font=FONT)
+        txt.tag_configure("dim", foreground=FG_DIM, font=FONT_SM)
+        txt.tag_configure("warn", foreground=FG_WARN, font=FONT)
 
         sections = [
             ("heading", "Quick Start\n"),
@@ -622,7 +661,7 @@ class ForgesteelGUI(tk.Tk):
         close_frame.pack(fill="x", pady=(12, 0))
         close_btn = HoverButton(
             close_frame, text="Got it", command=win.destroy, canvas_bg=BG_DARK,
-            width=100, height=34, radius=8, font=("Segoe UI Semibold", 10),
+            width=100, height=34, radius=8, font=FONT_BOLD,
         )
         close_btn.pack(side="right")
 
