@@ -8,8 +8,6 @@ from tkinter import ttk, filedialog, messagebox
 import threading
 import logging
 import json
-import sys
-import os
 from pathlib import Path
 
 from converter.loader import load_forgesteel_character, load_compendium_items
@@ -210,6 +208,8 @@ class ForgesteelGUI(tk.Tk):
         try:
             self.iconbitmap(default="")
         except Exception:
+            # Some platforms or environments may not support setting a window icon;
+            # ignore these non-critical errors and proceed with the default icon.
             pass
 
         self._build_styles()
@@ -400,9 +400,15 @@ class ForgesteelGUI(tk.Tk):
     # Logger
     # ------------------------------------------------------------------
     def _attach_logger(self):
+        root_logger = logging.getLogger()
+
+        # Remove any existing TextHandler instances to avoid duplicate log messages
+        root_logger.handlers = [
+            h for h in root_logger.handlers if not isinstance(h, TextHandler)
+        ]
+
         handler = TextHandler(self.log_text)
         handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-        root_logger = logging.getLogger()
         root_logger.addHandler(handler)
         root_logger.setLevel(logging.INFO)
 
