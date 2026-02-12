@@ -643,7 +643,7 @@ class ForgesteelGUI(tk.Tk):
             ("heading", "Compendium Sources\n"),
             ("body", "The converter searches for data in this order:\n"),
             ("body", "  1. Local directory (compendium path)\n"),
-            ("body", "  2. Cached files (~/.cache/forgesteel-converter/)\n"),
+            ("body", "  2. Cached files (~/.cache/forgesteel-converter/compendium)\n"),
             ("body", "  3. GitHub (MetaMorphic-Digital/draw-steel)\n\n"),
 
             ("heading", "GitHub Rate Limits\n"),
