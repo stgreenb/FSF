@@ -48,17 +48,19 @@ def _get_github_headers():
 def _log_http_error(operation, e, verbose=False):
     """Log HTTP errors with useful diagnostic information."""
     error_msg = f"HTTP error during {operation}"
-    if hasattr(e, 'code'):
+    if hasattr(e, "code"):
         error_msg += f": HTTP {e.code}"
-    if hasattr(e, 'reason'):
+    if hasattr(e, "reason"):
         error_msg += f" - {e.reason}"
 
     # Common GitHub API error codes
-    if hasattr(e, 'code'):
+    if hasattr(e, "code"):
         if e.code == 403:
             error_msg += " (rate limit exceeded or unauthenticated request blocked)"
             if verbose:
-                print("DEBUG: To increase rate limit, set GITHUB_TOKEN environment variable")
+                print(
+                    "DEBUG: To increase rate limit, set GITHUB_TOKEN environment variable"
+                )
         elif e.code == 401:
             error_msg += " (invalid or expired token)"
         elif e.code == 404:
@@ -179,13 +181,15 @@ def _fetch_from_release_zipball(release_tag, verbose=False):
 
     try:
         # Construct the zipball URL
-        zipball_url = f"https://github.com/{GITHUB_REPO}/archive/refs/tags/{release_tag}.zip"
+        zipball_url = (
+            f"https://github.com/{GITHUB_REPO}/archive/refs/tags/{release_tag}.zip"
+        )
 
         if verbose:
             print(f"DEBUG: Downloading release zipball from {zipball_url}")
 
         # Download the zipball
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as temp_file:
             req = urllib.request.Request(
                 zipball_url,
                 headers={
@@ -203,7 +207,7 @@ def _fetch_from_release_zipball(release_tag, verbose=False):
             if verbose:
                 print(f"DEBUG: Extracting zipball to {temp_dir}")
 
-            with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
+            with zipfile.ZipFile(temp_zip_path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
 
             # Find the extracted directory (it will have a name like "draw-steel-release-0.9.2")
@@ -249,7 +253,9 @@ def _fetch_from_release_zipball(release_tag, verbose=False):
             pass
 
 
-def _fetch_pack_files(api_url, items_dict, pack_name, verbose=False, depth=0, release_tag=None):
+def _fetch_pack_files(
+    api_url, items_dict, pack_name, verbose=False, depth=0, release_tag=None
+):
     """Recursively fetches JSON files from a GitHub API directory URL."""
     if depth > 10:  # Increase depth limit for nested directories
         return
@@ -418,7 +424,9 @@ def load_compendium_items(
     # If nothing worked, return empty with helpful guidance
     print("Warning: Could not load compendium from local, cache, or GitHub")
     print("  - Ensure the local path exists: --compendium /path/to/packs")
-    print("  - Download zip from GitHub (Code > Download ZIP), extract, and point --compendium to src/packs")
+    print(
+        "  - Download zip from GitHub (Code > Download ZIP), extract, and point --compendium to src/packs"
+    )
     print("  - Or set GITHUB_TOKEN environment variable for higher rate limits")
     print("  - Or use --update-compendium (-u) to refresh cached data")
     return {}
@@ -430,15 +438,8 @@ def _load_json_item(file_path, items_dict, verbose=False):
         with open(file_path, "r", encoding="utf-8") as f:
             item_data = json.load(f)
 
-            # Fix action types to be lowercase for Foundry compatibility
-            if (
-                item_data.get("type") == "ability"
-                and "system" in item_data
-                and "type" in item_data["system"]
-            ):
-                current_type = item_data["system"]["type"]
-                if isinstance(current_type, str):
-                    item_data["system"]["type"] = current_type.lower()
+            # Note: Don't convert system.type to lowercase - Foundry expects camelCase
+            # (e.g., "freeTriggered", "freeManeuver", not "freetriggered", "freemaneuver")
 
             if "_dsid" in item_data.get("system", {}):
                 dsid = item_data["system"]["_dsid"]
@@ -457,7 +458,9 @@ def _load_json_item(file_path, items_dict, verbose=False):
                     if existing_type != item_type:
                         unique_key = item_id  # Use the unique _id instead
                         if verbose:
-                            print(f"DEBUG: Collision for {dsid} - using _id {item_id} for {item_type}")
+                            print(
+                                f"DEBUG: Collision for {dsid} - using _id {item_id} for {item_type}"
+                            )
 
                 # If we haven't seen this key yet, add it
                 if unique_key not in items_dict:
