@@ -131,9 +131,13 @@ def _convert_feature(feature_data, item_type, compendium_items):
     # If not found by type+name, try variations by removing punctuation using text normalizer
     if not compendium_item and name:
         sanitized_name = TextNormalizer.sanitize_for_compendium_lookup(name)
-        for item_name, item in compendium_items.items():
-            item_sanitized = TextNormalizer.sanitize_for_compendium_lookup(item_name)
-            if item_sanitized == sanitized_name:
+        for item_key, item in compendium_items.items():
+            # Check both the key (dsid) and the item's name
+            key_sanitized = TextNormalizer.sanitize_for_compendium_lookup(item_key)
+            item_name_sanitized = TextNormalizer.sanitize_for_compendium_lookup(
+                item.get("name", "")
+            )
+            if key_sanitized == sanitized_name or item_name_sanitized == sanitized_name:
                 compendium_item = item
                 break
 
