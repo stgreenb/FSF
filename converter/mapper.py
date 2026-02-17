@@ -674,11 +674,49 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                     if feature_type == "Domain Feature":
                         selected_items = feature_data.get("selected", [])
                         for selected_item in selected_items:
-                            item = _convert_feature(
-                                selected_item, "ability", compendium_items
-                            )
-                            if item:
-                                foundry_character["items"].append(item)
+                            # Check if selected item is a Multiple Features container
+                            if selected_item.get("type") == "Multiple Features":
+                                nested_features = selected_item.get("data", {}).get(
+                                    "features", []
+                                )
+                                for nested_feature in nested_features:
+                                    nested_type = nested_feature.get("type")
+                                    if nested_type in [
+                                        "Skill Choice",
+                                        "Bonus",
+                                        "Characteristic Bonus",
+                                        "Proficiency",
+                                        "Ability Damage",
+                                    ]:
+                                        continue
+                                    if nested_type == "Ability":
+                                        ability_data = nested_feature.get(
+                                            "data", {}
+                                        ).get("ability", nested_feature)
+                                        reconstructed = {
+                                            "name": ability_data.get("name"),
+                                            "description": ability_data.get(
+                                                "description"
+                                            ),
+                                            "data": {"ability": ability_data},
+                                        }
+                                        item = _convert_feature(
+                                            reconstructed, "ability", compendium_items
+                                        )
+                                    elif nested_type == "Text":
+                                        item = _convert_feature(
+                                            nested_feature, "feature", compendium_items
+                                        )
+                                    else:
+                                        continue
+                                    if item:
+                                        foundry_character["items"].append(item)
+                            else:
+                                item = _convert_feature(
+                                    selected_item, "ability", compendium_items
+                                )
+                                if item:
+                                    foundry_character["items"].append(item)
                         continue
 
                     # Skip other framework/container features that don't represent actual content
@@ -730,16 +768,26 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 foundry_character["items"].append(item)
                         continue
                     elif feature_type == "Multiple Features":
-                        # Process Multiple Features to extract nested abilities
+                        # Process Multiple Features to extract nested items
                         nested_features = feature_data.get("features", [])
                         for nested_feature in nested_features:
-                            if nested_feature.get("type") == "Ability":
+                            nested_type = nested_feature.get("type")
+
+                            # Skip placeholder/framework types
+                            if nested_type in [
+                                "Skill Choice",
+                                "Bonus",
+                                "Characteristic Bonus",
+                                "Proficiency",
+                                "Ability Damage",
+                            ]:
+                                continue
+
+                            if nested_type == "Ability":
                                 # Extract the actual ability data from nested structure
-                                # Create a proper feature structure that matches what _convert_feature expects
                                 ability_data = nested_feature.get("data", {}).get(
                                     "ability", nested_feature
                                 )
-                                # Reconstruct the feature structure with proper data nesting
                                 reconstructed_feature = {
                                     "name": ability_data.get("name"),
                                     "description": ability_data.get("description"),
@@ -747,6 +795,13 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 }
                                 item = _convert_feature(
                                     reconstructed_feature, "ability", compendium_items
+                                )
+                                if item:
+                                    foundry_character["items"].append(item)
+                            elif nested_type == "Text":
+                                # Text features should be converted as features
+                                item = _convert_feature(
+                                    nested_feature, "feature", compendium_items
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
@@ -843,17 +898,26 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                         selected_kits.extend(feature_data.get("selected", []))
                         continue
 
-                    # Process Multiple Features to extract nested abilities
+                    # Process Multiple Features to extract nested items
                     if feature_type == "Multiple Features":
                         nested_features = feature_data.get("features", [])
                         for nested_feature in nested_features:
-                            if nested_feature.get("type") == "Ability":
-                                # Extract the actual ability data from nested structure
-                                # Create a proper feature structure that matches what _convert_feature expects
+                            nested_type = nested_feature.get("type")
+
+                            # Skip placeholder/framework types
+                            if nested_type in [
+                                "Skill Choice",
+                                "Bonus",
+                                "Characteristic Bonus",
+                                "Proficiency",
+                                "Ability Damage",
+                            ]:
+                                continue
+
+                            if nested_type == "Ability":
                                 ability_data = nested_feature.get("data", {}).get(
                                     "ability", nested_feature
                                 )
-                                # Reconstruct the feature structure with proper data nesting
                                 reconstructed_feature = {
                                     "name": ability_data.get("name"),
                                     "description": ability_data.get("description"),
@@ -861,6 +925,12 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 }
                                 item = _convert_feature(
                                     reconstructed_feature, "ability", compendium_items
+                                )
+                                if item:
+                                    foundry_character["items"].append(item)
+                            elif nested_type == "Text":
+                                item = _convert_feature(
+                                    nested_feature, "feature", compendium_items
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
