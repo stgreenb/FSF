@@ -144,6 +144,12 @@ def _convert_feature(feature_data, item_type, compendium_items):
     if compendium_item:
         item_copy = compendium_item.copy()
 
+        # Remove compendium-specific fields that shouldn't be in imported items
+        item_copy.pop("_key", None)
+        item_copy.pop("folder", None)
+        # Remove _id so writer generates a fresh one
+        item_copy.pop("_id", None)
+
         # Apply description transfer to ensure proper Foundry format
         from converter.description_transfer import DescriptionTransfer
 
@@ -457,6 +463,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                     == pool_item["uuid"]
                                 ):
                                     item_copy = comp_item.copy()
+                                    # Remove compendium-specific fields
+                                    item_copy.pop("_id", None)
+                                    item_copy.pop("_key", None)
+                                    item_copy.pop("folder", None)
                                     foundry_character["items"].append(item_copy)
                                     added_item = item_copy
                                     break
@@ -484,6 +494,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             and comp_item.get("type") == item_type
                         ):
                             item = comp_item.copy()
+                            # Remove compendium-specific fields
+                            item.pop("_id", None)
+                            item.pop("_key", None)
+                            item.pop("folder", None)
                             break
 
                     # If not found in compendium, create from feature data
@@ -526,6 +540,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                                 ):
                                                     ability_copy = comp_item.copy()
                                                     ability_copy["type"] = "ability"
+                                                    # Remove compendium-specific fields
+                                                    ability_copy.pop("_id", None)
+                                                    ability_copy.pop("_key", None)
+                                                    ability_copy.pop("folder", None)
                                                     # Ensure action type is lowercase for Foundry compatibility
                                                     if (
                                                         "system" in ability_copy
@@ -1050,6 +1068,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                     ):
                                         ability_copy = comp_item.copy()
                                         ability_copy["type"] = "ability"
+                                        # Remove compendium-specific fields
+                                        ability_copy.pop("_id", None)
+                                        ability_copy.pop("_key", None)
+                                        ability_copy.pop("folder", None)
                                         # Ensure action type is lowercase for Foundry compatibility
                                         if (
                                             "system" in ability_copy
@@ -1185,6 +1207,10 @@ def _process_item_advancements(item, compendium_items, foundry_character):
                         ):
                             ability_copy = comp_item.copy()
                             ability_copy["type"] = "ability"
+                            # Remove compendium-specific fields
+                            ability_copy.pop("_id", None)
+                            ability_copy.pop("_key", None)
+                            ability_copy.pop("folder", None)
                             # Ensure action type is lowercase for Foundry compatibility
                             if (
                                 "system" in ability_copy
@@ -1278,6 +1304,10 @@ def _process_choice_advancement(
                             item_copy["type"] = (
                                 "ability"  # Ensure it's marked as ability
                             )
+                            # Remove compendium-specific fields
+                            item_copy.pop("_id", None)
+                            item_copy.pop("_key", None)
+                            item_copy.pop("folder", None)
                             # Ensure action type is lowercase for Foundry compatibility
                             if "system" in item_copy and "type" in item_copy["system"]:
                                 current_type = item_copy["system"]["type"]
