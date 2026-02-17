@@ -143,9 +143,6 @@ def _convert_feature(feature_data, item_type, compendium_items):
 
     if compendium_item:
         item_copy = compendium_item.copy()
-        # Override type to match what was requested (in case we found by name but different type)
-        if item_copy.get("type") != item_type:
-            item_copy["type"] = item_type
 
         # Apply description transfer to ensure proper Foundry format
         from converter.description_transfer import DescriptionTransfer
@@ -157,22 +154,8 @@ def _convert_feature(feature_data, item_type, compendium_items):
             item_copy["system"] = {}
         item_copy["system"]["description"] = {"value": description, "director": ""}
 
-        # Override action type from source data for abilities
-        if item_type == "ability":
-            # Handle both wrapped data structures: {"data": {"ability": {...}}} and direct ability objects
-            ability_data = None
-            if "data" in feature_data and "ability" in feature_data["data"]:
-                ability_data = feature_data["data"]["ability"]
-            elif "type" in feature_data and "usage" in feature_data.get("type", {}):
-                # This is a direct ability object
-                ability_data = feature_data
-
-            if ability_data:
-                source_action_type = ability_data.get("type", {}).get("usage", "main")
-                if source_action_type:
-                    # Map source action types to Foundry's expected lowercase values
-                    mapped_action_type = _map_action_type(source_action_type)
-                    item_copy["system"]["type"] = mapped_action_type
+        # Don't override system.type - use the compendium's value which is correct
+        # The compendium has the proper Foundry format (e.g., "freeTriggered" not "triggered")
 
         return item_copy
 
