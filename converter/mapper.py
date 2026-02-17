@@ -1626,6 +1626,39 @@ def _process_skills_from_advancements(character_data, source_data):
                                         collected_skills.extend(
                                             [_normalize_skill_name(s) for s in skills]
                                         )
+                        # Check for Domain features with selected items that have their own featuresByLevel
+                        elif feature.get("type") == "Domain":
+                            for selected_domain in feature.get("data", {}).get(
+                                "selected", []
+                            ):
+                                for domain_level_data in selected_domain.get(
+                                    "featuresByLevel", []
+                                ):
+                                    for domain_feature in domain_level_data.get(
+                                        "features", []
+                                    ):
+                                        # Handle Multiple Features inside Domain
+                                        if (
+                                            domain_feature.get("type")
+                                            == "Multiple Features"
+                                        ):
+                                            for sub_feature in domain_feature.get(
+                                                "data", {}
+                                            ).get("features", []):
+                                                if (
+                                                    sub_feature.get("type")
+                                                    == "Skill Choice"
+                                                ):
+                                                    skills = sub_feature.get(
+                                                        "data", {}
+                                                    ).get("selected", [])
+                                                    if skills:
+                                                        collected_skills.extend(
+                                                            [
+                                                                _normalize_skill_name(s)
+                                                                for s in skills
+                                                            ]
+                                                        )
             else:
                 # Check for skill features (including nested ones)
                 for feature in data_section.get("features", []):
