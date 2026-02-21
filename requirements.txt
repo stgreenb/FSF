@@ -1,0 +1,11 @@
+# Forgesteel to Foundry VTT Converter
+# Python 3.6+ required
+#
+# This project uses only Python standard library modules.
+# No third-party packages are needed.
+#
+# tkinter is required for the GUI and is included with
+# standard Python installations on Windows. If you are
+# on Linux, you may need to install it separately:
+#   sudo apt-get install python3-tk  (Debian/Ubuntu)
+#   sudo dnf install python3-tkinter (Fedora)

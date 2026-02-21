@@ -2,7 +2,49 @@
 
 Convert Draw Steel characters from Forgesteel (.ds-hero files) into Foundry Virtual Tabletop format for the Draw Steel system module.
 
-## Quick Start
+## Quick Start (GUI - Recommended)
+
+The easiest way to use the converter is the graphical interface. No experience required.
+
+### Step 1: Download
+
+1. Go to the GitHub repository page
+2. Click the green **Code** button near the top-right
+3. Select **Download ZIP**
+4. Open the downloaded `.zip` file and **extract all** to a folder of your choice (e.g. your Desktop or Documents)
+
+### Step 2: Unblock the Script
+
+Windows may block files downloaded from the internet. Before running:
+
+1. Right-click **`Run-ForgesteelGUI.ps1`** and select **Properties**
+2. At the bottom of the General tab, check the **Unblock** checkbox
+3. Click **Apply** then **OK**
+
+### Step 3: Run
+
+1. Open the extracted folder
+2. Right-click **`Run-ForgesteelGUI.ps1`** and select **"Run with PowerShell"**
+3. The script will automatically:
+   - Check if Python is installed (and install it for you if it isn't)
+   - Install any dependencies
+   - Launch the GUI
+4. Browse for your `.ds-hero` file, set an output path, and click **Convert**
+
+> **First time running a PowerShell script?** If you get an "execution policy" warning, open PowerShell as Administrator and run:
+> ```powershell
+> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+> Then try right-clicking the script again. You only need to do this once.
+
+### Manual GUI Launch
+
+If you already have Python 3.6+ installed you can skip the PowerShell launcher:
+```bash
+python forgesteel_gui.py
+```
+
+## Quick Start (Command Line)
 
 **Use ONLY this command:**
 ```bash
@@ -13,8 +55,10 @@ python forgesteel_converter.py your_character.ds-hero converted_character.json
 
 ## Installation
 
-1. Clone or download this repository
+1. Download the repository as a ZIP (green **Code** button > **Download ZIP**) and extract it, or clone it with `git clone`
 2. Install Python 3.6+ (if not already installed)
+   - **Windows (easy):** Just run `Run-ForgesteelGUI.ps1` — it handles everything
+   - **Manual:** Download from [python.org](https://www.python.org/downloads/) (check "Add Python to PATH" during install)
 
 The converter automatically fetches the Draw Steel compendium using a hybrid approach:
 - Local first (if you have `draw_steel_repo/src/packs` or specify `--compendium`)
@@ -22,6 +66,21 @@ The converter automatically fetches the Draw Steel compendium using a hybrid app
 - GitHub fallback (automatic, no setup required)
 
 ## Usage
+
+### GUI Mode
+
+Run **`Run-ForgesteelGUI.ps1`** (right-click > Run with PowerShell) or:
+```bash
+python forgesteel_gui.py
+```
+
+The GUI provides:
+- File browser for input/output selection
+- Checkboxes for verbose logging, strict mode, and force-update compendium
+- Live log output showing conversion progress
+- Built-in help dialog (click the **?** button)
+
+### Command Line Mode
 
 ```bash
 # Basic conversion
@@ -66,13 +125,20 @@ python forgesteel_converter.py character.ds-hero character.json --strict
 
 ## Troubleshooting
 
+**PowerShell won't run the script** - You may need to set the execution policy:
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**"Python was installed but cannot be found in PATH"** - Close the PowerShell window and run the script again. The new PATH takes effect in a fresh session.
+
 **"File not found"** - Verify the .ds-hero file path is correct
 
 **Compendium fetch fails** - Check internet connection or use local compendium with `--compendium`
 
-**Missing items** - Use `--verbose` to see lookup details
+**Missing items** - Use `--verbose` (CLI) or check **Verbose logging** (GUI) to see lookup details
 
-**GitHub API limit** - 60 requests/hour for unauthenticated users. Use local compendium for bulk conversions
+**GitHub API limit** - 60 requests/hour for unauthenticated users. Set a `GITHUB_TOKEN` environment variable for 5,000/hour, or use a local compendium for bulk conversions
 
 ## Dependencies
 
