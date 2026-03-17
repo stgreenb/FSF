@@ -150,6 +150,13 @@ def _convert_feature(feature_data, item_type, compendium_items):
         # Remove _id so writer generates a fresh one
         item_copy.pop("_id", None)
 
+        # Fix effect origin references - they should not point to compendium
+        for effect in item_copy.get("effects", []):
+            # Remove the origin field as it points to the compendium
+            effect.pop("origin", None)
+            # Remove _key from effects as it contains compendium references
+            effect.pop("_key", None)
+
         # Apply description transfer to ensure proper Foundry format
         from converter.description_transfer import DescriptionTransfer
 
@@ -343,6 +350,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                 "skills": [],
                 "preferredKit": None,
             },
+            "skills": {"value": {}},
         },
         "items": [],
     }
@@ -667,14 +675,15 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 )
                                 for nested_feature in nested_features:
                                     nested_type = nested_feature.get("type")
+
                                     if nested_type in [
                                         "Skill Choice",
                                         "Bonus",
                                         "Characteristic Bonus",
                                         "Proficiency",
-                                        "Ability Damage",
                                     ]:
                                         continue
+
                                     if nested_type == "Ability":
                                         ability_data = nested_feature.get(
                                             "data", {}
@@ -739,7 +748,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             # Skip bonus-type features that are just modifiers
                             if selected_type in [
                                 "Bonus",
-                                "Ability Damage",
                                 "Characteristic Bonus",
                             ]:
                                 continue
@@ -765,7 +773,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 "Bonus",
                                 "Characteristic Bonus",
                                 "Proficiency",
-                                "Ability Damage",
                             ]:
                                 continue
 
@@ -781,6 +788,13 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 }
                                 item = _convert_feature(
                                     reconstructed_feature, "ability", compendium_items
+                                )
+                                if item:
+                                    foundry_character["items"].append(item)
+                            elif nested_type == "Ability Damage":
+                                # Ability Damage features should be looked up in compendium for effects
+                                item = _convert_feature(
+                                    nested_feature, "feature", compendium_items
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
@@ -896,7 +910,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 "Bonus",
                                 "Characteristic Bonus",
                                 "Proficiency",
-                                "Ability Damage",
                             ]:
                                 continue
 
@@ -935,7 +948,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             # Skip bonus-type features that are just modifiers
                             if selected_type in [
                                 "Bonus",
-                                "Ability Damage",
                                 "Characteristic Bonus",
                             ]:
                                 continue
@@ -985,8 +997,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                     [_normalize_skill_name(s) for s in char.get("skills", [])]
                 )
         if skills_list:
-            # Add skills to hero section
-            foundry_character["system"]["hero"]["skills"] = skills_list
+            # Add skills to skills section (object format for Draw Steel v0.11+)
+            foundry_character["system"]["skills"]["value"] = {
+                skill: True for skill in skills_list
+            }
 
     # Complication
     complication = character_data.get("complication")
@@ -1704,14 +1718,18 @@ def _process_skills_from_advancements(character_data, source_data):
                             [_normalize_skill_name(s) for s in advancement["selected"]]
                         )
 
-    # Add skills to hero section (avoid duplicates)
+    # Add skills to skills section (avoid duplicates)
     if collected_skills:
-        existing_skills = character_data["system"]["hero"].get("skills", [])
-        # Combine and deduplicate
+        existing_skills = list(
+            character_data.get("system", {}).get("skills", {}).get("value", {}).keys()
+        )
+        # Combine and deduplicate, then convert to object format
         all_skills = list(dict.fromkeys(existing_skills + collected_skills))
-        character_data["system"]["hero"]["skills"] = all_skills
+        character_data["system"]["skills"]["value"] = {
+            skill: True for skill in all_skills
+        }
     else:
-        character_data["system"]["hero"]["skills"] = []
+        character_data["system"]["skills"]["value"] = {}
 
 
 def _post_process_languages_and_culture(character_data, source_data):

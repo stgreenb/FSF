@@ -82,6 +82,10 @@ python forgesteel_converter.py character.ds-hero character.json --strict
 
 No external Python packages required - uses only standard library.
 
+## Compatibility
+
+Tested with Draw Steel Foundry VTT system v0.10+. Compatible with v0.11.x.
+
 ## Known Limitations
 
 - Only converts one selected subclass (Forgesteel limitation)
