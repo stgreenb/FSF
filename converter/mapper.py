@@ -357,7 +357,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
     # Movement calculation: extract from ancestry Speed features
     movement_speed = 5  # Default base movement for all heroes
-    kit_speed_bonus = 0
     ancestry_speed = None
 
     # Process Ancestry Features for Speed
@@ -375,21 +374,15 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                 if ancestry_speed:
                     movement_speed = ancestry_speed
 
-    # Process Class Kits for Speed bonus
-    for level_data in class_data.get("featuresByLevel", []):
-        for feature in level_data.get("features", []):
-            if feature.get("type") == "Kit" and "selected" in feature.get("data", {}):
-                for kit in feature.get("data", {}).get("selected", []):
-                    kit_speed = kit.get("speed", 0)
-                    kit_speed_bonus = max(kit_speed_bonus, kit_speed)
-
-    movement_speed += kit_speed_bonus
+    # NOTE: Kit speed bonuses are applied separately by the Foundry system
+    # during prepareBaseData/prepareDerivedData via movement.kitBonus.
+    # Only write the ancestry base speed to avoid double-counting.
 
     # Update Foundry character movement
     foundry_character["system"]["movement"]["value"] = movement_speed
 
     print(
-        f"Calculated Movement Speed: {movement_speed} (ancestry {ancestry_speed or 'base 5'} + kit bonus {kit_speed_bonus})"
+        f"Calculated Movement Speed: {movement_speed} (ancestry {ancestry_speed or 'base 5'})"
     )
 
     # Characteristics - prioritize explicit values over calculated ones
@@ -1281,78 +1274,78 @@ def _process_choice_advancement(
 
 
 def _populate_advancement_selections(character_data, source_data, compendium_items):
-    """Populate advancement selections in flags for skills and languages from origin items."""
+    """Populate advancement selections in flags for skills and languages from origin items.
+
+    Uses positional matching between Forgesteel Skill Choice features and Foundry pack
+    skill advancements, so each advancement gets the exact skills the user selected.
+    """
     # Note: Actor-level flags remain empty - all selections are stored at the item level only
 
-    # Collect all skill selections from Forgesteel character
-    skill_selections = {}  # Maps advancement descriptions to selected skills
-
-    # Helper function to extract skill names from Forgesteel Skill Choice features
-    def collect_skills_from_features(features_list):
-        selected_skills = []
+    def _get_skill_choices(features_list):
+        """Extract ordered Skill Choice selections from a features list (Title Case)."""
+        result = []
         if not features_list:
-            return selected_skills
+            return result
         for feature in features_list:
             if feature.get("type") == "Skill Choice":
                 skills = feature.get("data", {}).get("selected", [])
                 if skills:
-                    # Normalize skill names to camelCase format used by Foundry
-                    selected_skills.extend([_normalize_skill_name(s) for s in skills])
+                    result.append([_normalize_skill_name(s) for s in skills])
             elif feature.get("type") == "Multiple Features":
                 for sub_feature in feature.get("data", {}).get("features", []):
                     if sub_feature.get("type") == "Skill Choice":
                         skills = sub_feature.get("data", {}).get("selected", [])
                         if skills:
-                            selected_skills.extend(
-                                [_normalize_skill_name(s) for s in skills]
-                            )
-        return selected_skills
+                            result.append([_normalize_skill_name(s) for s in skills])
+        return result
 
-    # Collect skills from all sources
-    all_selected_skills = set()
+    def _get_culture_skill_choices(culture):
+        """Extract ordered Skill Choice selections from culture subsections."""
+        result = []
+        if not culture:
+            return result
+        for section_name in ["language", "environment", "organization", "upbringing"]:
+            section = culture.get(section_name, {})
+            if section.get("type") == "Skill Choice":
+                skills = section.get("data", {}).get("selected", [])
+                if skills:
+                    result.append([_normalize_skill_name(s) for s in skills])
+        return result
 
-    # From ancestry
+    # Build source-to-choices mapping: item type -> ordered list of Skill Choice selections
+    source_choices = {}
+
     ancestry = source_data.get("ancestry", {})
     if ancestry:
-        all_selected_skills.update(
-            collect_skills_from_features(ancestry.get("features", []))
-        )
+        source_choices["ancestry"] = _get_skill_choices(ancestry.get("features", []))
 
-    # From culture sections
-    culture = source_data.get("culture", {})
-    if culture:
-        for section_name in ["language", "environment", "organization", "upbringing"]:
-            if section_name in culture:
-                section = culture[section_name]
-                if section.get("type") == "Skill Choice":
-                    skills = section.get("data", {}).get("selected", [])
-                    if skills:
-                        all_selected_skills.update(
-                            [_normalize_skill_name(s) for s in skills]
-                        )
-
-    # From career
     career = source_data.get("career", {})
     if career:
-        all_selected_skills.update(
-            collect_skills_from_features(career.get("features", []))
-        )
+        source_choices["career"] = _get_skill_choices(career.get("features", []))
 
-    # From class
     class_data = source_data.get("class", {})
     if class_data:
+        class_choices = []
         for level_data in class_data.get("featuresByLevel", []):
-            all_selected_skills.update(
-                collect_skills_from_features(level_data.get("features", []))
-            )
+            class_choices.extend(_get_skill_choices(level_data.get("features", [])))
+        source_choices["class"] = class_choices
 
-    # From selected subclass
+    culture = source_data.get("culture", {})
+    culture_choices = _get_culture_skill_choices(culture)
+    if culture_choices:
+        source_choices["culture"] = culture_choices
+
     for subclass in class_data.get("subclasses", []):
         if subclass.get("selected", False):
+            subclass_choices = []
             for level_data in subclass.get("featuresByLevel", []):
-                all_selected_skills.update(
-                    collect_skills_from_features(level_data.get("features", []))
-                )
+                level_num = level_data.get("level", 1)
+                if level_num <= class_data.get("level", 1):
+                    subclass_choices.extend(
+                        _get_skill_choices(level_data.get("features", []))
+                    )
+            if subclass_choices:
+                source_choices["subclass"] = subclass_choices
 
     # Now go through character items and populate advancement selections
     for item in character_data.get("items", []):
@@ -1376,6 +1369,11 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
         if "advancement" not in item["flags"]["draw-steel"]:
             item["flags"]["draw-steel"]["advancement"] = {}
 
+        # Get the ordered skill choices for this item's source
+        item_type = item.get("type")
+        skill_choices = source_choices.get(item_type, [])
+        choice_index = 0
+
         # For each advancement in the item
         for advancement_id, advancement in item["system"]["advancements"].items():
             advancement_type = advancement.get("type")
@@ -1384,103 +1382,18 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
             if advancement_type not in ["skill", "language"]:
                 continue
 
-            # Handle skill advancements
+            # Handle skill advancements using positional matching
             if advancement_type == "skill":
-                # Check what skills this advancement allows
                 skills_in_adv = advancement.get("skills", {})
                 choices = skills_in_adv.get("choices", [])
                 groups = skills_in_adv.get("groups", [])
 
-                # If it has direct choices, select the ones that were selected in Forgesteel
-                if choices:
-                    selected_from_choices = []
-                    for choice in choices:
-                        if choice in all_selected_skills:
-                            selected_from_choices.append(choice)
+                if (choices or groups) and choice_index < len(skill_choices):
+                    selected_skills = skill_choices[choice_index]
+                    choice_index += 1
 
-                    if selected_from_choices:
-                        selection_data = {"selected": selected_from_choices}
-                        # Store at item level only (actor level should remain empty)
-                        item["flags"]["draw-steel"]["advancement"][advancement_id] = (
-                            selection_data
-                        )
-
-                # If it has groups, match selected skills against group members
-                if groups:
-                    selected_from_groups = []
-
-                    # Complete skill-to-group mapping from Draw Steel config
-                    skill_groups_map = {
-                        "alchemy": "crafting",
-                        "alertness": "intrigue",
-                        "architecture": "crafting",
-                        "blacksmithing": "crafting",
-                        "brag": "interpersonal",
-                        "carpentry": "crafting",
-                        "climb": "exploration",
-                        "concealObject": "intrigue",
-                        "cooking": "crafting",
-                        "criminalUnderworld": "lore",
-                        "culture": "lore",
-                        "disguise": "intrigue",
-                        "drive": "exploration",
-                        "eavesdrop": "intrigue",
-                        "empathize": "interpersonal",
-                        "endurance": "exploration",
-                        "escapeArtist": "intrigue",
-                        "fletching": "crafting",
-                        "flirt": "interpersonal",
-                        "forgery": "crafting",
-                        "gamble": "interpersonal",
-                        "gymnastics": "exploration",
-                        "handleAnimals": "interpersonal",
-                        "heal": "exploration",
-                        "hide": "intrigue",
-                        "history": "lore",
-                        "interrogate": "interpersonal",
-                        "intimidate": "interpersonal",
-                        "jewelry": "crafting",
-                        "jump": "exploration",
-                        "lead": "interpersonal",
-                        "lie": "interpersonal",
-                        "lift": "exploration",
-                        "magic": "lore",
-                        "mechanics": "crafting",
-                        "monsters": "lore",
-                        "music": "interpersonal",
-                        "nature": "lore",
-                        "navigate": "exploration",
-                        "perform": "interpersonal",
-                        "persuade": "interpersonal",
-                        "pickLock": "intrigue",
-                        "pickPocket": "intrigue",
-                        "psionics": "lore",
-                        "readPerson": "interpersonal",
-                        "religion": "lore",
-                        "ride": "exploration",
-                        "rumors": "lore",
-                        "sabotage": "intrigue",
-                        "search": "intrigue",
-                        "sneak": "intrigue",
-                        "society": "lore",
-                        "strategy": "lore",
-                        "swim": "exploration",
-                        "tailoring": "crafting",
-                        "timescape": "lore",
-                        "track": "intrigue",
-                    }
-
-                    for skill in all_selected_skills:
-                        skill_lower = skill.lower()
-                        if skill_lower in skill_groups_map:
-                            skill_group = skill_groups_map[skill_lower]
-                            # If this skill's group is in the advancement's allowed groups, include it
-                            if skill_group in groups:
-                                selected_from_groups.append(skill)
-
-                    if selected_from_groups:
-                        selection_data = {"selected": selected_from_groups}
-                        # Store at item level only (actor level should remain empty)
+                    if selected_skills:
+                        selection_data = {"selected": selected_skills}
                         item["flags"]["draw-steel"]["advancement"][advancement_id] = (
                             selection_data
                         )

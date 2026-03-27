@@ -92,3 +92,34 @@ fvtt-Actor-*.json
 *_debug.json
 *.backup
 *.bak
+
+# Caliber local state
+.caliber/
+
+# OpenCode agent state
+.opencode/
+
+# Test artifact outputs (named character JSONs, logs, etc.)
+Calder_Sendric.json
+Pyre.json
+Pyre_test.json
+Quistis.json
+Quistis_test.json
+Swami.json
+Swami_tank.json
+Vistin.json
+Vistin2.json
+Faolan.json
+Hamret.json
+Vhan.json
+Keth.json
+The-earth*.json
+*_test.json
+*_log.txt
+*_full.txt
+*_txt
+repomix-output.xml
+*test.txt
+test_log*.txt
+conversion_log.txt
+*python*.txt
