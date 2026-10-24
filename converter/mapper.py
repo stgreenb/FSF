@@ -146,7 +146,7 @@ def _apply_damage_modifier_scaling(item_copy, feature_data, character_level):
                         # Leave dynamic Foundry formulas (e.g. "5+@level") intact
                         if isinstance(change.get("value"), str) and "@" in change["value"]:
                             continue
-                        change["value"] = str(computed)
+                        change["value"] = computed
 
 
 def _convert_feature(feature_data, item_type, compendium_items, character_level=1):
