@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 
@@ -14,32 +15,79 @@ def _convert_feature(feature_data, item_type):
     }
 
 
-def _map_action_type(source_action_type: str) -> str:
+def _map_action_type(source_action_type, free=False):
     """Map source action types to Foundry's expected lowercase values.
 
     Args:
         source_action_type: Action type from source data (e.g., "Maneuver", "Main Action")
+        free: If True, the action is a free maneuver/triggered action
 
     Returns:
         Foundry-compatible action type (e.g., "maneuver", "main")
     """
     # Mapping from source action types to Foundry's expected values
     action_type_mapping = {
-        "Maneuver": "maneuver",
+        "Maneuver": "freeManeuver" if free else "maneuver",
         "Main Action": "main",
         "Move Action": "move",
-        "Triggered Action": "triggered",
+        "Triggered Action": "freeTriggered" if free else "triggered",
         "Free Action": "free",
         "Reaction": "reaction",
         "main": "main",
-        "maneuver": "maneuver",
+        "maneuver": "freeManeuver" if free else "maneuver",
         "move": "move",
-        "triggered": "triggered",
+        "triggered": "freeTriggered" if free else "triggered",
         "free": "free",
         "reaction": "reaction",
     }
 
     return action_type_mapping.get(source_action_type, source_action_type.lower())
+
+
+def _fs_echelon(level):
+    """ForgeSteel echelon for a level (creature-logic.ts getEchelon)."""
+    if level <= 3:
+        return 1
+    if level <= 6:
+        return 2
+    if level <= 8:
+        return 3
+    return 4
+
+
+def _fs_modifier_value(modifier, level):
+    """Replicate ForgeSteel ModifierLogic.calculateModifierValue for a modifier dict."""
+    value = modifier.get("value", 0) or 0
+    value += (modifier.get("valuePerLevel") or 0) * (level - 1)
+    value += (modifier.get("valuePerEchelon") or 0) * _fs_echelon(level)
+    return value
+
+
+def _map_ability_distance_target(ability_data):
+    """Map ForgeSteel ability distance/target lists to Foundry schemas."""
+    distance = {"type": "melee", "primary": 1, "secondary": None, "tertiary": None}
+    target = {"type": "creature", "value": 1}
+    dist_list = ability_data.get("distance") or []
+    if dist_list:
+        d = dist_list[0]
+        dtype = (d.get("type") or "").lower()
+        val = d.get("value", 0)
+        if dtype == "self":
+            distance = {"type": "self", "primary": 0, "secondary": None, "tertiary": None}
+            target = {"type": "self", "value": 1}
+        elif dtype in ("ranged", "melee", "area"):
+            distance = {
+                "type": dtype,
+                "primary": val,
+                "secondary": d.get("value2") or None,
+                "tertiary": None,
+            }
+    tgt = (ability_data.get("target") or "").lower()
+    if tgt.startswith("self"):
+        target = {"type": "self", "value": 1}
+    elif "object" in tgt:
+        target = {"type": "object", "value": 1}
+    return distance, target
 
 
 def _evaluate_lookup_formula(formula: str, level: int) -> str:
@@ -62,6 +110,43 @@ def _evaluate_lookup_formula(formula: str, level: int) -> str:
         return str(int(result)) if isinstance(result, (int, float)) and result == int(result) else str(result)
     except Exception:
         return formula
+
+
+def _apply_damage_modifier_scaling(item_copy, feature_data, character_level):
+    """ForgeSteel Damage Modifier features scale with level
+    (value + valuePerLevel*(level-1) + valuePerEchelon*echelon). Update matching
+    effect change values so immunities/weaknesses match ForgeSteel at the level."""
+    if not isinstance(feature_data, dict) or feature_data.get("type") != "Damage Modifier":
+        return
+    for modifier in feature_data.get("data", {}).get("modifiers", []) or []:
+        dtype = (modifier.get("damageType") or "").lower()
+        mtype = (modifier.get("type") or "").lower()
+        if not dtype or mtype not in ("immunity", "weakness"):
+            continue
+        field = "immunities" if mtype == "immunity" else "weaknesses"
+        target_key = f"system.damage.{field}.{dtype}"
+        computed = _fs_modifier_value(modifier, character_level)
+        effects = item_copy.get("effects", []) or []
+        if isinstance(effects, dict):
+            effects = list(effects.values())
+        for effect in effects:
+            if not isinstance(effect, dict):
+                continue
+            change_sets = [
+                effect.get("changes") or [],
+                (effect.get("system") or {}).get("changes") or [],
+            ]
+            for changes in change_sets:
+                if isinstance(changes, dict):
+                    changes = list(changes.values())
+                for change in changes:
+                    if not isinstance(change, dict):
+                        continue
+                    if change.get("key") == target_key:
+                        # Leave dynamic Foundry formulas (e.g. "5+@level") intact
+                        if isinstance(change.get("value"), str) and "@" in change["value"]:
+                            continue
+                        change["value"] = str(computed)
 
 
 def _convert_feature(feature_data, item_type, compendium_items, character_level=1):
@@ -127,6 +212,26 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
                 None,
             )
 
+        # Draw Steel 1.1+ ships canonical "X - Activate" ability items paired
+        # with triggered-action features (e.g. "Repulsive Ward - Activate").
+        # When an ability is requested, prefer the canonical activate ability
+        # over a plain feature with the same base name.
+        if not compendium_item and item_type == "ability" and name:
+            activate_variants = (
+                f"{name} - activate",
+                f"{name}, activate",
+                f"{name} activate",
+            )
+            compendium_item = next(
+                (
+                    item
+                    for item in compendium_items.values()
+                    if item.get("type", "").lower() == "ability"
+                    and item.get("name", "").lower() in activate_variants
+                ),
+                None,
+            )
+
         # If still not found by type, try just by name (case-insensitive, any type)
         if not compendium_item:
             compendium_item = next(
@@ -153,6 +258,7 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
     # If not found by type+name, try variations by removing punctuation using text normalizer
     if not compendium_item and name:
         sanitized_name = TextNormalizer.sanitize_for_compendium_lookup(name)
+        fallback_item = None
         for item_key, item in compendium_items.items():
             # Check both the key (dsid) and the item's name
             key_sanitized = TextNormalizer.sanitize_for_compendium_lookup(item_key)
@@ -160,11 +266,18 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
                 item.get("name", "")
             )
             if key_sanitized == sanitized_name or item_name_sanitized == sanitized_name:
-                compendium_item = item
-                break
+                # Prefer a compendium item whose type matches what was requested
+                # (e.g. perk "Invisible Force" also ships as an ability item)
+                if item_type and item.get("type", "").lower() == item_type.lower():
+                    compendium_item = item
+                    break
+                if fallback_item is None:
+                    fallback_item = item
+        if not compendium_item:
+            compendium_item = fallback_item
 
     if compendium_item:
-        item_copy = compendium_item.copy()
+        item_copy = copy.deepcopy(compendium_item)
 
         # Remove compendium-specific fields that shouldn't be in imported items
         item_copy.pop("_key", None)
@@ -212,7 +325,23 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
         # Don't override system.type - use the compendium's value which is correct
         # The compendium has the proper Foundry format (e.g., "freeTriggered" not "triggered")
 
-        return item_copy
+        # ForgeSteel Damage Modifier features carry per-level/per-echelon scaling
+        # (value + valuePerLevel*(level-1) + valuePerEchelon*echelon). Update matching
+        # effect change values so immunities/weaknesses match ForgeSteel at the level.
+        _apply_damage_modifier_scaling(item_copy, feature_data, character_level)
+
+        # If the caller requested an ability but the compendium matched a non-ability
+        # item (e.g. Talent Ward "Repulsive Ward" ships as a feature), fall through to
+        # the ability synthesizer below so it lands in Foundry's action lists.
+        if (
+            item_type == "ability"
+            and compendium_item.get("type") != "ability"
+            and isinstance(feature_data.get("data"), dict)
+            and "ability" in feature_data["data"]
+        ):
+            pass
+        else:
+            return item_copy
 
     # Use enhanced description transfer
     from converter.description_transfer import DescriptionTransfer
@@ -252,18 +381,17 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
         and "ability" in feature_data["data"]
     ):
         ability_data = feature_data["data"]["ability"]
-        source_action_type = ability_data.get("type", {}).get("usage", "main")
+        ability_type_data = ability_data.get("type") or {}
+        source_action_type = ability_type_data.get("usage", "main")
+        is_free = bool(ability_type_data.get("free"))
+        distance, target = _map_ability_distance_target(ability_data)
         result_item["system"].update(
             {
                 "keywords": ability_data.get("keywords", []),
-                "type": _map_action_type(source_action_type),
-                "distance": {
-                    "type": "melee",
-                    "primary": 1,
-                    "secondary": None,
-                    "tertiary": None,
-                },
-                "target": {"type": "creature", "value": 1},
+                "type": _map_action_type(source_action_type, free=is_free),
+                "trigger": ability_type_data.get("trigger", "") or "",
+                "distance": distance,
+                "target": target,
                 "effect": {"before": ability_data.get("description", ""), "after": ""},
                 "power": {
                     "roll": {
@@ -276,6 +404,105 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
         )
 
     return result_item
+
+
+def _expand_ds_features(feature):
+    """Yield a DS feature plus its selected/nested content, mirroring
+    ForgeSteel's FeatureLogic.simplifyFeatures (only SELECTED options count)."""
+    yield feature
+    ftype = feature.get("type")
+    data = feature.get("data") or {}
+    if ftype == "Ancestry Feature Choice":
+        selected = data.get("selected")
+        if isinstance(selected, dict):
+            yield from _expand_ds_features(selected)
+    elif ftype in ("Choice", "Domain Feature", "Perk", "Tagged Feature Choice"):
+        for sub in data.get("selected", []) or []:
+            if isinstance(sub, dict):
+                yield from _expand_ds_features(sub)
+    elif ftype == "Multiple Features":
+        for sub in data.get("features", []) or []:
+            if isinstance(sub, dict):
+                yield from _expand_ds_features(sub)
+    elif ftype == "Kit":
+        for kit in data.get("selected", []) or []:
+            for sub in kit.get("features", []) or []:
+                if isinstance(sub, dict):
+                    yield from _expand_ds_features(sub)
+
+
+def _apply_stamina_bonus_effects(class_item, character_data, character_level, foundry_character):
+    """Encode extra Stamina Bonus features as a flat stamina.max effect.
+
+    ForgeSteel derives stamina from class data plus every Bonus feature with
+    field=Stamina (value + valuePerLevel*(level-1) + valuePerEchelon*echelon).
+    The class item already reproduces the class's own Stamina bonus (compendium
+    starting/level match value/valuePerLevel), so any remaining Stamina Bonus
+    features are emitted as a single ADD effect on the class item, keeping
+    Foundry's derived max identical to ForgeSteel's.
+    """
+    class_stamina = class_item.get("system", {}).get("stamina", {})
+    class_starting = class_stamina.get("starting")
+    class_level_bonus = class_stamina.get("level")
+
+    sources = []
+    for section in ("ancestry", "culture", "career", "complication"):
+        data = character_data.get(section) or {}
+        sources.extend(data.get("features", []) or [])
+    hero_class = character_data.get("class") or {}
+    for level_data in hero_class.get("featuresByLevel", []) or []:
+        if level_data.get("level", 1) <= character_level:
+            sources.extend(level_data.get("features", []) or [])
+    for subclass in hero_class.get("subclasses", []) or []:
+        if not subclass.get("selected"):
+            continue
+        for level_data in subclass.get("featuresByLevel", []) or []:
+            if level_data.get("level", 1) <= character_level:
+                sources.extend(level_data.get("features", []) or [])
+
+    total = 0
+    names = []
+    class_primary_skipped = False
+    for feature in sources:
+        for expanded in _expand_ds_features(feature):
+            if expanded.get("type") != "Bonus":
+                continue
+            data = expanded.get("data") or {}
+            if data.get("field") != "Stamina":
+                continue
+            # The class's own Stamina bonus is already carried by the class item
+            if (
+                not class_primary_skipped
+                and class_starting is not None
+                and data.get("value") == class_starting
+                and (data.get("valuePerLevel") or 0) == (class_level_bonus or 0)
+            ):
+                class_primary_skipped = True
+                continue
+            total += _fs_modifier_value(data, character_level)
+            names.append(expanded.get("name", "Stamina"))
+
+    if total:
+        class_item.setdefault("effects", []).append(
+            {
+                "name": "Stamina Bonus",
+                "img": None,
+                "type": "base",
+                "system": {},
+                "changes": [
+                    {
+                        "key": "system.stamina.max",
+                        "mode": 2,
+                        "value": str(total),
+                        "priority": 20,
+                    }
+                ],
+                "disabled": False,
+                "duration": {"startTime": None, "combat": None, "seconds": None, "rounds": None, "turns": None},
+                "description": f"Stamina bonuses from: {', '.join(names)}",
+                "flags": {},
+            }
+        )
 
 
 def convert_character(character_data, compendium_items, strict=False, verbose=False):
@@ -645,7 +872,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                         comp_item.get("name") == feature_name
                         and comp_item.get("type") == "ancestryTrait"
                     ):
-                        item = comp_item.copy()
+                        item = copy.deepcopy(comp_item)
+                        # ForgeSteel Damage Modifier features (e.g. Psychic Scar)
+                        # scale with level; keep effect values in sync
+                        _apply_damage_modifier_scaling(item, feature, character_level)
                         break
 
                 # If not found in compendium, create from feature data
@@ -683,15 +913,16 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             if "system" not in item:
                 item["system"] = {}
             item["system"]["level"] = hero_class.get("level", 1)
-            # Adjust class stamina: ForgeSteel uses starting + level * level_bonus
-            # Foundry uses starting + (level-1) * level_bonus in class.mjs prepareDerivedData
-            # To make them match, add level_bonus to starting
-            if "stamina" in item["system"]:
-                item["system"]["stamina"]["starting"] = item["system"]["stamina"].get("starting", 0) + item["system"]["stamina"].get("level", 0)
         if item:
             foundry_character["items"].append(item)
             # Apply characteristic advancements from class item
             _apply_class_characteristic_advancements(item, character_level, foundry_character)
+
+            # Encode non-class Stamina Bonus features (e.g. Enchantment of Battle)
+            # as an item effect so Foundry's derived stamina matches ForgeSteel.
+            _apply_stamina_bonus_effects(
+                item, character_data, character_level, foundry_character
+            )
 
         # Process class features with level filtering
         for level_data in hero_class.get("featuresByLevel", []):
@@ -785,6 +1016,22 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             )
                             if item:
                                 foundry_character["items"].append(item)
+                            # ForgeSteel also grants the perk's inner ability
+                            # (e.g. Invisible Force maneuver); emit it so it shows
+                            # up in Foundry's maneuver/action lists.
+                            perk_ability = (selected_item.get("data") or {}).get("ability")
+                            if perk_ability or selected_item.get("type") == "Ability":
+                                ability_item = _convert_feature(
+                                    selected_item, "ability", compendium_items, character_level
+                                )
+                                if ability_item:
+                                    is_duplicate = any(
+                                        existing.get("name") == ability_item.get("name")
+                                        and existing.get("type") == ability_item.get("type")
+                                        for existing in foundry_character["items"]
+                                    )
+                                    if not is_duplicate:
+                                        foundry_character["items"].append(ability_item)
                         continue
 
                     if feature.get("type") == "Choice":
@@ -1433,8 +1680,18 @@ def _apply_item_immunities_weaknesses(foundry_character, character_level):
         # Check for structured Damage Modifier effects in item system (for features converted from source)
         # This handles features like Ward of Excellent Protection choices
         if "effects" in system:
-            for effect in system["effects"]:
-                for change in effect.get("changes", []):
+            effects_data = system["effects"]
+            if isinstance(effects_data, dict):
+                effect_list = [e for e in effects_data.values() if isinstance(e, dict)]
+            elif isinstance(effects_data, list):
+                effect_list = [e for e in effects_data if isinstance(e, dict)]
+            else:
+                effect_list = []
+            for effect in effect_list:
+                changes = effect.get("changes", [])
+                if isinstance(changes, dict):
+                    changes = [c for c in changes.values() if isinstance(c, dict)]
+                for change in changes:
                     key = change.get("key", "")
                     if "damage.immunities" in key:
                         dmg_type = key.split(".")[-1]
