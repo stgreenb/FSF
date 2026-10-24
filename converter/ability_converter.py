@@ -8,6 +8,8 @@ with proper level filtering and comprehensive validation.
 import logging
 from typing import Dict, Any, List, Set
 
+from converter.text_normalizer import TextNormalizer
+
 logger = logging.getLogger(__name__)
 
 class AbilityConverter:
@@ -308,9 +310,10 @@ class AbilityConverter:
         original_count = len(original_abilities)
         converted_count = len(converted_abilities)
 
-        # Count abilities that should be included based on level
+        # Count abilities that should be included based on level.
+        # Source data uses "minLevel" (not "level") for the ability's minimum level.
         expected_count = sum(1 for ability in original_abilities
-                           if ability.get("level", 1) <= character_level)
+                           if ability.get("minLevel", ability.get("level", 1)) <= character_level)
 
         validation_result = {
             "original_count": original_count,
@@ -322,10 +325,13 @@ class AbilityConverter:
             "extra_abilities": []
         }
 
-        # Check for missing abilities
-        original_names = {ability.get("name", "") for ability in original_abilities
-                         if ability.get("level", 1) <= character_level}
-        converted_names = {ability.get("name", "") for ability in converted_abilities}
+        # Check for missing abilities.
+        # Normalize both sides before comparing - converted names are already
+        # normalized by TextNormalizer, so raw source names (smart quotes etc.)
+        # would otherwise show up as spurious "extra" abilities.
+        original_names = {TextNormalizer.normalize_text(ability.get("name", "")) for ability in original_abilities
+                         if ability.get("minLevel", ability.get("level", 1)) <= character_level}
+        converted_names = {TextNormalizer.normalize_text(ability.get("name", "")) for ability in converted_abilities}
 
         missing = original_names - converted_names
         extra = converted_names - original_names

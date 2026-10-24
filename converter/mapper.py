@@ -42,7 +42,29 @@ def _map_action_type(source_action_type: str) -> str:
     return action_type_mapping.get(source_action_type, source_action_type.lower())
 
 
-def _convert_feature(feature_data, item_type, compendium_items):
+def _evaluate_lookup_formula(formula: str, level: int) -> str:
+    """Evaluate a lookup formula at the given character level.
+
+    Args:
+        formula: Formula string like "5+@level" or "5 + @level"
+        level: Character level
+
+    Returns:
+        Evaluated result as string, or original formula if evaluation fails
+    """
+    import re
+    try:
+        # Replace @level with the actual level
+        evaluated = formula.replace("@level", str(level))
+        # Simple arithmetic evaluation (only +, -, *, /, parentheses)
+        # Use eval with restricted globals for safety
+        result = eval(evaluated, {"__builtins__": {}}, {})
+        return str(int(result)) if isinstance(result, (int, float)) and result == int(result) else str(result)
+    except Exception:
+        return formula
+
+
+def _convert_feature(feature_data, item_type, compendium_items, character_level=1):
     """Converts a forgesteel feature to a Foundry VTT item."""
     from converter.text_normalizer import TextNormalizer
 
@@ -157,6 +179,26 @@ def _convert_feature(feature_data, item_type, compendium_items):
             # Remove _key from effects as it contains compendium references
             effect.pop("_key", None)
 
+            # Evaluate lookup formulas in effect descriptions at character level
+            # Pattern: [[lookup FORMULA evaluate=true]]
+            effect_desc = effect.get("description", "")
+            import re
+            lookup_match = re.search(r'\[\[lookup\s+(.+?)\s+evaluate=true\]\]', effect_desc)
+            if lookup_match:
+                formula = lookup_match.group(1).strip()
+                evaluated_value = _evaluate_lookup_formula(formula, character_level)
+                # Update the effect's change value if it's a simple numeric change
+                for change in effect.get("changes", []):
+                    # Only update if the change value looks like a hardcoded number
+                    # that matches the old formula result (e.g., "7" for "5+@level" at level 2)
+                    try:
+                        old_value = int(change.get("value", ""))
+                        new_value = int(evaluated_value)
+                        if old_value != new_value:
+                            change["value"] = str(new_value)
+                    except (ValueError, TypeError):
+                        pass
+
         # Apply description transfer to ensure proper Foundry format
         from converter.description_transfer import DescriptionTransfer
 
@@ -257,12 +299,19 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         level_summary = LevelDetector.get_level_detection_summary(character_data)
         print(f"Level detection: {level_summary}")
 
-    # Base values - stamina is always 20 for heroes at level 1
-    base_stamina = 20
+    # Character level from class data
+    class_data = character_data.get("class", {})
+    character_level = class_data.get("level", 1)
 
     # Get recoveries from class definition
-    class_data = character_data.get("class", {})
     base_recoveries = class_data.get("recoveries", 8)
+    if base_recoveries == 8 and not class_data.get("recoveries"):
+        # Fall back to compendium
+        class_name = class_data.get("name", "")
+        for comp_item in compendium_items.values():
+            if comp_item.get("name") == class_name and comp_item.get("type") == "class":
+                base_recoveries = comp_item.get("system", {}).get("recoveries", 8)
+                break
 
     # Calculate stability from ancestry traits (e.g., Grounded adds +1)
     base_stability = 0
@@ -276,10 +325,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             elif feature.get("name") == "Grounded":
                 base_stability += 1
 
-    # NOTE: Stamina is always 20 for level 1 heroes in Foundry
-    # Kit bonuses are applied separately during prepareBaseData
-    # Don't override the base stamina value
-
     # Basic Information
     foundry_character = {
         "name": character_data.get("name"),
@@ -287,8 +332,9 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         "img": "icons/svg/mystery-man.svg",
         "system": {
             "stamina": {
-                "value": base_stamina
-                - character_data.get("state", {}).get("staminaDamage", 0),
+                # Let Foundry compute max from class + kits via prepareDerivedData
+                # Don't set value/max here - Foundry's hero.mjs computes max from kits,
+                # class.mjs adds class stamina, then value ??= max sets value = max
                 "temporary": character_data.get("state", {}).get("staminaTemp", 0),
             },
             "characteristics": {
@@ -350,7 +396,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                 "skills": [],
                 "preferredKit": None,
             },
-            "skills": {"value": {}},
+            "skills": {"value": []},
         },
         "items": [],
     }
@@ -435,7 +481,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Ancestry
     ancestry = character_data.get("ancestry")
     if ancestry:
-        item = _convert_feature(ancestry, "ancestry", compendium_items)
+        item = _convert_feature(ancestry, "ancestry", compendium_items, character_level)
         if item:
             foundry_character["items"].append(item)
 
@@ -504,7 +550,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                     # If not found in compendium, create from feature data
                     if not item:
                         item = _convert_feature(
-                            selected_feature, item_type, compendium_items
+                            selected_feature, item_type, compendium_items, character_level
                         )
 
                     if item:
@@ -604,7 +650,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
                 # If not found in compendium, create from feature data
                 if not item:
-                    item = _convert_feature(feature, "ancestryTrait", compendium_items)
+                    item = _convert_feature(feature, "ancestryTrait", compendium_items, character_level)
 
                 if item:
                     # Check for duplicates before adding
@@ -624,21 +670,29 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Culture
     culture = character_data.get("culture")
     if culture:
-        item = _convert_feature(culture, "culture", compendium_items)
+        item = _convert_feature(culture, "culture", compendium_items, character_level)
         if item:
             foundry_character["items"].append(item)
 
     # Class
     hero_class = character_data.get("class")
     if hero_class:
-        item = _convert_feature(hero_class, "class", compendium_items)
+        item = _convert_feature(hero_class, "class", compendium_items, character_level)
         if item:
             # Add the level to the class item system
             if "system" not in item:
                 item["system"] = {}
             item["system"]["level"] = hero_class.get("level", 1)
+            # Adjust class stamina: ForgeSteel uses starting + level * level_bonus
+            # Foundry uses starting + (level-1) * level_bonus in class.mjs prepareDerivedData
+            # To make them match, add level_bonus to starting
+            if "stamina" in item["system"]:
+                item["system"]["stamina"]["starting"] = item["system"]["stamina"].get("starting", 0) + item["system"]["stamina"].get("level", 0)
         if item:
             foundry_character["items"].append(item)
+            # Apply characteristic advancements from class item
+            _apply_class_characteristic_advancements(item, character_level, foundry_character)
+
         # Process class features with level filtering
         for level_data in hero_class.get("featuresByLevel", []):
             level_num = level_data.get("level", 1)
@@ -689,11 +743,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                             "data": {"ability": ability_data},
                                         }
                                         item = _convert_feature(
-                                            reconstructed, "ability", compendium_items
+                                            reconstructed, "ability", compendium_items, character_level
                                         )
                                     elif nested_type == "Text":
                                         item = _convert_feature(
-                                            nested_feature, "feature", compendium_items
+                                            nested_feature, "feature", compendium_items, character_level
                                         )
                                     else:
                                         continue
@@ -701,7 +755,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                         foundry_character["items"].append(item)
                             else:
                                 item = _convert_feature(
-                                    selected_item, "ability", compendium_items
+                                    selected_item, "ability", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
@@ -727,7 +781,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                         selected_items = feature_data.get("selected", [])
                         for selected_item in selected_items:
                             item = _convert_feature(
-                                selected_item, feature_type.lower(), compendium_items
+                                selected_item, feature_type.lower(), compendium_items, character_level
                             )
                             if item:
                                 foundry_character["items"].append(item)
@@ -738,10 +792,21 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             "selected", []
                         ):
                             selected_type = selected_feature.get("type", "")
+                            # Handle Characteristic Bonus from choices (e.g., "Characteristic Increase: Additional Choice")
+                            if selected_type == "Characteristic Bonus":
+                                char_name = (
+                                    selected_feature.get("data", {})
+                                    .get("characteristic", "")
+                                    .lower()
+                                )
+                                value = selected_feature.get("data", {}).get("value", 0)
+                                if char_name in foundry_character["system"]["characteristics"]:
+                                    current = foundry_character["system"]["characteristics"][char_name].get("value", 0)
+                                    foundry_character["system"]["characteristics"][char_name]["value"] = current + value
+                                continue
                             # Skip bonus-type features that are just modifiers
                             if selected_type in [
                                 "Bonus",
-                                "Characteristic Bonus",
                             ]:
                                 continue
                             item_type = (
@@ -749,7 +814,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             )
 
                             item = _convert_feature(
-                                selected_feature, item_type, compendium_items
+                                selected_feature, item_type, compendium_items, character_level
                             )
                             if item:
                                 foundry_character["items"].append(item)
@@ -780,21 +845,21 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                     "data": {"ability": ability_data},
                                 }
                                 item = _convert_feature(
-                                    reconstructed_feature, "ability", compendium_items
+                                    reconstructed_feature, "ability", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
                             elif nested_type == "Ability Damage":
                                 # Ability Damage features should be looked up in compendium for effects
                                 item = _convert_feature(
-                                    nested_feature, "feature", compendium_items
+                                    nested_feature, "feature", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
                             elif nested_type == "Text":
                                 # Text features should be converted as features
                                 item = _convert_feature(
-                                    nested_feature, "feature", compendium_items
+                                    nested_feature, "feature", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
@@ -821,7 +886,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             feature_to_convert = feature
 
                         item = _convert_feature(
-                            feature_to_convert, item_type, compendium_items
+                            feature_to_convert, item_type, compendium_items, character_level
                         )
                         if item:
                             foundry_character["items"].append(item)
@@ -829,7 +894,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Career
     career = character_data.get("career")
     if career:
-        item = _convert_feature(career, "career", compendium_items)
+        item = _convert_feature(career, "career", compendium_items, character_level)
         if item:
             foundry_character["items"].append(item)
         for feature in career.get("features", []):
@@ -845,7 +910,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                 selected_items = feature.get("data", {}).get("selected", [])
                 for selected_item in selected_items:
                     item = _convert_feature(
-                        selected_item, feature_type.lower(), compendium_items
+                        selected_item, feature_type.lower(), compendium_items, character_level
                     )
                     if item:
                         foundry_character["items"].append(item)
@@ -855,7 +920,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             if any(pattern in feature_name for pattern in skip_patterns):
                 continue
 
-            processed_feature = _convert_feature(feature, "feature", compendium_items)
+            processed_feature = _convert_feature(feature, "feature", compendium_items, character_level)
             if processed_feature:
                 foundry_character["items"].append(processed_feature)
 
@@ -866,7 +931,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     subclasses = class_data.get("subclasses", [])
     for subclass in subclasses:
         if subclass.get("selected", False):
-            item = _convert_feature(subclass, "subclass", compendium_items)
+            item = _convert_feature(subclass, "subclass", compendium_items, character_level)
             if item:
                 foundry_character["items"].append(item)
 
@@ -880,6 +945,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             if level_num <= character_level:
                 for feature in level_data.get("features", []):
                     feature_type = feature.get("type", "")
+                    feature_data = feature.get("data", {})
 
                     # Skip Skill Choice - will be processed by _process_skills_from_advancements
                     if feature_type == "Skill Choice":
@@ -916,13 +982,13 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                     "data": {"ability": ability_data},
                                 }
                                 item = _convert_feature(
-                                    reconstructed_feature, "ability", compendium_items
+                                    reconstructed_feature, "ability", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
                             elif nested_type == "Text":
                                 item = _convert_feature(
-                                    nested_feature, "feature", compendium_items
+                                    nested_feature, "feature", compendium_items, character_level
                                 )
                                 if item:
                                     foundry_character["items"].append(item)
@@ -938,17 +1004,28 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             "selected", []
                         ):
                             selected_type = selected_feature.get("type", "")
+                            # Handle Characteristic Bonus from choices (e.g., "Characteristic Increase: Additional Choice")
+                            if selected_type == "Characteristic Bonus":
+                                char_name = (
+                                    selected_feature.get("data", {})
+                                    .get("characteristic", "")
+                                    .lower()
+                                )
+                                value = selected_feature.get("data", {}).get("value", 0)
+                                if char_name in foundry_character["system"]["characteristics"]:
+                                    current = foundry_character["system"]["characteristics"][char_name].get("value", 0)
+                                    foundry_character["system"]["characteristics"][char_name]["value"] = current + value
+                                continue
                             # Skip bonus-type features that are just modifiers
                             if selected_type in [
                                 "Bonus",
-                                "Characteristic Bonus",
                             ]:
                                 continue
                             item_type = (
                                 "ability" if selected_type == "Ability" else "feature"
                             )
                             item = _convert_feature(
-                                selected_feature, item_type, compendium_items
+                                selected_feature, item_type, compendium_items, character_level
                             )
                             if item:
                                 foundry_character["items"].append(item)
@@ -976,7 +1053,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             feature_to_convert = feature
 
                         item = _convert_feature(
-                            feature_to_convert, item_type, compendium_items
+                            feature_to_convert, item_type, compendium_items, character_level
                         )
                         if item:
                             foundry_character["items"].append(item)
@@ -998,9 +1075,12 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Complication
     complication = character_data.get("complication")
     if complication and complication != "null":
-        item = _convert_feature(complication, "complication", compendium_items)
+        item = _convert_feature(complication, "complication", compendium_items, character_level)
         if item:
             foundry_character["items"].append(item)
+
+        # Parse complication for immunities/weaknesses (e.g., "Fire and Chaos" gives fire immunity 5, cold weakness 5)
+        _apply_complication_effects(foundry_character, complication)
 
     # Top-level features
     for feature in character_data.get("features", []):
@@ -1008,7 +1088,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         # Skip placeholder/framework features
         if feature_type in ["Language Choice", "Skill Choice"]:
             continue
-        item = _convert_feature(feature, "feature", compendium_items)
+        item = _convert_feature(feature, "feature", compendium_items, character_level)
         if item:
             foundry_character["items"].append(item)
 
@@ -1035,9 +1115,21 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
     # Kits - process selected kits from class features
     for kit in selected_kits:
-        kit_item = _convert_feature(kit, "kit", compendium_items)
+        kit_item = _convert_feature(kit, "kit", compendium_items, character_level)
         if kit_item:
             foundry_character["items"].append(kit_item)
+
+            # Get kit stamina bonus from compendium (kit.bonuses.stamina * echelon)
+            kit_name = kit.get("name", "")
+            kit_compendium = None
+            for comp_item in compendium_items.values():
+                if comp_item.get("name") == kit_name and comp_item.get("type") == "kit":
+                    kit_compendium = comp_item
+                    break
+            if kit_compendium:
+                # Kit bonuses are used by Foundry's hero.mjs prepareBaseData
+                # which reads kit.system.bonuses.stamina * echelon
+                pass
 
             # Process kit advancements to add kit-specific abilities
             if "system" in kit_item and "advancements" in kit_item["system"]:
@@ -1117,7 +1209,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Inventory
     for item in character_data.get("state", {}).get("inventory", []):
         foundry_character["items"].append(
-            _convert_feature(item, "treasure", compendium_items)
+            _convert_feature(item, "treasure", compendium_items, character_level)
         )
 
     # Post-processing: Extract skills from item advancements
@@ -1127,8 +1219,237 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     _process_skills_from_advancements(foundry_character, character_data)
     _post_process_languages_and_culture(foundry_character, character_data)
     _fix_ability_types(foundry_character)
+    _apply_item_immunities_weaknesses(foundry_character, character_level)
 
     return foundry_character
+
+
+def _apply_complication_effects(foundry_character, complication):
+    """Parse complication for immunities/weaknesses and apply them.
+    
+    Handles cases like "Fire and Chaos" which gives fire immunity 5 and cold weakness 5.
+    Parses both description text and structured feature data.
+    """
+    import re
+    
+    damage_type_map = {
+        "fire": "fire",
+        "cold": "cold",
+        "acid": "acid",
+        "lightning": "lightning",
+        "poison": "poison",
+        "psychic": "psychic",
+        "sonic": "sonic",
+        "corruption": "corruption",
+        "holy": "holy",
+    }
+    
+    def apply_modifier(dmg_type, value, is_immunity):
+        dmg_type = damage_type_map.get(dmg_type.lower(), dmg_type.lower())
+        target = foundry_character["system"]["damage"]["immunities"] if is_immunity else foundry_character["system"]["damage"]["weaknesses"]
+        if dmg_type in target:
+            target[dmg_type] = max(target[dmg_type], value)
+    
+    # Parse structured features (Damage Modifier entries)
+    for feature in complication.get("features", []):
+        if feature.get("type") == "Damage Modifier":
+            for modifier in feature.get("data", {}).get("modifiers", []):
+                dmg_type = modifier.get("damageType", "")
+                mod_type = modifier.get("type", "")  # "Immunity" or "Weakness"
+                value = modifier.get("value", 0)
+                if mod_type == "Immunity":
+                    apply_modifier(dmg_type, value, True)
+                elif mod_type == "Weakness":
+                    apply_modifier(dmg_type, value, False)
+    
+    # Also parse description text as fallback
+    description = complication.get("description", "")
+    if description:
+        immunity_pattern = re.compile(r'immunity\s+to\s+(\w+)\s+(\d+)|(\w+)\s+immunity\s+(\d+)', re.IGNORECASE)
+        weakness_pattern = re.compile(r'weakness\s+to\s+(\w+)\s+(\d+)|(\w+)\s+weakness\s+(\d+)', re.IGNORECASE)
+        
+        for match in immunity_pattern.finditer(description):
+            groups = match.groups()
+            if groups[0] and groups[1]:
+                dmg_type, value = groups[0].lower(), int(groups[1])
+            elif groups[2] and groups[3]:
+                dmg_type, value = groups[2].lower(), int(groups[3])
+            else:
+                continue
+            apply_modifier(dmg_type, value, True)
+        
+        for match in weakness_pattern.finditer(description):
+            groups = match.groups()
+            if groups[0] and groups[1]:
+                dmg_type, value = groups[0].lower(), int(groups[1])
+            elif groups[2] and groups[3]:
+                dmg_type, value = groups[2].lower(), int(groups[3])
+            else:
+                continue
+            apply_modifier(dmg_type, value, False)
+
+
+def _apply_class_characteristic_advancements(class_item, character_level, foundry_character):
+    """Apply characteristic increases from class advancements up to character level.
+    
+    Class items have advancements of type 'characteristic' that increase characteristics
+    at specific levels. We need to apply those that are <= character_level.
+    """
+    advancements = class_item.get("system", {}).get("advancements", {})
+    for adv_id, advancement in advancements.items():
+        if advancement.get("type") == "characteristic":
+            req_level = advancement.get("requirements", {}).get("level", 1)
+            if req_level <= character_level:
+                characteristics = advancement.get("characteristics", {})
+                for char_name, value in characteristics.items():
+                    char_name_lower = char_name.lower()
+                    if char_name_lower in foundry_character["system"]["characteristics"]:
+                        # Add the characteristic increase (not max)
+                        current = foundry_character["system"]["characteristics"][char_name_lower].get("value", 0)
+                        foundry_character["system"]["characteristics"][char_name_lower]["value"] = current + value
+                    # Handle 'max' constraint
+                    if "max" in advancement and char_name_lower in foundry_character["system"]["characteristics"]:
+                        max_val = advancement["max"]
+                        foundry_character["system"]["characteristics"][char_name_lower]["value"] = min(
+                            foundry_character["system"]["characteristics"][char_name_lower]["value"], 
+                            max_val
+                        )
+
+
+def _apply_item_immunities_weaknesses(foundry_character, character_level):
+    """Extract immunities/weaknesses from all items and apply to character.
+    
+    Parses effect descriptions and item descriptions for lookup formulas like
+    [[lookup 5+@level evaluate=true]] and structured Damage Modifier effects.
+    """
+    import re
+    
+    damage_type_map = {
+        "fire": "fire",
+        "cold": "cold",
+        "acid": "acid",
+        "lightning": "lightning",
+        "poison": "poison",
+        "psychic": "psychic",
+        "sonic": "sonic",
+        "corruption": "corruption",
+        "holy": "holy",
+    }
+    
+    def apply_modifier(dmg_type, value, is_immunity):
+        dmg_type = damage_type_map.get(dmg_type.lower(), dmg_type.lower())
+        target = foundry_character["system"]["damage"]["immunities"] if is_immunity else foundry_character["system"]["damage"]["weaknesses"]
+        if dmg_type in target:
+            target[dmg_type] = max(target[dmg_type], value)
+    
+    # Pattern for lookup formulas: [[lookup FORMULA evaluate=true]]
+    lookup_pattern = re.compile(r'\[\[lookup\s+(.+?)\s+evaluate=true\]\]')
+    
+    # Pattern for immunity/weakness in text: "X immunity N" or "immunity to X N"
+    immunity_text_pattern = re.compile(r'(\w+)\s+immunity\s+(?:equal\s+to\s+)?(\d+)|immunity\s+to\s+(\w+)\s+(\d+)', re.IGNORECASE)
+    weakness_text_pattern = re.compile(r'(\w+)\s+weakness\s+(\d+)|weakness\s+to\s+(\w+)\s+(\d+)', re.IGNORECASE)
+    
+    for item in foundry_character.get("items", []):
+        system = item.get("system", {})
+        
+        # Check effects for lookup formulas and Damage Modifier type effects
+        for effect in item.get("effects", []):
+            # Check effect changes for Damage Modifier type
+            for change in effect.get("changes", []):
+                if change.get("key") == "system.damage.immunities" or change.get("key") == "system.damage.weaknesses":
+                    # This is a direct immunity/weakness effect
+                    pass  # Already handled by Foundry at runtime
+            
+            # Check effect description for lookup formulas with immunity/weakness
+            effect_desc = effect.get("description", "")
+            if effect_desc:
+                # Look for immunity/weakness context around lookup
+                lookup_matches = list(lookup_pattern.finditer(effect_desc))
+                for match in lookup_matches:
+                    formula = match.group(1).strip()
+                    evaluated = _evaluate_lookup_formula(formula, character_level)
+                    try:
+                        value = int(evaluated)
+                    except (ValueError, TypeError):
+                        continue
+                    
+                    # Check context around the lookup for immunity/weakness and damage type
+                    # Get text before the lookup
+                    before_text = effect_desc[:match.start()].lower()
+                    # Check for damage type keywords near the lookup
+                    for dmg_type in damage_type_map.keys():
+                        if dmg_type in before_text[-50:]:  # Within 50 chars before lookup
+                            if "immun" in before_text[-50:]:
+                                apply_modifier(dmg_type, value, True)
+                            elif "weak" in before_text[-50:]:
+                                apply_modifier(dmg_type, value, False)
+        
+        # Check item description for lookup formulas (e.g., Disciple of Fire)
+        description = system.get("description", {}).get("value", "")
+        if description:
+            # Parse lookup formulas in description with immunity/weakness context
+            lookup_matches = list(lookup_pattern.finditer(description))
+            for match in lookup_matches:
+                formula = match.group(1).strip()
+                evaluated = _evaluate_lookup_formula(formula, character_level)
+                try:
+                    value = int(evaluated)
+                except (ValueError, TypeError):
+                    continue
+                
+                # Check context for damage type and immunity/weakness
+                before_text = description[:match.start()].lower()
+                after_text = description[match.end():match.end()+50].lower()
+                context = before_text[-100:] + after_text
+                
+                for dmg_type in damage_type_map.keys():
+                    if dmg_type in context:
+                        if "immun" in context:
+                            apply_modifier(dmg_type, value, True)
+                        elif "weak" in context:
+                            apply_modifier(dmg_type, value, False)
+            
+            # Also check for plain text immunity/weakness statements
+            for match in immunity_text_pattern.finditer(description):
+                groups = match.groups()
+                if groups[0] and groups[1]:  # "X immunity N"
+                    dmg_type, value = groups[0].lower(), int(groups[1])
+                elif groups[2] and groups[3]:  # "immunity to X N"
+                    dmg_type, value = groups[2].lower(), int(groups[3])
+                else:
+                    continue
+                apply_modifier(dmg_type, value, True)
+            
+            for match in weakness_text_pattern.finditer(description):
+                groups = match.groups()
+                if groups[0] and groups[1]:  # "X weakness N"
+                    dmg_type, value = groups[0].lower(), int(groups[1])
+                elif groups[2] and groups[3]:  # "weakness to X N"
+                    dmg_type, value = groups[2].lower(), int(groups[3])
+                else:
+                    continue
+                apply_modifier(dmg_type, value, False)
+        
+        # Check for structured Damage Modifier effects in item system (for features converted from source)
+        # This handles features like Ward of Excellent Protection choices
+        if "effects" in system:
+            for effect in system["effects"]:
+                for change in effect.get("changes", []):
+                    key = change.get("key", "")
+                    if "damage.immunities" in key:
+                        dmg_type = key.split(".")[-1]
+                        value = change.get("value", 0)
+                        try:
+                            apply_modifier(dmg_type, int(value), True)
+                        except (ValueError, TypeError):
+                            pass
+                    elif "damage.weaknesses" in key:
+                        dmg_type = key.split(".")[-1]
+                        value = change.get("value", 0)
+                        try:
+                            apply_modifier(dmg_type, int(value), False)
+                        except (ValueError, TypeError):
+                            pass
 
 
 def _normalize_skill_name(skill_name):
@@ -1276,58 +1597,73 @@ def _process_choice_advancement(
 def _populate_advancement_selections(character_data, source_data, compendium_items):
     """Populate advancement selections in flags for skills and languages from origin items.
 
-    Uses positional matching between Forgesteel Skill Choice features and Foundry pack
-    skill advancements, so each advancement gets the exact skills the user selected.
+    Matches Forgesteel Skill Choice features to Foundry pack skill advancements by
+    level and chooseN, so each advancement gets the exact skills the user selected.
     """
     # Note: Actor-level flags remain empty - all selections are stored at the item level only
 
-    def _get_skill_choices(features_list):
-        """Extract ordered Skill Choice selections from a features list (Title Case)."""
+    def _get_skill_choices_with_level(features_list, level):
+        """Extract Skill Choice selections from a features list with level info.
+        
+        Returns list of tuples: (level, chooseN, [skills...])
+        """
         result = []
         if not features_list:
             return result
         for feature in features_list:
             if feature.get("type") == "Skill Choice":
-                skills = feature.get("data", {}).get("selected", [])
+                data = feature.get("data", {})
+                skills = data.get("selected", [])
+                choose_n = data.get("count", 1)
                 if skills:
-                    result.append([_normalize_skill_name(s) for s in skills])
+                    result.append((level, choose_n, [_normalize_skill_name(s) for s in skills]))
             elif feature.get("type") == "Multiple Features":
                 for sub_feature in feature.get("data", {}).get("features", []):
                     if sub_feature.get("type") == "Skill Choice":
-                        skills = sub_feature.get("data", {}).get("selected", [])
+                        data = sub_feature.get("data", {})
+                        skills = data.get("selected", [])
+                        choose_n = data.get("count", 1)
                         if skills:
-                            result.append([_normalize_skill_name(s) for s in skills])
+                            result.append((level, choose_n, [_normalize_skill_name(s) for s in skills]))
         return result
 
     def _get_culture_skill_choices(culture):
-        """Extract ordered Skill Choice selections from culture subsections."""
+        """Extract Skill Choice selections from culture subsections.
+        
+        Culture skills don't have a level in the source, treat as level 1.
+        """
         result = []
         if not culture:
             return result
         for section_name in ["language", "environment", "organization", "upbringing"]:
             section = culture.get(section_name, {})
             if section.get("type") == "Skill Choice":
-                skills = section.get("data", {}).get("selected", [])
+                data = section.get("data", {})
+                skills = data.get("selected", [])
+                choose_n = data.get("count", 1)
                 if skills:
-                    result.append([_normalize_skill_name(s) for s in skills])
+                    result.append((1, choose_n, [_normalize_skill_name(s) for s in skills]))
         return result
 
-    # Build source-to-choices mapping: item type -> ordered list of Skill Choice selections
+    # Build source-to-choices mapping: item type -> list of (level, chooseN, [skills...])
     source_choices = {}
 
     ancestry = source_data.get("ancestry", {})
     if ancestry:
-        source_choices["ancestry"] = _get_skill_choices(ancestry.get("features", []))
+        # Ancestry skills are typically at level 1
+        source_choices["ancestry"] = _get_skill_choices_with_level(ancestry.get("features", []), 1)
 
     career = source_data.get("career", {})
     if career:
-        source_choices["career"] = _get_skill_choices(career.get("features", []))
+        # Career skills are typically at level 1
+        source_choices["career"] = _get_skill_choices_with_level(career.get("features", []), 1)
 
     class_data = source_data.get("class", {})
     if class_data:
         class_choices = []
         for level_data in class_data.get("featuresByLevel", []):
-            class_choices.extend(_get_skill_choices(level_data.get("features", [])))
+            level_num = level_data.get("level", 1)
+            class_choices.extend(_get_skill_choices_with_level(level_data.get("features", []), level_num))
         source_choices["class"] = class_choices
 
     culture = source_data.get("culture", {})
@@ -1342,7 +1678,7 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
                 level_num = level_data.get("level", 1)
                 if level_num <= class_data.get("level", 1):
                     subclass_choices.extend(
-                        _get_skill_choices(level_data.get("features", []))
+                        _get_skill_choices_with_level(level_data.get("features", []), level_num)
                     )
             if subclass_choices:
                 source_choices["subclass"] = subclass_choices
@@ -1369,10 +1705,19 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
         if "advancement" not in item["flags"]["draw-steel"]:
             item["flags"]["draw-steel"]["advancement"] = {}
 
-        # Get the ordered skill choices for this item's source
+        # Get the skill choices for this item's source, grouped by (level, chooseN)
         item_type = item.get("type")
-        skill_choices = source_choices.get(item_type, [])
-        choice_index = 0
+        skill_choices_list = source_choices.get(item_type, [])
+        
+        # Build a mapping from (level, chooseN) -> list of skill selections
+        # (there could be multiple choices with same level/chooseN, use them in order)
+        from collections import defaultdict
+        source_choices_by_key = defaultdict(list)
+        for level, choose_n, skills in skill_choices_list:
+            source_choices_by_key[(level, choose_n)].append(skills)
+        
+        # Track which source choice index we've used for each (level, chooseN) key
+        used_choice_index = defaultdict(int)
 
         # For each advancement in the item
         for advancement_id, advancement in item["system"]["advancements"].items():
@@ -1382,15 +1727,26 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
             if advancement_type not in ["skill", "language"]:
                 continue
 
-            # Handle skill advancements using positional matching
+            # Handle skill advancements using level+chooseN matching
             if advancement_type == "skill":
                 skills_in_adv = advancement.get("skills", {})
                 choices = skills_in_adv.get("choices", [])
                 groups = skills_in_adv.get("groups", [])
+                adv_level = advancement.get("requirements", {}).get("level", 1) or 1
+                adv_choose_n = advancement.get("chooseN", 1)
 
-                if (choices or groups) and choice_index < len(skill_choices):
-                    selected_skills = skill_choices[choice_index]
-                    choice_index += 1
+                # Skip advancements with completely fixed choices (not user-selectable)
+                # Fixed choices: choices is non-empty AND groups is empty (no group restriction = fixed list)
+                # User-selectable: choices is empty (any skill) OR groups is non-empty (restricted group)
+                if choices and not groups:
+                    continue
+
+                key = (adv_level, adv_choose_n)
+                
+                # Match by level and chooseN
+                if key in source_choices_by_key and used_choice_index[key] < len(source_choices_by_key[key]):
+                    selected_skills = source_choices_by_key[key][used_choice_index[key]]
+                    used_choice_index[key] += 1
 
                     if selected_skills:
                         selection_data = {"selected": selected_skills}
@@ -1398,7 +1754,7 @@ def _populate_advancement_selections(character_data, source_data, compendium_ite
                             selection_data
                         )
 
-            # Handle language advancements
+            # Handle language advancements (unchanged)
             elif advancement_type == "language":
                 # For languages, collect from the appropriate source based on item type
                 selected_languages = set()
@@ -1634,15 +1990,13 @@ def _process_skills_from_advancements(character_data, source_data):
     # Add skills to skills section (avoid duplicates)
     if collected_skills:
         existing_skills = list(
-            character_data.get("system", {}).get("skills", {}).get("value", {}).keys()
+            character_data.get("system", {}).get("skills", {}).get("value", [])
         )
-        # Combine and deduplicate, then convert to object format
+        # Combine and deduplicate
         all_skills = list(dict.fromkeys(existing_skills + collected_skills))
-        character_data["system"]["skills"]["value"] = {
-            skill: True for skill in all_skills
-        }
+        character_data["system"]["skills"]["value"] = all_skills
     else:
-        character_data["system"]["skills"]["value"] = {}
+        character_data["system"]["skills"]["value"] = []
 
 
 def _post_process_languages_and_culture(character_data, source_data):
