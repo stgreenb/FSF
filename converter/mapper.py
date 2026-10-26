@@ -505,6 +505,48 @@ def _apply_stamina_bonus_effects(class_item, character_data, character_level, fo
         )
 
 
+def _apply_pending_damage_modifiers(foundry_character, pending, character_level):
+    """Apply deferred ForgeSteel 'Damage Modifier' pseudo-features.
+
+    ForgeSteel encodes immunities/weaknesses as numeric Damage Modifier
+    features; compendium items (e.g. Disciple of Fire) usually already carry
+    the same values as effect changes. Grant a modifier at the actor level
+    only when no emitted item effect covers the same damage key, so values
+    are never double-counted."""
+    if not pending:
+        return
+    granted = set()
+    for item in foundry_character.get("items", []):
+        for effect in item.get("effects", []) or []:
+            if not isinstance(effect, dict):
+                continue
+            change_sets = [
+                effect.get("changes") or [],
+                (effect.get("system") or {}).get("changes") or [],
+            ]
+            for changes in change_sets:
+                if isinstance(changes, dict):
+                    changes = list(changes.values())
+                for change in changes:
+                    if isinstance(change, dict):
+                        granted.add(str(change.get("key", "")))
+    for feature in pending:
+        for modifier in feature.get("data", {}).get("modifiers", []) or []:
+            dtype = (modifier.get("damageType") or "").lower()
+            mtype = (modifier.get("type") or "").lower()
+            if not dtype or mtype not in ("immunity", "weakness"):
+                continue
+            field = "immunities" if mtype == "immunity" else "weaknesses"
+            key = f"system.damage.{field}.{dtype}"
+            if key in granted:
+                continue
+            computed = _fs_modifier_value(modifier, character_level)
+            target = foundry_character["system"]["damage"].get(field)
+            if target is not None and dtype in target:
+                target[dtype] = max(target[dtype], computed)
+                granted.add(key)
+
+
 def convert_character(character_data, compendium_items, strict=False, verbose=False):
     """Converts forgesteel character data to Foundry VTT format.
 
@@ -522,6 +564,8 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
     # Detect character level using multi-source detection
     character_level = LevelDetector.detect_level(character_data)
+    # Deferred Damage Modifier pseudo-features (granted in post-processing)
+    pending_damage_modifiers = []
     if verbose:
         level_summary = LevelDetector.get_level_detection_summary(character_data)
         print(f"Level detection: {level_summary}")
@@ -942,6 +986,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                     if feature_type == "Class Ability":
                         continue
 
+                    # Defer Damage Modifier pseudo-features to post-processing
+                    if feature_type == "Damage Modifier":
+                        pending_damage_modifiers.append(feature)
+                        continue
+
                     # Handle Domain Feature by extracting selected abilities
                     if feature_type == "Domain Feature":
                         selected_items = feature_data.get("selected", [])
@@ -960,6 +1009,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                         "Characteristic Bonus",
                                         "Proficiency",
                                     ]:
+                                        continue
+
+                                    if nested_type == "Damage Modifier":
+                                        pending_damage_modifiers.append(nested_feature)
                                         continue
 
                                     if nested_type == "Ability":
@@ -1056,6 +1109,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 "Bonus",
                             ]:
                                 continue
+                            # Defer Damage Modifier pseudo-features
+                            if selected_type == "Damage Modifier":
+                                pending_damage_modifiers.append(selected_feature)
+                                continue
                             item_type = (
                                 "ability" if selected_type == "Ability" else "feature"
                             )
@@ -1079,6 +1136,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 "Characteristic Bonus",
                                 "Proficiency",
                             ]:
+                                continue
+
+                            # Defer Damage Modifier pseudo-features
+                            if nested_type == "Damage Modifier":
+                                pending_damage_modifiers.append(nested_feature)
                                 continue
 
                             if nested_type == "Ability":
@@ -1198,6 +1260,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                     if feature_type == "Skill Choice":
                         continue
 
+                    # Defer Damage Modifier pseudo-features to post-processing
+                    if feature_type == "Damage Modifier":
+                        pending_damage_modifiers.append(feature)
+                        continue
+
                     # Process Kit features to get kit abilities
                     if feature_type == "Kit":
                         # Process the selected kits and their abilities
@@ -1217,6 +1284,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 "Characteristic Bonus",
                                 "Proficiency",
                             ]:
+                                continue
+
+                            # Defer Damage Modifier pseudo-features
+                            if nested_type == "Damage Modifier":
+                                pending_damage_modifiers.append(nested_feature)
                                 continue
 
                             if nested_type == "Ability":
@@ -1267,6 +1339,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             if selected_type in [
                                 "Bonus",
                             ]:
+                                continue
+                            # Defer Damage Modifier pseudo-features
+                            if selected_type == "Damage Modifier":
+                                pending_damage_modifiers.append(selected_feature)
                                 continue
                             item_type = (
                                 "ability" if selected_type == "Ability" else "feature"
@@ -1334,6 +1410,10 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         feature_type = feature.get("type", "")
         # Skip placeholder/framework features
         if feature_type in ["Language Choice", "Skill Choice"]:
+            continue
+        # Defer Damage Modifier pseudo-features to post-processing
+        if feature_type == "Damage Modifier":
+            pending_damage_modifiers.append(feature)
             continue
         item = _convert_feature(feature, "feature", compendium_items, character_level)
         if item:
@@ -1467,6 +1547,9 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     _post_process_languages_and_culture(foundry_character, character_data)
     _fix_ability_types(foundry_character)
     _apply_item_immunities_weaknesses(foundry_character, character_level)
+    _apply_pending_damage_modifiers(
+        foundry_character, pending_damage_modifiers, character_level
+    )
 
     return foundry_character
 
