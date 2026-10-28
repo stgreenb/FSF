@@ -263,3 +263,81 @@ def parse_skill_groups(config_path: str) -> Dict[str, str]:
     return found
 
 
+# ---------------------------------------------------------------------------
+# Project / treasure item accessors (change add-project-and-inventory-conversion)
+#
+# Schema authority: draw_steel_repo (pinned tags/1.1.0)
+#   data/item/project.mjs defineSchema():
+#     system.type / prerequisites (text) / projectSource (text) /
+#     rollCharacteristic (set) / goal (nullable int) / points (int) /
+#     yield.document (UUID) / yield.amount / yield.display
+#   No prerequisite/source satisfaction booleans exist (design D5).
+#   Treasure items embed system.project {prerequisites, source,
+#   rollCharacteristic[], yield, goal} — definition only, never progress (D2).
+# ---------------------------------------------------------------------------
+
+def _project_system(item: Dict[str, Any]) -> Dict[str, Any]:
+    sysb = item.get("system")
+    return sysb if isinstance(sysb, dict) else {}
+
+
+def project_points(item: Dict[str, Any]) -> int:
+    val = _project_system(item).get("points")
+    return val if isinstance(val, int) and val >= 0 else 0
+
+
+def project_goal(item: Dict[str, Any]) -> Optional[int]:
+    val = _project_system(item).get("goal")
+    return val if isinstance(val, int) and val >= 1 else None
+
+
+def project_prerequisites_text(item: Dict[str, Any]) -> str:
+    val = _project_system(item).get("prerequisites")
+    return val if isinstance(val, str) else ""
+
+
+def project_source_text(item: Dict[str, Any]) -> str:
+    val = _project_system(item).get("projectSource")
+    return val if isinstance(val, str) else ""
+
+
+def project_roll_characteristics(item: Dict[str, Any]) -> List[str]:
+    val = _project_system(item).get("rollCharacteristic")
+    if isinstance(val, (list, set, tuple)):
+        return [str(c) for c in val if isinstance(c, (str, int)) and str(c)]
+    return []
+
+
+def project_kind(item: Dict[str, Any]) -> str:
+    val = _project_system(item).get("type")
+    return val if isinstance(val, str) and val else "research"
+
+
+def project_yield_document(item: Dict[str, Any]) -> Optional[str]:
+    yld = _project_system(item).get("yield")
+    if isinstance(yld, dict):
+        doc = yld.get("document")
+        if isinstance(doc, str) and doc:
+            return doc
+    return None
+
+
+def treasure_quantity(item: Dict[str, Any]) -> int:
+    val = _project_system(item).get("quantity")
+    return val if isinstance(val, int) and val >= 1 else 1
+
+
+def treasure_project_block(item: Dict[str, Any]) -> Dict[str, Any]:
+    """Crafting definition embedded on a treasure (definition only — per D2
+    it is never a progress source)."""
+    block = _project_system(item).get("project")
+    return block if isinstance(block, dict) else {}
+
+
+def project_description(item: Dict[str, Any]) -> str:
+    """Plain-text project description (HTML tags stripped from the export)."""
+    value = _project_system(item).get("description")
+    raw = value.get("value") if isinstance(value, dict) else None
+    if not isinstance(raw, str) or not raw:
+        return ""
+    return " ".join(re.sub(r"<[^>]+>", " ", raw).split())

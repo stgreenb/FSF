@@ -192,7 +192,49 @@ def validate_document(doc: Dict[str, Any], spec: Dict[str, Any]) -> List[str]:
             violations.append(
                 f"$/feature[{feature.get('id')}]: required key '{key}' missing"
             )
+    violations.extend(_numeric_invariants(doc))
     return violations
+
+
+def _numeric_invariants(doc: Dict[str, Any]) -> List[str]:
+    """Hand-written range invariants for projects/inventory (task 4.1):
+    corpus seeding types but cannot infer ranges."""
+    out: List[str] = []
+    state = doc.get("state")
+    if not isinstance(state, dict):
+        return out
+    for proj in state.get("projects") or []:
+        if not isinstance(proj, dict):
+            out.append("$/state/projects[]: expected object")
+            continue
+        pid = proj.get("id", "?")
+        goal = proj.get("goal")
+        if goal is not None and (not isinstance(goal, int) or goal < 1):
+            out.append(f"$/state/projects/{pid}/goal: expected int >= 1")
+        progress = proj.get("progress")
+        if isinstance(progress, dict):
+            pts = progress.get("points")
+            if pts is not None and (not isinstance(pts, int) or pts < 0):
+                out.append(
+                    f"$/state/projects/{pid}/progress/points: expected "
+                    "int >= 0")
+        elif progress is not None:
+            out.append(f"$/state/projects/{pid}/progress: expected object")
+    for entry in state.get("inventory") or []:
+        if not isinstance(entry, dict):
+            out.append("$/state/inventory[]: expected object")
+            continue
+        eid = entry.get("id", "?")
+        count = entry.get("count")
+        if count is not None and (not isinstance(count, int) or count < 1):
+            out.append(f"$/state/inventory/{eid}/count: expected int >= 1")
+        crafting = entry.get("crafting")
+        if isinstance(crafting, dict):
+            cgoal = crafting.get("goal")
+            if cgoal is not None and (not isinstance(cgoal, int) or cgoal < 1):
+                out.append(f"$/state/inventory/{eid}/crafting/goal: "
+                           "expected int >= 1")
+    return out
 
 
 def load_spec(spec_path: str = SPEC_PATH) -> Dict[str, Any]:

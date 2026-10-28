@@ -1586,7 +1586,33 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             treasure_item["system"]["description"]["value"] = (
                 (desc_value + "\n\n" + "\n\n".join(extras)).strip()
             )
+        # Task 1.3: hero-file count -> Foundry quantity; crafting definition
+        # text surfaces on the item (module treasures are text-only).
+        count = item.get("count")
+        if isinstance(count, int) and count > 0:
+            treasure_item["system"]["quantity"] = count
+        crafting = item.get("crafting")
+        if isinstance(crafting, dict):
+            new_desc = (
+                treasure_item.get("system", {}).get("description", {}).get("value")
+                or ""
+            )
+            prereq = crafting.get("itemPrerequisites") or ""
+            if prereq and prereq not in new_desc:
+                goal = crafting.get("goal")
+                line = f"Crafting: {prereq}"
+                if goal:
+                    line += f" (goal {goal})"
+                src = crafting.get("source")
+                if src:
+                    line += f". Source: {src}"
+                treasure_item["system"]["description"]["value"] = (
+                    (new_desc + "\n\n" + line).strip()
+                )
         foundry_character["items"].append(treasure_item)
+
+    # Projects
+    _convert_projects(foundry_character, character_data, compendium_items)
 
     # Encode non-class Stamina Bonus features (e.g. Enchantment of Battle) as
     # an item effect so Foundry's derived stamina matches ForgeSteel. Runs
@@ -1998,6 +2024,143 @@ def _process_choice_advancement(
 
 
 # ---------------------------------------------------------------------------
+# state.projects -> Foundry 'project' items
+#
+# Authoritative schema: draw_steel_repo (pinned tags/1.1.0)
+#   src/module/data/item/project.mjs defineSchema():
+#     system.type              StringField required   one of ds.CONFIG.projects
+#                                                            .types: crafting,
+#                                                            research, ...
+#     system.prerequisites     StringField required   free TEXT (no bool field)
+#     system.projectSource     StringField required   free TEXT (no bool field)
+#     system.rollCharacteristic SetField              lower-case names
+#     system.goal              NumberField nullable integer min 1
+#     system.points            NumberField required integer min 0, initial 0
+#     system.events            DocumentUUIDField      (module default; left out)
+#     system.yield             {document UUID, amount formula, display text}
+#
+# FS project (hero state.projects entry)      ->  Foundry project item
+#   id ('<x>-crafting')                        ->  system._dsid (provenance)
+#   name                                       ->  name
+#   description                                ->  system.description.value (HTML)
+#   itemPrerequisites (text)                   ->  system.prerequisites
+#   source (text)                              ->  system.projectSource
+#   characteristic[] ('Might', ...)            ->  system.rollCharacteristic[]
+#                                                 (lower-cased)
+#   goal                                       ->  system.goal
+#   progress.points                            ->  system.points (build state,
+#                                                 exempt from full-rest reset)
+#   (kind inferred: id suffix '-crafting' or
+#    'Craft ' name prefix)                     ->  system.type 'crafting',
+#                                                 else 'research'
+#   crafting-target treasure (name lookup)     ->  system.yield.document:
+#         Actor.<actor>.Item.<treasure> when the hero already owns the item,
+#         else Compendium.draw-steel.rewards.Item.<pack _id> when the pack
+#         carries it (module _preCreate, project.mjs:85-110, then copies
+#         type/prereqs/rollChar/goal/source from the treasure's system.project
+#         — idempotent against the values set here), else omitted.
+#   progress.prerequisites (bool)              ->  DROPPED: module schema has no
+#   progress.source (bool)                        satisfaction field (sheet
+#                                                 renders plain text areas);
+#                                                 reverse defaults false.
+#   progress.followerID, isCustom              ->  DROPPED: no Foundry analogue
+#                                                 (design non-goals).
+# ---------------------------------------------------------------------------
+def _convert_projects(foundry_character, character_data, compendium_items):
+    """Emit one Foundry 'project' item per hero state.projects entry."""
+    projects = character_data.get("state", {}).get("projects") or []
+    if not isinstance(projects, list):
+        return
+    from .writer import _generate_foundry_id
+    # yield.document links need stable item ids; the writer only backfills
+    # missing ones at write time, so pre-assign here when a link needs one.
+    if not foundry_character.get("_id"):
+        foundry_character["_id"] = _generate_foundry_id()
+    items_by_name = {}
+    for it in foundry_character["items"]:
+        if it.get("type") == "treasure":
+            if not it.get("_id"):
+                it["_id"] = _generate_foundry_id()
+            items_by_name.setdefault(str(it.get("name", "")).casefold(), it)
+    actor_id = foundry_character.get("_id") or ""
+
+    for proj in projects:
+        if not isinstance(proj, dict) or not proj.get("name"):
+            print(f"WARNING: skipping malformed state.projects entry: {proj!r}")
+            continue
+        name = proj["name"]
+        pid = proj.get("id") or ""
+        progress = proj.get("progress") or {}
+        points = progress.get("points")
+        roll_chars = [
+            str(c).casefold()
+            for c in (proj.get("characteristic") or [])
+            if isinstance(c, str) and c.strip()
+        ]
+        proj_type = (
+            "crafting"
+            if pid.endswith("-crafting") or name.startswith("Craft ")
+            else "research"
+        )
+        yield_document = ""
+        target = name[len("Craft "):].strip() if name.startswith("Craft ") else ""
+        if target:
+            owned = items_by_name.get(target.casefold())
+            if owned is not None and actor_id and owned.get("_id"):
+                yield_document = f"Actor.{actor_id}.Item.{owned['_id']}"
+            else:
+                pack = next(
+                    (
+                        ci for ci in compendium_items.values()
+                        if ci.get("type") == "treasure"
+                        and str(ci.get("name", "")).casefold() == target.casefold()
+                    ),
+                    None,
+                )
+                if pack is not None and pack.get("_id"):
+                    yield_document = (
+                        f"Compendium.draw-steel.rewards.Item.{pack['_id']}"
+                    )
+        description = proj.get("description") or ""
+        system = {
+            "_dsid": pid,
+            "description": {
+                "value": f"<p>{description}</p>" if description else "",
+                "director": "",
+            },
+            "type": proj_type,
+            "prerequisites": proj.get("itemPrerequisites") or "",
+            "projectSource": proj.get("source") or "",
+            "rollCharacteristic": roll_chars,
+            "goal": proj.get("goal") if isinstance(proj.get("goal"), int) else None,
+            "points": points if isinstance(points, int) and points >= 0 else 0,
+            "yield": {
+                "document": yield_document,
+                "amount": "1",
+                "display": "",
+            },
+        }
+        foundry_character["items"].append({
+            "name": name,
+            "type": "project",
+            "img": "icons/svg/mystery-man.svg",
+            "system": system,
+            "effects": [],
+            "flags": {},
+            "_stats": {
+                "compendiumSource": None,
+                "duplicateSource": None,
+                "exportSource": None,
+                "coreVersion": "13.350",
+                "systemId": "draw-steel",
+                "systemVersion": "1.1.0",
+            },
+        })
+    if projects:
+        print(f"Projects: converted {sum(1 for p in projects if isinstance(p, dict))}"
+              f" project(s) from state.projects")
+
+
 def _populate_advancement_selections(character_data, source_data, compendium_items):
     """Populate advancement selections in flags for skills and languages from origin items.
 

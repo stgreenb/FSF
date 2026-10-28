@@ -531,12 +531,7 @@ class ReverseMapper:
             if item.itype in origin_types:
                 continue
             if item.itype in (ff.TYPE_TREASURE, ff.TYPE_PROJECT):
-                self.report.loss(item.name, item.itype, item.dsid,
-                                 reason="unsupported-construct",
-                                 action="dropped",
-                                 detail="loot/projects not represented "
-                                        "in .ds-hero")
-                continue
+                continue  # handled in the inventory / projects pipelines
             # paired canonical activate abilities fold into their feature
             if item.itype == ff.TYPE_ABILITY and item.dsid \
                     and item.dsid.endswith("-activate"):
@@ -754,8 +749,8 @@ class ReverseMapper:
             "wealth": wealth,
             "projectPoints": project_points,
             "conditions": [],
-            "inventory": [],
-            "projects": [],
+            "inventory": self._collect_inventory(),
+            "projects": self._collect_projects(),
             "controlledSlots": [],
             "notes": "",
             "encounterState": "ready",
@@ -781,6 +776,145 @@ class ReverseMapper:
             self.report.count(ff.TYPE_TITLE, converted=1)
         return titles
 
+    # --------------------------------------------------- projects & inventory
+    def _collect_projects(self) -> List[Dict[str, Any]]:
+        """Reconstruct state.projects from Foundry project items (D2: only
+        project items carry progress; treasure system.project blocks are
+        definitions for inventory hydration, never progress sources).
+
+        Satisfaction booleans (progress.prerequisites/source) default False:
+        the module schema records no satisfaction state (design D5)."""
+        projects: List[Dict[str, Any]] = []
+        for item in self.actor.by_type(ff.TYPE_PROJECT):
+            payload = None
+            if item.dsid:
+                payload, _src = self.provider.get(item.dsid)
+            if not isinstance(payload, dict) or "goal" not in payload:
+                payload = self.provider.samples.index.name_one(item.name)
+            goal = ff.project_goal(item.raw)
+            points = ff.project_points(item.raw)
+            chars = [c.capitalize() for c in ff.project_roll_characteristics(item.raw)]
+            prereq_text = ff.project_prerequisites_text(item.raw)
+            source_text = ff.project_source_text(item.raw)
+            if isinstance(payload, dict) and payload.get("name"):
+                entry = copy.deepcopy(payload)
+                if goal is not None:
+                    entry["goal"] = goal
+                if chars:
+                    entry["characteristic"] = chars
+                if prereq_text:
+                    entry["itemPrerequisites"] = prereq_text
+                if source_text:
+                    entry["source"] = source_text
+            else:
+                entry = {
+                    "id": item.dsid or "project-" + norm_key(item.name).replace(" ", "-"),
+                    "name": item.name,
+                    "description": ff.project_description(item.raw),
+                    "itemPrerequisites": prereq_text,
+                    "source": source_text,
+                    "characteristic": chars,
+                    "goal": goal,
+                    "isCustom": True,
+                }
+                self.report.loss(item.name, ff.TYPE_PROJECT, item.dsid,
+                                 reason="payload-unavailable",
+                                 action="defaulted",
+                                 detail="project definition not in ForgeSteel "
+                                        "data; rebuilt from the item alone — "
+                                        "re-check the project in ForgeSteel")
+            if goal is None:
+                entry.pop("goal", None)
+                self.report.loss(item.name, ff.TYPE_PROJECT, item.dsid,
+                                 reason="defaulted", action="defaulted",
+                                 detail="project item carried no goal")
+            progress = entry.get("progress")
+            if not isinstance(progress, dict):
+                progress = {}
+            progress["points"] = points
+            progress["prerequisites"] = False
+            progress["source"] = False
+            progress.setdefault("followerID", None)
+            entry["progress"] = progress
+            projects.append(entry)
+            self.report.count(ff.TYPE_PROJECT, converted=1)
+        return projects
+
+    def _collect_inventory(self) -> List[Dict[str, Any]]:
+        """Reconstruct state.inventory from treasure items (D3/D4: dump
+        items.json canonical via unique name match, sample corpus fallback;
+        identity is the name — count is carried state from the export)."""
+        inventory: List[Dict[str, Any]] = []
+        dump_items = self.fs.data.get("items", {})
+        for item in self.actor.by_type(ff.TYPE_TREASURE):
+            defn: Optional[Dict[str, Any]] = None
+            source = None
+            if item.dsid and item.dsid in dump_items:
+                defn, source = dump_items[item.dsid], "dump"
+            else:
+                matches = [obj for obj in dump_items.values()
+                           if isinstance(obj, dict)
+                           and norm_key(obj.get("name", "")) == norm_key(item.name)]
+                if len(matches) == 1:
+                    defn, source = matches[0], "dump"
+                elif len(matches) > 1:
+                    self.report.loss(item.name, ff.TYPE_TREASURE, item.dsid,
+                                     reason="payload-unavailable",
+                                     action="dropped",
+                                     detail="item name matches multiple ForgeSteel "
+                                            "definitions; not guessed")
+                    continue
+            sample_hit = self.provider.samples.index.name_one(item.name)
+            if defn is None:
+                if isinstance(sample_hit, dict):
+                    defn, source = sample_hit, "sample"
+                else:
+                    self.report.loss(item.name, ff.TYPE_TREASURE, item.dsid,
+                                     reason="payload-unavailable", action="dropped",
+                                     detail="no ForgeSteel item definition matches "
+                                            "this treasure")
+                    continue
+            elif (isinstance(sample_hit, dict) and source == "dump"
+                    and _canonical(defn) != _canonical(sample_hit)):
+                self.report.warning(
+                    "payload-divergence",
+                    f"{item.name}: dump item definition differs from sample "
+                    "corpus; dump used")
+            entry = copy.deepcopy(defn)
+            # count is carried state from the export, never the source def
+            entry["count"] = ff.treasure_quantity(item.raw)
+            fbl = entry.get("featuresByLevel")
+            if isinstance(fbl, list):
+                entry["featuresByLevel"] = [
+                    block for block in fbl
+                    if isinstance(block, dict)
+                    and isinstance(block.get("level"), int)
+                    and block["level"] <= self._level]
+            # crafting definition may exist only on the treasure itself
+            if not entry.get("crafting"):
+                block = ff.treasure_project_block(item.raw)
+                if block:
+                    entry["crafting"] = {
+                        "id": "item-crafting-" + norm_key(item.name).replace(" ", "-"),
+                        "name": f"Craft {item.name}",
+                        "description": f"Craft a {item.name}.",
+                        "itemPrerequisites": block.get("prerequisites") or "",
+                        "source": block.get("source") or "",
+                        "characteristic": [
+                            str(c).capitalize() for c in
+                            (block.get("rollCharacteristic") or [])
+                            if isinstance(c, str)],
+                        "goal": block.get("goal")
+                        if isinstance(block.get("goal"), int) else None,
+                        "isCustom": False,
+                    }
+            inventory.append(entry)
+            self.report.count(ff.TYPE_TREASURE, converted=1)
+        return inventory
+
+    # ------------------------------------------------------- skill slots
+    #: selection states that are genuine choices (vs. language choices and
+    #: static-data rules baked into the pseudo-data by design).
     _CHOICE_TYPES = ("Skill Choice", "Choice", "Perk", "Class Ability", "Kit",
                      "Ancestry Feature Choice", "Item Choice")
 

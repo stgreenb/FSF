@@ -96,3 +96,102 @@ class TestPluralVariantLookup(unittest.TestCase):
         self.assertEqual(hit.get("id"), "fury-1-4")
 
 
+class TestProjectEmission(unittest.TestCase):
+    """state.projects -> Foundry 'project' items (change
+    add-project-and-inventory-conversion, task 1.4)."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(KETH, encoding="utf-8") as fh:
+            hero = json.load(fh)
+        cls.compendium = load_compendium_items(
+            os.path.join(REPO, "draw_steel_repo", "src", "packs"))
+        cls.doc = convert_character(hero, cls.compendium)
+        cls.hero = hero
+
+    def _convert(self, mutate):
+        hero = json.loads(json.dumps(self.hero))
+        mutate(hero)
+        return convert_character(hero, self.compendium)
+
+    def test_project_item_emitted(self):
+        items = [i for i in self.doc["items"] if i.get("type") == "project"]
+        self.assertEqual(len(items), 1)
+        system = items[0]["system"]
+        self.assertEqual(system["_dsid"], "item-blade-of-quintessence-crafting")
+        self.assertEqual(items[0]["name"], "Craft Blade of Quintessence")
+        self.assertEqual(system["type"], "crafting")
+        self.assertEqual(system["goal"], 450)
+        self.assertEqual(system["points"], 11)
+        self.assertEqual(system["rollCharacteristic"],
+                         ["might", "reason", "intuition"])
+        self.assertIn("ruby hardened", system["prerequisites"])
+        self.assertEqual(system["projectSource"], "Texts or lore in Zaliac")
+
+    def test_project_yield_links_pack_treasure(self):
+        # Blade of Quintessence is not owned, so the link targets the pack.
+        items = [i for i in self.doc["items"] if i.get("type") == "project"]
+        doc_uuid = items[0]["system"]["yield"]["document"]
+        self.assertTrue(doc_uuid.startswith("Compendium.draw-steel.rewards."))
+
+    def test_owned_craft_target_links_actor_item(self):
+        def mutate(hero):
+            hero["state"]["projects"].append({
+                "id": "item-executioners-blade-crafting",
+                "name": "Craft Executioner's Blade",
+                "description": "Craft an Executioner's Blade.",
+                "itemPrerequisites": "The skull of a convicted criminal",
+                "source": "Texts or lore in Caelian",
+                "characteristic": ["Might", "Reason", "Intuition"],
+                "goal": 450, "isCustom": False,
+                "progress": {"prerequisites": True, "source": True,
+                             "followerID": None, "points": 3},
+            })
+        doc = self._convert(mutate)
+        actor_id = doc["_id"]
+        blade = next(i for i in doc["items"]
+                     if i.get("type") == "treasure"
+                     and i["name"] == "Executioner's Blade")
+        project = next(i for i in doc["items"]
+                       if i.get("type") == "project"
+                       and i["name"] == "Craft Executioner's Blade")
+        self.assertEqual(
+            project["system"]["yield"]["document"],
+            f"Actor.{actor_id}.Item.{blade['_id']}")
+
+    def test_empty_projects_emits_nothing(self):
+        doc = self._convert(lambda hero: hero["state"].update(projects=[]))
+        self.assertEqual([i for i in doc["items"]
+                          if i.get("type") == "project"], [])
+
+    def test_malformed_project_entry_skipped(self):
+        def mutate(hero):
+            hero["state"]["projects"] = ["nope", hero["state"]["projects"][0]]
+        doc = self._convert(mutate)
+        self.assertEqual(len([i for i in doc["items"]
+                              if i.get("type") == "project"]), 1)
+
+    # ---- inventory quantity / crafting text ----
+    def test_treasure_quantity_from_count(self):
+        def mutate(hero):
+            for it in hero["state"]["inventory"]:
+                if "Blade" in it["name"]:
+                    it["count"] = 3
+        doc = self._convert(mutate)
+        blade = next(i for i in doc["items"]
+                     if i.get("type") == "treasure"
+                     and i["name"] == "Executioner's Blade")
+        self.assertEqual(blade["system"]["quantity"], 3)
+
+    def test_treasure_crafting_text_surface(self):
+        blade = next(i for i in self.doc["items"]
+                     if i.get("type") == "treasure"
+                     and i["name"] == "Executioner's Blade")
+        desc = blade["system"]["description"]["value"]
+        self.assertIn("Crafting:", desc)
+        self.assertIn("skull of a convicted criminal", desc)
+        self.assertIn("goal 450", desc)
+
+
+if __name__ == "__main__":
+    unittest.main()

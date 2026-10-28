@@ -86,6 +86,15 @@ def semantic_projection(doc):
     out["state.core"] = (state["xp"], state["surges"], state["victories"],
                          state["renown"], state["wealth"])
     out["state.titles"] = sorted(t.get("id", "?") for t in state.get("titles", []))
+    # D3: identity = name (+crafting def); count is carried state, not identity
+    out["state.projects"] = sorted(
+        (t.get("name", "?"), t.get("goal"),
+         (t.get("progress") or {}).get("points"))
+        for t in state.get("projects", []))
+    out["state.inventory"] = sorted(
+        (t.get("name", "?"),
+         (t.get("crafting") or {}).get("goal") if t.get("crafting") else None)
+        for t in state.get("inventory", []))
     return out
 
 
@@ -182,6 +191,22 @@ class TestRoundTrip(unittest.TestCase):
 
     def test_keth(self):
         self.check_sample("Keth.ds-hero")
+
+    def test_keth_projects_inventory(self):
+        """Task 4.3: intermediate is generated at test time (never committed);
+        the cycle must restore the crafting project and both blades."""
+        rt_doc, fwd_doc, _report = run_roundtrip(os.path.join(REPO,
+                                                              "Keth.ds-hero"))
+        projects = rt_doc["state"]["projects"]
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0]["id"], "item-blade-of-quintessence-crafting")
+        self.assertEqual(projects[0]["goal"], 450)
+        self.assertEqual(projects[0]["progress"]["points"], 11)
+        # exactly one project item carried the progress (D2 no double count)
+        self.assertEqual(len([i for i in fwd_doc["items"]
+                              if i["type"] == "project"]), 1)
+        names = {i["name"] for i in rt_doc["state"]["inventory"]}
+        self.assertEqual(names, {"Black Ash Dart", "Executioner's Blade"})
 
     def test_drift_guard(self):
         """A perturbed reverse mapping must fail the suite loudly."""

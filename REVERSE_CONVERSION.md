@@ -59,6 +59,14 @@ done
 
 ## Known limitations (verified against live exports)
 
+- **Project satisfaction flags**: Foundry's project schema has no field for
+  prerequisite/source satisfaction; only the texts and points round-trip,
+  and reversed projects default the two satisfaction flags to false.
+- **Project progress rides both ways**: crafting points, goal, and
+  prerequisite/source wording travel forward (as Foundry project items)
+  and back; progress is read only from `project` items, never from a
+  treasure's embedded crafting block (which would double-count).
+
 - **Perk slot pairing**: the Foundry module models a Perk choice as an
   `itemGrant` advancement that never records which item was granted, and
   perk items carry no back-link to their granting definition. When two
@@ -133,7 +141,8 @@ payload losses.
 - `losses[]` — per item: `item`, `type`, `dsid`, `reason`, `action`, `detail`.
   Reasons: `unmappable` (no provenance, no name match — usually homebrew;
   re-create manually in the app), `payload-unavailable` (no ForgeSteel data
-  for the resolved dsid), `unsupported-construct` (extra classes — multi-classing is not
+  for the resolved dsid — also how unknown homebrew loot/projects are
+  reported), `unsupported-construct` (extra classes — multi-classing is not
   representable in `.ds-hero`), `version-mismatch`, `defaulted` (an unmade
   choice with a safe stand-in, e.g. the career inciting incident).
 - `warnings[]` — informational; never fail `--strict`: `payload-divergence`,
@@ -149,6 +158,14 @@ payload losses.
   module at all). The slot shows unfilled in the app; re-select.
 - **`unmappable`** — check whether the item is homebrew; if it is a renamed
   official item, restore its original name in Foundry and re-export.
+- **`payload-unavailable` treasure/project** — the item name matched no
+  ForgeSteel data (true homebrew, or an ambiguous double match). Projects
+  still ride with progress rebuilt from the export item alone — re-check
+  the wording in ForgeSteel. Homebrew loot must be re-created in the app.
+- **project satisfaction flags** — ForgeSteel tracks whether a project's
+  prerequisites/source were satisfied; the Foundry module has no field for
+  that, so reversed projects default those flags to false. Re-tick them in
+  ForgeSteel if they were satisfied (points/goal are unaffected).
 
 ## State convention: full-rest
 
