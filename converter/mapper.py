@@ -1,18 +1,7 @@
 import copy
 import json
 import os
-
-
-def _convert_feature(feature_data, item_type):
-    """Converts a forgesteel feature to a Foundry VTT item."""
-    return {
-        "name": feature_data.get("name"),
-        "type": item_type,
-        "img": "icons/svg/mystery-man.svg",
-        "system": {
-            "description": {"value": feature_data.get("description"), "director": ""}
-        },
-    }
+import re
 
 
 def _map_action_type(source_action_type, free=False):
@@ -163,6 +152,8 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
         "Clarity": "clarity-and-strain",
         "Glowing Eyes": "glowing-eyes",
         "Psionic Bolt": "psionic-bolt",  # Handle space naming difference
+        "Mighty Leaps": "mighty-leap",  # Singular/plural drift vs pack
+        "Headbutter": "headbutt",  # FS title text vs pack name
     }
 
     compendium_item = None
@@ -181,6 +172,7 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
             "feature": "feature",
             "perk": "perk",
             "project": "project",
+            "title": "title",
             "subclass": "subclass",
             "complication": "complication",
             "treasure": "treasure",
@@ -463,12 +455,33 @@ def _apply_stamina_bonus_effects(class_item, character_data, character_level, fo
     total = 0
     names = []
     class_primary_skipped = False
+    # 1.1 packs encode some ancestry stamina bonuses natively (e.g. the dwarf
+    # 'Spark Off Your Skin' carries system.stamina.bonuses.echelon). Features
+    # whose exported item already applies a stamina change must not be added
+    # again as a flat bonus or Foundry double-counts them.
+    def _name_key(text):
+        return re.sub(r"[^a-z0-9]+", "-", str(text).lower()).strip("-")
+
+    native_stamina_names = set()
+    for exported in foundry_character.get("items", []) or []:
+        sysb = exported.get("system", {}) or {}
+        candidates = list(sysb.get("effects", []) or [])
+        candidates.extend(exported.get("effects", []) or [])
+        for eff in candidates:
+            if not isinstance(eff, dict):
+                continue
+            changes = (eff.get("system", {}) or {}).get("changes") or eff.get("changes") or []
+            for ch in changes:
+                if isinstance(ch, dict) and str(ch.get("key", "")).startswith("system.stamina"):
+                    native_stamina_names.add(_name_key(exported.get("name", "")))
     for feature in sources:
         for expanded in _expand_ds_features(feature):
             if expanded.get("type") != "Bonus":
                 continue
             data = expanded.get("data") or {}
             if data.get("field") != "Stamina":
+                continue
+            if _name_key(expanded.get("name", "")) in native_stamina_names:
                 continue
             # The class's own Stamina bonus is already carried by the class item
             if (
@@ -962,12 +975,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             # Apply characteristic advancements from class item
             _apply_class_characteristic_advancements(item, character_level, foundry_character)
 
-            # Encode non-class Stamina Bonus features (e.g. Enchantment of Battle)
-            # as an item effect so Foundry's derived stamina matches ForgeSteel.
-            _apply_stamina_bonus_effects(
-                item, character_data, character_level, foundry_character
-            )
-
         # Process class features with level filtering
         for level_data in hero_class.get("featuresByLevel", []):
             level_num = level_data.get("level", 1)
@@ -1405,6 +1412,29 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         # Parse complication for immunities/weaknesses (e.g., "Fire and Chaos" gives fire immunity 5, cold weakness 5)
         _apply_complication_effects(foundry_character, complication)
 
+    # Titles: ForgeSteel stores earned titles under state.titles (each with
+    # its granted features). The module ships a 'title' item per title plus
+    # sibling feature items (e.g. Brawler grants "Duck!").
+    for title in character_data.get("state", {}).get("titles", []) or []:
+        if not isinstance(title, dict) or not title.get("id"):
+            continue
+        title_item = _convert_feature(title, "title", compendium_items,
+                                      character_level)
+        if title_item:
+            foundry_character["items"].append(title_item)
+        for feat in title.get("features", []) or []:
+            if not isinstance(feat, dict) or not feat.get("name"):
+                continue
+            fitem = _convert_feature(feat, "feature", compendium_items,
+                                     character_level)
+            if not fitem:
+                continue
+            # A feature named like its title (e.g. Angler's roll modifier)
+            # can name-match the title item itself; do not duplicate it.
+            if fitem.get("type") == "title":
+                continue
+            foundry_character["items"].append(fitem)
+
     # Top-level features
     for feature in character_data.get("features", []):
         feature_type = feature.get("type", "")
@@ -1535,8 +1565,41 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
     # Inventory
     for item in character_data.get("state", {}).get("inventory", []):
-        foundry_character["items"].append(
-            _convert_feature(item, "treasure", compendium_items, character_level)
+        treasure_item = _convert_feature(
+            item, "treasure", compendium_items, character_level
+        )
+        # Leveled treasure bonuses live in featuresByLevel and the official
+        # module ships treasures as text-only items, so surface the leveled
+        # text in the description for players to apply manually.
+        extras = []
+        desc_value = (
+            treasure_item.get("system", {}).get("description", {}).get("value") or ""
+        )
+        for level_block in item.get("featuresByLevel", []) or []:
+            if level_block.get("level", 1) > character_level:
+                continue
+            for feat in level_block.get("features", []) or []:
+                text = feat.get("description")
+                if text and text not in desc_value:
+                    extras.append(text)
+        if extras:
+            treasure_item["system"]["description"]["value"] = (
+                (desc_value + "\n\n" + "\n\n".join(extras)).strip()
+            )
+        foundry_character["items"].append(treasure_item)
+
+    # Encode non-class Stamina Bonus features (e.g. Enchantment of Battle) as
+    # an item effect so Foundry's derived stamina matches ForgeSteel. Runs
+    # after every item pass (inventory/titles included) so the native-effect
+    # scan sees stamina effects carried by late-added items.
+    class_foundry_item = next(
+        (i for i in foundry_character["items"] if i.get("type") == "class"),
+        None,
+    )
+    if class_foundry_item is not None:
+        _apply_stamina_bonus_effects(
+            class_foundry_item, character_data, character_level,
+            foundry_character
         )
 
     # Post-processing: Extract skills from item advancements
@@ -1934,6 +1997,7 @@ def _process_choice_advancement(
                             break
 
 
+# ---------------------------------------------------------------------------
 def _populate_advancement_selections(character_data, source_data, compendium_items):
     """Populate advancement selections in flags for skills and languages from origin items.
 

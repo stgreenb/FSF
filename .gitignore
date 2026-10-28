@@ -123,3 +123,7 @@ repomix-output.xml
 test_log*.txt
 conversion_log.txt
 *python*.txt
+.council-tmp/
+.council-log/
+openspec/changes/**/debug-*.md
+fs_data/

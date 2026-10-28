@@ -454,12 +454,15 @@ def _load_json_item(file_path, items_dict, verbose=False):
                     existing_type = existing_item.get("type", "")
                     existing_id = existing_item.get("_id", "")
 
-                    # If different types have the same dsid, use the _id as the key
-                    if existing_type != item_type:
-                        unique_key = item_id  # Use the unique _id instead
+                    # Some _dsids are type markers shared by many distinct
+                    # files (e.g. every treasure carries "_dsid": "treasure").
+                    # Any collision between distinct documents falls back to
+                    # the document's unique _id so nothing is silently dropped.
+                    if existing_type != item_type or existing_id != item_id:
+                        unique_key = item_id or os.path.basename(file_path)
                         if verbose:
                             print(
-                                f"DEBUG: Collision for {dsid} - using _id {item_id} for {item_type}"
+                                f"DEBUG: Collision for {dsid} - using {unique_key} for {item_type}"
                             )
 
                 # If we haven't seen this key yet, add it

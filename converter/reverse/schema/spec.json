@@ -1,0 +1,91 @@
+{
+  "blocks": {
+    "ancestry": [
+      "ancestryPoints",
+      "description",
+      "features",
+      "id",
+      "name"
+    ],
+    "career": [
+      "description",
+      "features",
+      "id",
+      "incitingIncidents",
+      "name"
+    ],
+    "class": [
+      "abilities",
+      "characteristics",
+      "description",
+      "featuresByLevel",
+      "id",
+      "level",
+      "name",
+      "primaryCharacteristics",
+      "primaryCharacteristicsOptions",
+      "subclassCount",
+      "subclassName",
+      "subclasses",
+      "type"
+    ],
+    "complication": [
+      "description",
+      "features",
+      "id",
+      "name"
+    ],
+    "culture": [
+      "description",
+      "environment",
+      "id",
+      "language",
+      "name",
+      "organization",
+      "type",
+      "upbringing"
+    ]
+  },
+  "corpus_size": 24,
+  "feature_required_keys": [
+    "data",
+    "description",
+    "id",
+    "name",
+    "type"
+  ],
+  "state_types": {
+    "conditions": "array",
+    "controlledSlots": "array",
+    "defeated": "boolean",
+    "encounterState": "string",
+    "heroTokens": "integer",
+    "hidden": "boolean",
+    "inventory": "array",
+    "notes": "string",
+    "projectPoints": "integer",
+    "projects": "array",
+    "recoveriesUsed": "integer",
+    "renown": "integer",
+    "staminaDamage": "integer",
+    "staminaTemp": "integer",
+    "surges": "integer",
+    "victories": "integer",
+    "wealth": "integer",
+    "xp": "integer"
+  },
+  "top_required": [
+    "abilityCustomizations",
+    "ancestry",
+    "career",
+    "class",
+    "complication",
+    "culture",
+    "features",
+    "folder",
+    "id",
+    "name",
+    "picture",
+    "state"
+  ]
+}
