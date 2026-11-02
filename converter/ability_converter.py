@@ -5,6 +5,7 @@ This module handles conversion of all class abilities from source data
 with proper level filtering and comprehensive validation.
 """
 
+import copy
 import logging
 from typing import Dict, Any, List, Set
 
@@ -137,8 +138,9 @@ class AbilityConverter:
         )
 
         if compendium_item:
-            # Use compendium item as base
-            result_item = compendium_item.copy()
+            # Use compendium item as base (deep: the system block is
+            # rewritten below and must never touch the shared index entry)
+            result_item = copy.deepcopy(compendium_item)
             result_item["type"] = "ability"
 
             # Override with source data if needed
@@ -233,6 +235,20 @@ class AbilityConverter:
                                 compendium_items: Dict[str, Any]) -> Dict[str, Any]:
         """Find ability in compendium with various matching strategies.
 
+        Matching stages (first hit wins):
+
+        1. blank guard — a blank name never matches (it would otherwise
+           match every item in the partial stage)
+        2. exact display-name match (case-insensitive)
+        3. partial (substring) match, case-insensitive
+        4. sanitized display-name comparison — ``TextNormalizer
+           .sanitize_for_compendium_lookup`` collapses whitespace runs
+           (pack ``'Psionic  Bolt'`` == Forgesteel ``'Psionic Bolt'``),
+           unifies unicode punctuation (curly vs straight apostrophes), and
+           maps British→American spellings. Both sides are sanitized
+           DISPLAY names; index keys are dsid slugs and are never
+           comparable to display names.
+
         Args:
             ability_name: Normalized ability name
             ability_level: Ability level for context
@@ -242,6 +258,11 @@ class AbilityConverter:
             Matching compendium item or None
         """
         from converter.text_normalizer import TextNormalizer
+
+        # A blank ability name must never match (an empty needle matches
+        # every name in the partial-match stage below)
+        if not ability_name or not ability_name.strip():
+            return None
 
         # Try exact name match first
         for item in compendium_items.values():
@@ -255,11 +276,16 @@ class AbilityConverter:
                 ability_name.lower() in item.get("name", "").lower()):
                 return item
 
-        # Try sanitized name match
+        # Try sanitized name match. Compare DISPLAY names, not the index
+        # keys: keys are dsid slugs (e.g. 'psionic-bolt') whose sanitized
+        # form can never equal a sanitized display name
+        # ('psionic  bolt' -> 'psionicbolt'). Sanitizing both sides of the
+        # name-to-name comparison is what collapses the pack's double
+        # spacing ('Psionic  Bolt') onto the Forgesteel spelling.
         sanitized_name = TextNormalizer.sanitize_for_compendium_lookup(ability_name)
-        for item_name, item in compendium_items.items():
+        for item in compendium_items.values():
             if (item.get("type") == "ability"):
-                item_sanitized = TextNormalizer.sanitize_for_compendium_lookup(item_name)
+                item_sanitized = TextNormalizer.sanitize_for_compendium_lookup(item.get("name", ""))
                 if item_sanitized == sanitized_name:
                     return item
 
