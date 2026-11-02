@@ -192,14 +192,24 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
                 None,
             )
 
-        # If not found by exact name, try finding by type and similar name
-        if not compendium_item and compendium_type:
+        # If not found by exact name, try finding by type and a guarded
+        # similar-name match (design D3): every token of the lookup name must
+        # appear as a whole token in the candidate, and the lookup must be at
+        # least 4 characters. Guards against short-name false positives such
+        # as ancestry rune "Light" matching "Lightning Nimbleness".
+        def _tokens(text):
+            return [t for t in re.split(r"[^a-z0-9]+", text.lower()) if t]
+
+        name_tokens = _tokens(name)
+        if (not compendium_item and compendium_type
+                and len(name.replace(" ", "")) >= 4 and name_tokens):
             compendium_item = next(
                 (
                     item
                     for item in compendium_items.values()
-                    if name.lower() in item.get("name", "").lower()
-                    and item.get("type", "").lower() == compendium_type.lower()
+                    if item.get("type", "").lower() == compendium_type.lower()
+                    and all(t in _tokens(item.get("name", ""))
+                            for t in name_tokens)
                 ),
                 None,
             )
@@ -287,7 +297,6 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
             # Evaluate lookup formulas in effect descriptions at character level
             # Pattern: [[lookup FORMULA evaluate=true]]
             effect_desc = effect.get("description", "")
-            import re
             lookup_match = re.search(r'\[\[lookup\s+(.+?)\s+evaluate=true\]\]', effect_desc)
             if lookup_match:
                 formula = lookup_match.group(1).strip()
@@ -398,29 +407,38 @@ def _convert_feature(feature_data, item_type, compendium_items, character_level=
     return result_item
 
 
-def _expand_ds_features(feature):
+def _expand_ds_features(feature, _path=()):
     """Yield a DS feature plus its selected/nested content, mirroring
-    ForgeSteel's FeatureLogic.simplifyFeatures (only SELECTED options count)."""
-    yield feature
+    ForgeSteel's FeatureLogic.simplifyFeatures (only SELECTED options count).
+
+    Bonus features carry a private ``_enclosing_names`` tuple of their
+    ancestor feature names (design D5) so callers can recognize bonuses
+    nested under a named parent (Prayer > Prayer of Steel > Stamina). The
+    key must not reach output; the only consumer strips it by consumption."""
+    if feature.get("type") == "Bonus":
+        yield dict(feature, _enclosing_names=tuple(_path))
+    else:
+        yield feature
     ftype = feature.get("type")
+    sub_path = _path + (str(feature.get("name", "")),)
     data = feature.get("data") or {}
     if ftype == "Ancestry Feature Choice":
         selected = data.get("selected")
         if isinstance(selected, dict):
-            yield from _expand_ds_features(selected)
+            yield from _expand_ds_features(selected, sub_path)
     elif ftype in ("Choice", "Domain Feature", "Perk", "Tagged Feature Choice"):
         for sub in data.get("selected", []) or []:
             if isinstance(sub, dict):
-                yield from _expand_ds_features(sub)
+                yield from _expand_ds_features(sub, sub_path)
     elif ftype == "Multiple Features":
         for sub in data.get("features", []) or []:
             if isinstance(sub, dict):
-                yield from _expand_ds_features(sub)
+                yield from _expand_ds_features(sub, sub_path)
     elif ftype == "Kit":
         for kit in data.get("selected", []) or []:
             for sub in kit.get("features", []) or []:
                 if isinstance(sub, dict):
-                    yield from _expand_ds_features(sub)
+                    yield from _expand_ds_features(sub, sub_path)
 
 
 def _apply_stamina_bonus_effects(class_item, character_data, character_level, foundry_character):
@@ -481,7 +499,15 @@ def _apply_stamina_bonus_effects(class_item, character_data, character_level, fo
             data = expanded.get("data") or {}
             if data.get("field") != "Stamina":
                 continue
-            if _name_key(expanded.get("name", "")) in native_stamina_names:
+            # self-application skip: the Bonus' own name OR any enclosing
+            # feature name (D5) already appears as an item applying stamina
+            skip_names = {_name_key(expanded.get("name", ""))}
+            skip_names.update(
+                _name_key(n)
+                for n in (expanded.get("_enclosing_names") or ())
+                if n
+            )
+            if skip_names & native_stamina_names:
                 continue
             # The class's own Stamina bonus is already carried by the class item
             if (
@@ -583,9 +609,11 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
         level_summary = LevelDetector.get_level_detection_summary(character_data)
         print(f"Level detection: {level_summary}")
 
-    # Character level from class data
+    # Character level: class data wins; the LevelDetector result computed
+    # above is the fallback when class data omits it (design D0: one source
+    # of truth chain, no dead compute-and-overwrite).
     class_data = character_data.get("class", {})
-    character_level = class_data.get("level", 1)
+    character_level = class_data.get("level") or character_level or 1
 
     # Get recoveries from class definition
     base_recoveries = class_data.get("recoveries", 8)
@@ -738,10 +766,6 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
         # Apply characteristic bonuses from features
         if class_data.get("featuresByLevel"):
-            character_level = class_data.get(
-                "level", 1
-            )  # Default to level 1 if not specified
-
             for level_data in class_data["featuresByLevel"]:
                 level_num = level_data.get("level", 1)
                 # Only apply features up to the character's level
@@ -793,7 +817,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                     .get("sourceId")
                                     == pool_item["uuid"]
                                 ):
-                                    item_copy = comp_item.copy()
+                                    item_copy = copy.deepcopy(comp_item)
                                     # Remove compendium-specific fields
                                     item_copy.pop("_id", None)
                                     item_copy.pop("_key", None)
@@ -810,6 +834,55 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
 
         for feature in ancestry.get("features", []):
             if feature.get("type") == "Choice":
+                selected_options = feature.get("data", {}).get("selected", [])
+
+                def _exact_ancestry_trait(nm):
+                    return next(
+                        (
+                            c
+                            for c in compendium_items.values()
+                            if c.get("name") == nm
+                            and c.get("type") == "ancestryTrait"
+                        ),
+                        None,
+                    )
+
+                # Design D4: options that are not themselves compendium
+                # traits (Dwarf Runic Carving runes "Light"/"Voice" exist
+                # only as hero-file options) fall back to the parent
+                # Choice's own trait BEFORE any fuzzy matching could pull in
+                # an unrelated item like "Lightning Nimbleness".
+                parent_doc = _exact_ancestry_trait(feature.get("name"))
+                if parent_doc and not any(
+                    _exact_ancestry_trait(o.get("name"))
+                    for o in selected_options
+                ):
+                    trait_copy = copy.deepcopy(parent_doc)
+                    for junk in ("_id", "_key", "folder"):
+                        trait_copy.pop(junk, None)
+                    picked = ", ".join(
+                        o.get("name", "") for o in selected_options
+                    )
+                    desc = trait_copy.setdefault("system", {}).setdefault(
+                        "description", {}
+                    )
+                    if isinstance(desc, dict):
+                        current = desc.get("value", "") or ""
+                        desc["value"] = (
+                            current
+                            + f"<p><strong>Selected:</strong> {picked}</p>"
+                        )
+                    if not any(
+                        existing.get("name") == trait_copy.get("name")
+                        and existing.get("type") == trait_copy.get("type")
+                        for existing in foundry_character["items"]
+                    ):
+                        foundry_character["items"].append(trait_copy)
+                        _process_item_advancements(
+                            trait_copy, compendium_items, foundry_character
+                        )
+                    continue
+
                 for selected_feature in feature.get("data", {}).get("selected", []):
                     # Ancestry features should always be ancestryTrait, even if they contain abilities
                     # The abilities will be granted through the trait's advancements
@@ -824,7 +897,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                             comp_item.get("name") == item_name
                             and comp_item.get("type") == item_type
                         ):
-                            item = comp_item.copy()
+                            item = copy.deepcopy(comp_item)
                             # Remove compendium-specific fields
                             item.pop("_id", None)
                             item.pop("_key", None)
@@ -869,7 +942,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                                     .get("sourceId")
                                                     == pool_item["uuid"]
                                                 ):
-                                                    ability_copy = comp_item.copy()
+                                                    ability_copy = copy.deepcopy(comp_item)
                                                     ability_copy["type"] = "ability"
                                                     # Remove compendium-specific fields
                                                     ability_copy.pop("_id", None)
@@ -898,7 +971,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                 comp_item.get("name") == parent_name
                                 and comp_item.get("type") == "ancestryTrait"
                             ):
-                                parent_trait = comp_item.copy()
+                                parent_trait = copy.deepcopy(comp_item)
                                 break
 
                         if parent_trait:
@@ -923,6 +996,13 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             else:
                 # For non-Choice features, try to use compendium version to get advancements
                 feature_name = feature.get("name")
+                # Ancestry Damage Modifier pseudo-features (Revenant) carry no
+                # printable content: defer them to the pending pass that
+                # applies immunities/weaknesses to the effect-bearing item,
+                # instead of emitting a featureless placeholder trait.
+                if feature.get("type") == "Damage Modifier":
+                    pending_damage_modifiers.append(feature)
+                    continue
                 item = None
                 for comp_item in compendium_items.values():
                     if (
@@ -969,7 +1049,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
             # Add the level to the class item system
             if "system" not in item:
                 item["system"] = {}
-            item["system"]["level"] = hero_class.get("level", 1)
+            item["system"]["level"] = character_level
         if item:
             foundry_character["items"].append(item)
             # Apply characteristic advancements from class item
@@ -1507,7 +1587,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
                                         .get("sourceId")
                                         == pool_item["uuid"]
                                     ):
-                                        ability_copy = comp_item.copy()
+                                        ability_copy = copy.deepcopy(comp_item)
                                         ability_copy["type"] = "ability"
                                         # Remove compendium-specific fields
                                         ability_copy.pop("_id", None)
@@ -1541,7 +1621,7 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     # Always include basic abilities - these are fundamental to all characters
     for dsid, compendium_item in compendium_items.items():
         if dsid in basic_dsids and compendium_item.get("type") == "ability":
-            ability_copy = compendium_item.copy()
+            ability_copy = copy.deepcopy(compendium_item)
             # Remove compendium-specific fields
             ability_copy.pop("_id", None)
             ability_copy.pop("_key", None)
@@ -1639,6 +1719,15 @@ def convert_character(character_data, compendium_items, strict=False, verbose=Fa
     _apply_pending_damage_modifiers(
         foundry_character, pending_damage_modifiers, character_level
     )
+
+    # Grant reconciliation post-pass (change fix-compendium-grant-
+    # reconciliation): dedupe / above-level trim / completion against the
+    # compendium advancements. SelectionContext is built here — the single
+    # construction site (design D2a).
+    from converter.grant_reconcile import build_selection_context, reconcile
+    selection_ctx = build_selection_context(character_data, character_level)
+    foundry_character = reconcile(
+        foundry_character, compendium_items, selection_ctx)
 
     return foundry_character
 
@@ -1934,7 +2023,7 @@ def _process_item_advancements(item, compendium_items, foundry_character):
                             .get("sourceId")
                             == pool_item["uuid"]
                         ):
-                            ability_copy = comp_item.copy()
+                            ability_copy = copy.deepcopy(comp_item)
                             ability_copy["type"] = "ability"
                             # Remove compendium-specific fields
                             ability_copy.pop("_id", None)
@@ -1943,35 +2032,27 @@ def _process_item_advancements(item, compendium_items, foundry_character):
                             foundry_character["items"].append(ability_copy)
                             break
                     else:
-                        # If not found by _id, search all compendium items for matching _id
-                        # This handles cases where items have same _dsid but different _id
-                        for root, dirs, files in os.walk("draw_steel_repo/src/packs"):
-                            for file in files:
-                                if file.endswith(".json") and uuid_target in file:
-                                    file_path = os.path.join(root, file)
-                                    try:
-                                        with open(
-                                            file_path, "r", encoding="utf-8"
-                                        ) as f:
-                                            direct_item = json.load(f)
-                                            if direct_item.get("_id") == uuid_target:
-                                                ability_copy = direct_item.copy()
-                                                ability_copy["type"] = "ability"
-                                                # Remove compendium-specific fields
-                                                ability_copy.pop("_id", None)
-                                                ability_copy.pop("_key", None)
-                                                ability_copy.pop("folder", None)
-                                                foundry_character["items"].append(
-                                                    ability_copy
-                                                )
-                                                break
-                                    except:
-                                        pass
-                            if any(
-                                item.get("_id") == uuid_target
-                                for item in foundry_character["items"][-1:]
-                            ):
-                                break
+                        # Loader-index resolution (design D6): never rescan
+                        # the pack tree at conversion time; a UUID that no
+                        # index can resolve is reported, never silently lost.
+                        found = None
+                        resolver = getattr(compendium_items, "resolve_by_uuid", None)
+                        if resolver is not None:
+                            found = resolver(uuid_target)
+                        if found is None:
+                            print(
+                                "WARNING: advancement pool UUID "
+                                f"{uuid_target} not resolvable from the "
+                                "compendium index; skipping"
+                            )
+                        else:
+                            ability_copy = copy.deepcopy(found)
+                            ability_copy["type"] = "ability"
+                            # Remove compendium-specific fields
+                            ability_copy.pop("_id", None)
+                            ability_copy.pop("_key", None)
+                            ability_copy.pop("folder", None)
+                            foundry_character["items"].append(ability_copy)
 
 
 def _process_choice_advancement(
@@ -2011,7 +2092,7 @@ def _process_choice_advancement(
                             .get("sourceId")
                             == pool_item["uuid"]
                         ):
-                            item_copy = comp_item.copy()
+                            item_copy = copy.deepcopy(comp_item)
                             item_copy["type"] = (
                                 "ability"  # Ensure it's marked as ability
                             )

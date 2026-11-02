@@ -211,6 +211,48 @@ class ReverseMapper:
                                  reason="payload-unavailable", action="dropped",
                                  detail="ancestry trait not found in ancestry data")
                 continue
+            # Forward D4 convention: a Choice emitted as its parent trait
+            # records picks as 'Selected: <option>' in the description.
+            # This runs even when the parent resolved to its static data twin
+            # (the common case): each named pick is recovered from the sample
+            # corpus by name and routed through the same attachment logic as
+            # a directly-resolved trait.
+            for sel_name in ff.selected_from_description(trait.raw):
+                sample = self.provider.samples.index.name_one(sel_name)
+                if not (isinstance(sample, dict) and sample.get("id")):
+                    self.report.loss(
+                        trait.name, trait.itype, trait.dsid,
+                        reason="payload-unavailable", action="dropped",
+                        detail="choice option named in description not found "
+                               "in corpus: " + sel_name)
+                    continue
+                self.report.loss(
+                    sel_name, trait.itype, sample.get("id"),
+                    reason="defaulted", action="recovered-by-name",
+                    detail="choice option recovered via parent trait "
+                           "'Selected' description")
+                sel_copy = copy.deepcopy(sample)
+                for node in _walk_nodes(sel_copy):
+                    if isinstance(node.get("id"), str):
+                        self._ancestry_ids.add(node["id"])
+                target = None
+                for choice in choices:
+                    option_ids = {o.get("feature", {}).get("id")
+                                  for o in choice["data"].get("options", [])
+                                  if isinstance(o, dict)}
+                    if sel_copy.get("id") in option_ids:
+                        target = choice
+                        break
+                if target is not None:
+                    selected = target["data"].setdefault("selected", [])
+                    if not any(s.get("id") == sel_copy.get("id")
+                               for s in selected if isinstance(s, dict)):
+                        selected.append(sel_copy)
+                else:
+                    # option ids absent from the static dump (app-synthesized
+                    # options): attach the option as a top-level feature so
+                    # its presence survives, as with direct recovery.
+                    block["features"].append(sel_copy)
             self.report.count(ff.TYPE_ANCESTRY_TRAIT, converted=1)
             trait_copy = copy.deepcopy(resolved)
             # every id inside the trait payload belongs to the ancestry's setting

@@ -21,7 +21,7 @@ import { SourcebookData } from '/tmp/opencode/fs-data-bundle.mjs';
 
 const KINDS = [
 	'ancestries', 'classes', 'subclasses', 'careers', 'cultures',
-	'complications', 'perks', 'kits', 'items', 'titles',
+	'complications', 'perks', 'kits', 'items', 'titles', 'domains',
 ] as const;
 
 const MEMBERSHIP_KINDS = [...KINDS, 'imbuements', 'domains', 'projects', 'titles'];

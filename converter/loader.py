@@ -73,9 +73,15 @@ def _log_http_error(operation, e, verbose=False):
 
 
 def load_forgesteel_character(file_path):
-    """Loads a forgesteel character from a .ds-hero file."""
+    """Loads a forgesteel character from a .ds-hero file.
+
+    A blank or missing top-level name falls back to the file's basename
+    (issue #3: heroes must never import into Foundry nameless)."""
     with open(file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+    if isinstance(data, dict) and not str(data.get("name") or "").strip():
+        data["name"] = Path(file_path).stem
+    return data
 
 
 def _get_latest_release_tag(verbose=False):
@@ -115,7 +121,7 @@ def _fetch_github_files(verbose=False):
 
     Returns a dict of {dsid: item_data} loaded from GitHub.
     """
-    items = {}
+    items = CompendiumIndex()
 
     if verbose:
         print("DEBUG: Fetching compendium from GitHub...")
@@ -225,6 +231,9 @@ def _fetch_from_release_zipball(release_tag, verbose=False):
                     print(f"DEBUG: Packs directory not found at {packs_dir}")
                 return {}
 
+            if not isinstance(items, CompendiumIndex):
+                items = CompendiumIndex(items)
+
             # Walk through all JSON files in the packs directory
             for json_file in packs_dir.rglob("*.json"):
                 try:
@@ -286,6 +295,13 @@ def _fetch_pack_files(
                 try:
                     with urllib.request.urlopen(raw_url, timeout=10) as response:
                         file_data = json.loads(response.read().decode("utf-8"))
+                        _apply_patches(file_data)
+                        if isinstance(items_dict, CompendiumIndex):
+                            doc_name, is_folder = _doc_type_from_filename(
+                                item["name"])
+                            if not is_folder:
+                                items_dict.index_document(
+                                    file_data, pack_name, doc_name or "Item")
                         if "_dsid" in file_data.get("system", {}):
                             dsid = file_data["system"]["_dsid"]
                             if dsid not in items_dict:
@@ -351,7 +367,7 @@ def load_compendium_items(
         force_update: Force refresh from GitHub (currently ignored)
         target_types: List of item types to load for better performance
     """
-    items = {}
+    items = CompendiumIndex()
     items_loaded = 0
     duplicates_resolved = 0
 
@@ -382,10 +398,12 @@ def load_compendium_items(
         if verbose:
             print(f"DEBUG: Loading compendium from cache...")
 
+        cached = CompendiumIndex()
         for file in cache_dir.glob("*.json"):
-            _load_json_item(str(file), items, verbose)
+            _load_json_item(str(file), cached, verbose)
 
-        if items:
+        if cached:
+            items = cached
             items_loaded = len(items)
             if verbose:
                 print(
@@ -432,11 +450,147 @@ def load_compendium_items(
     return {}
 
 
+# Declarative patches for known upstream compendium data defects
+# (change fix-compendium-grant-reconciliation, design D6). Applied in memory
+# at load time only — never on disk. Entries are applied when the document
+# name matches exactly and a dict anywhere in the document carries the faulty
+# `key` value; nothing else is touched.
+PACK_PATCHES = [
+    {
+        "doc_name": "Null Field",
+        "old_key": "system.characteristics.might.intuition",
+        "new_key": "system.characteristics.intuition.resist",
+        "note": "Null Field > Synaptic Break effect key (issue #3)",
+    },
+    {
+        "doc_name": "Summoner Strike",
+        "old_key": "flags-draw-steel.summoner-strike-range",
+        "new_key": "flags.draw-steel.summoner-strike-range",
+        "note": "Summoner Strike flags key (issue #3)",
+    },
+]
+
+
+def _apply_patches(doc):
+    """Apply PACK_PATCHES to one loaded document in memory.
+
+    Returns the number of key renames applied (0 for unaffected docs)."""
+    name = doc.get("name")
+    entries = [p for p in PACK_PATCHES if p["doc_name"] == name]
+    if not entries:
+        return 0
+
+    applied = 0
+
+    def walk(node):
+        nonlocal applied
+        if isinstance(node, dict):
+            k = node.get("key")
+            if isinstance(k, str):
+                for entry in entries:
+                    if k == entry["old_key"]:
+                        node["key"] = entry["new_key"]
+                        applied += 1
+                        print(
+                            f"DEBUG: PACK_PATCH applied to {name}: "
+                            f"{entry['note']}")
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+
+    walk(doc)
+    return applied
+
+
+def _doc_type_from_filename(file_path):
+    """Derive the compendium document NAME segment from the file naming
+    convention '<DocTypePrefix>_<Name>_<id>.json' used by the pack tree
+    (npc_/retainer_ are Actors; Folder_ files are folders, not documents).
+
+    Returns (document_name_or_None, is_folder)."""
+    base = os.path.basename(file_path)[:-5]  # strip .json
+    prefix = base.split("_", 1)[0]
+    if prefix == "Folder":
+        return None, True
+    doc_map = {"npc": "Actor", "retainer": "Actor",
+               "RollTable": "RollTable", "JournalEntry": "JournalEntry",
+               "ActiveEffect": "ActiveEffect"}
+    return doc_map.get(prefix, "Item"), False
+
+
+class CompendiumIndex(dict):
+    """Compendium dict keyed by `_dsid` (as before) plus auxiliary indexes
+    over EVERY loaded document, including actor documents (summon minions)
+    that carry no `_dsid` (design D6).
+
+    `resolve_by_name(name)` -> (document, canonical UUID) | None
+    `resolve_by_uuid(_id)`  -> document | None
+
+    Canonical UUID form (Foundry v13): Compendium.draw-steel.<pack>.<DocumentName>.<_id>
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.by_name = {}   # lower(name) -> list[(document, uuid_or_None)]
+        self.by_uuid = {}   # _id -> document
+        self.index_warnings = []
+
+    def index_document(self, doc, pack, doc_name):
+        doc_id = doc.get("_id")
+        uuid = None
+        if doc_id and pack and pack != "unknown":
+            self.by_uuid[doc_id] = doc
+            uuid = f"Compendium.draw-steel.{pack}.{doc_name}.{doc_id}"
+        elif doc_id:
+            self.by_uuid[doc_id] = doc
+        name = doc.get("name")
+        if isinstance(name, str) and name:
+            self.by_name.setdefault(name.lower(), []).append((doc, uuid))
+
+    def resolve_by_name(self, name):
+        """Exact (case-insensitive) name lookup over all indexed documents."""
+        matches = self.by_name.get((name or "").lower())
+        if not matches:
+            return None
+        if len(matches) > 1:
+            self.index_warnings.append(
+                f"resolve_by_name: {name!r} matches {len(matches)} documents")
+        return matches[0]
+
+    def resolve_by_uuid(self, doc_id):
+        return self.by_uuid.get(doc_id)
+
+
+def _pack_from_path(file_path):
+    """Pack directory name from a path like .../packs/<pack>/[sub...]/file.json."""
+    parts = os.path.normpath(file_path).split(os.sep)
+    try:
+        return parts[parts.index("packs") + 1]
+    except ValueError:
+        return "unknown"
+
+
 def _load_json_item(file_path, items_dict, verbose=False):
-    """Loads a single JSON item and adds it to items_dict."""
+    """Loads a single JSON item and adds it to items_dict.
+
+    Also maintains CompendiumIndex auxiliary indexes when items_dict is one
+    (folder documents are skipped entirely; every other document is indexed
+    by name and by _id regardless of `_dsid` presence)."""
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             item_data = json.load(f)
+
+            _apply_patches(item_data)
+
+            doc_name, is_folder = _doc_type_from_filename(file_path)
+            if is_folder:
+                return
+            if isinstance(items_dict, CompendiumIndex):
+                items_dict.index_document(
+                    item_data, _pack_from_path(file_path),
+                    doc_name or "Item")
 
             # Note: Don't convert system.type to lowercase - Foundry expects camelCase
             # (e.g., "freeTriggered", "freeManeuver", not "freetriggered", "freemaneuver")

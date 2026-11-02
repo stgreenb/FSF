@@ -24,7 +24,7 @@ CACHE_ROOT = os.path.join(os.path.expanduser("~"), ".cache",
                           "forgesteel-converter", "fs_data")
 
 DUMP_KINDS = ("ancestries", "classes", "subclasses", "careers", "cultures",
-              "complications", "perks", "kits", "items", "titles")
+              "complications", "perks", "kits", "items", "titles", "domains")
 
 #: Deterministic id transforms from Foundry ``_dsid`` conventions to raw
 #: ForgeSteel ids (verified empirically against the pinned packs).

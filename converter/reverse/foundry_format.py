@@ -341,3 +341,28 @@ def project_description(item: Dict[str, Any]) -> str:
     if not isinstance(raw, str) or not raw:
         return ""
     return " ".join(re.sub(r"<[^>]+>", " ", raw).split())
+
+
+_SELECTED_RE = re.compile(
+    r"Selected:\s*([^<]+?)(?:</p>|$)", re.IGNORECASE)
+
+
+def selected_from_description(item: Dict[str, Any]) -> List[str]:
+    """Picked option names recorded by the forward D4 convention: an ancestry
+    Choice emitted as its parent trait lists its picks as
+    ``Selected: <name>[, <name>]`` in the item description.
+
+    Returns the plain option names ([] when the convention is absent)."""
+    sysb = item.get("system") if isinstance(item, dict) else None
+    value = (sysb.get("description") or {}) if isinstance(sysb, dict) else {}
+    raw = value.get("value") if isinstance(value, dict) else None
+    if not isinstance(raw, str) or "selected:" not in raw.lower():
+        return []
+    text = " ".join(re.sub(r"<[^>]+>", " ", raw).split())
+    names: List[str] = []
+    for m in _SELECTED_RE.finditer(text):
+        for part in m.group(1).split(","):
+            part = part.strip().rstrip(".")
+            if part and part not in names:
+                names.append(part)
+    return names
