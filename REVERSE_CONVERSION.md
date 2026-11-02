@@ -8,6 +8,30 @@ Typical cadence: play in Foundry → every couple of months export the actors
 → reverse-convert → review the loss report → open the `.ds-hero` in the
 players' ForgeSteel app.
 
+Forward-direction changes that landed during this work (affect every
+conversion, not just reverse):
+
+- **Dwarf stamina double-count fixed**: the 1.1 packs carry the dwarf echelon
+  stamina natively on *Spark Off Your Skin*; the converter no longer adds a
+  duplicate flat bonus. Re-convert any dwarf actor converted before this fix
+  (they exported with +6 phantom max stamina per echelon).
+- **Titles convert**: `state.titles` now emits Foundry `title` items plus each
+  title's granted features (e.g. Angler, Brawler → Duck!).
+- **Treasures are pack-native now**: all treasure pack files shared
+  `_dsid: "treasure"`, which collapsed them in the compendium loader; the
+  loader falls back to the unique `_id` on collisions, so named treasures
+  (Executioner's Blade, Blade of Quintessence...) resolve to their pack
+  entries with leveled text in the description.
+- **Project conversion**: `state.projects` ⇄ Foundry `project` items —
+  goal/points/prerequisite & source texts round-trip; crafting progress is
+  read only from project items.
+- **Inventory conversion**: treasures reverse into `state.inventory`
+  hydrated from the ForgeSteel data dump (leveled definitions + crafting);
+  unknown homebrew loot is reported, never guessed.
+- **Yield links use canonical v13 UUIDs**
+  (`Compendium.draw-steel.rewards.Item.<id>`) — Foundry silently drops
+  project items whose `yield.document` segment is wrong.
+
 ## Prerequisites (one-time)
 
 Both upstream checkouts must exist next to this file and be pinned to the
