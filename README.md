@@ -99,6 +99,13 @@ Report issues with:
 - Verbose converter output
 - Expected vs actual results
 
+## Documentation
+
+- **[Changelog](CHANGELOG.md)** — notable changes per OpenSpec change
+- **[Reverse Conversion](REVERSE_CONVERSION.md)** — Foundry → ForgeSteel usage & limitations
+- **[Forward Conversion Fixes](FORWARD_CONVERSION_FIXES.md)** — issue-by-issue forward fixes
+- **[Field Tests](FIELD_TEST.md)** — live round-trip verification records
+
 ## License
 
 This converter works with the Draw Steel system by MCDM for Foundry Virtual Tabletop. Ensure you have appropriate licenses for both Forgesteel and Foundry VTT.
