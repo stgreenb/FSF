@@ -232,8 +232,12 @@ def _classify(
     if itype not in ff.KNOWN_TYPES:
         report.loss(name, itype, dsid, reason="unsupported-construct",
                     action="dropped", detail=f"unknown Foundry item type {itype!r}")
-    elif dsid is None:
+    elif dsid is None and itype != ff.TYPE_TREASURE:
         report.loss(name, itype, None, reason="unmappable", action="dropped",
                     detail="no provenance id and no compendium name match")
+    # Treasures without provenance are NOT reported here: the reverse mapper
+    # reconstructs them as defaulted inventory entries (change
+    # carry-unknown-treasure-to-print); only items it cannot extract at all
+    # (blank name) are loss-reported there.
     return IngestedItem(raw=entry, itype=itype, name=name, dsid=dsid,
                         provenance=provenance)

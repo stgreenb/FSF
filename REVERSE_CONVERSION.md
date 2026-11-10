@@ -27,7 +27,9 @@ conversion, not just reverse):
   read only from project items.
 - **Inventory conversion**: treasures reverse into `state.inventory`
   hydrated from the ForgeSteel data dump (leveled definitions + crafting);
-  unknown homebrew loot is reported, never guessed.
+  unknown homebrew loot is synthesized from the item's own fields as a
+  `defaulted` entry (see [Custom items](#custom-items-foundry-made-gear));
+  ambiguous name matches are reported, never guessed.
 - **Yield links use canonical v13 UUIDs**
   (`Compendium.draw-steel.rewards.Item.<id>`) — Foundry silently drops
   project items whose `yield.document` segment is wrong.
@@ -108,6 +110,43 @@ done
   incidents). These are reported as `defaulted` losses and must be re-picked
   once in ForgeSteel.
 
+## Custom items (Foundry-made gear)
+
+A treasure with no provenance and no ForgeSteel/`fs_data` name match is no
+longer dropped: the reverse **synthesizes a `defaulted` `state.inventory`
+entry** from the item's own fields — name, HTML description converted to
+markdown, `quantity` → `count`, and a card-correct item type derived from
+the Foundry category (`consumable` → Consumable Item, `trinket` → Trinket
+(1st echelon), `artifact` → Artifact, `leveled` → refined by keyword to
+Leveled Weapon/Armor/Implement, anything unknown → `Leveled Item`). A
+`project` item for a custom subject becomes an **editable custom project**
+(`isCustom: true`) carrying its points. ForgeSteel keeps unknown inventory
+ids on save (`hero-update-logic` returns the original item), so the entry
+survives opening, editing, level-up and printing in the app, and rides
+forward back to Foundry as a treasure.
+
+Boundaries to know:
+
+- **Text fidelity only.** Fields come exclusively from the export; no
+  power rolls or leveled effects are invented. A GM weapon whose bonus
+  lives in a Foundry active effect (e.g. `+1 damage` with no description
+  text) prints as lore only — the conversion flags it with a
+  `mechanical-effects-lost` warning naming each effect and its changed
+  keys, so nothing disappears silently; re-apply the number in Foundry
+  after re-import.
+- **Type is a heuristic.** A `leveled` treasure without a
+  Weapon/Armor/Implement keyword lands on the generic `Leveled Item`
+  card; the report detail names the chosen type.
+- **Ambiguous names are never reconstructed** — a name matching several
+  dump items stays a `payload-unavailable` loss (identity is never guessed).
+- **Quantity 0** (a spent stack) comes back as count 1 — Foundry exports
+  the item, so it is treated as present.
+- Synthetic ids are deterministic (`custom-<slug>`, hash-suffixed on
+  name collision): re-converting the same export gives identical files.
+- Escape hatch if a card ever renders oddly in a player's ForgeSteel
+  build: move the item's text into a plain Text feature under `features`
+  (always prints) and delete the synthetic inventory entry.
+
 ## Exit codes
 
 | Code | Meaning |
@@ -163,14 +202,22 @@ payload losses.
 `<out>.report.json` has three parts:
 
 - `losses[]` — per item: `item`, `type`, `dsid`, `reason`, `action`, `detail`.
-  Reasons: `unmappable` (no provenance, no name match — usually homebrew;
-  re-create manually in the app), `payload-unavailable` (no ForgeSteel data
-  for the resolved dsid — also how unknown homebrew loot/projects are
-  reported), `unsupported-construct` (extra classes — multi-classing is not
-  representable in `.ds-hero`), `version-mismatch`, `defaulted` (an unmade
-  choice with a safe stand-in, e.g. the career inciting incident).
+  Reasons: `unmappable` (no provenance, no name match **and nothing
+  extractable** — e.g. a blank-name treasure; re-create manually in the app),
+  `payload-unavailable` (no ForgeSteel data for the resolved dsid, or an
+  ambiguous name match — never guessed), `unsupported-construct` (extra
+  classes — multi-classing is not representable in `.ds-hero`),
+  `version-mismatch`, `defaulted` (two flavors: an unmade choice with a safe
+  stand-in, e.g. the career inciting incident — **or** a custom item
+  synthesized from the export's own fields, see
+  [custom items](#custom-items-foundry-made-gear)).
 - `warnings[]` — informational; never fail `--strict`: `payload-divergence`,
-  `state-reset`, `setting-uncertain`, `dump-stale`, `unrepresentable-picture`.
+  `state-reset`, `setting-uncertain`, `dump-stale`, `unrepresentable-picture`,
+  `mechanical-effects-lost` (a reconstructed custom item carries Foundry
+  active effects that are pure mechanics — e.g. `damage.bonuses.treasure
+  +1` with no description text — so they cannot ride the text-fidelity
+  round trip; the warning names each effect and its changed keys, and the
+  bonus must be re-applied manually in Foundry after re-import).
 - `counts` — per-category converted/dropped tallies.
 
 ### Roster triage cheat-sheet
@@ -182,10 +229,12 @@ payload losses.
   module at all). The slot shows unfilled in the app; re-select.
 - **`unmappable`** — check whether the item is homebrew; if it is a renamed
   official item, restore its original name in Foundry and re-export.
-- **`payload-unavailable` treasure/project** — the item name matched no
-  ForgeSteel data (true homebrew, or an ambiguous double match). Projects
-  still ride with progress rebuilt from the export item alone — re-check
-  the wording in ForgeSteel. Homebrew loot must be re-created in the app.
+- **`payload-unavailable` treasure/project** — an ambiguous double match
+  (name resolves to several ForgeSteel items) or project data with nothing
+  to hydrate from. Projects still ride with progress rebuilt from the export
+  item alone — re-check the wording in ForgeSteel. Unmatched treasures are
+  no longer in this bucket: they are synthesized as `defaulted` entries
+  (see [Custom items](#custom-items-foundry-made-gear)).
 - **project satisfaction flags** — ForgeSteel tracks whether a project's
   prerequisites/source were satisfied; the Foundry module has no field for
   that, so reversed projects default those flags to false. Re-tick them in

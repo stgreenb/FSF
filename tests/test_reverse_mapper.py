@@ -446,13 +446,30 @@ class TestProjectsInventory(unittest.TestCase):
         self.assertEqual(set(levels), expected)
 
     # ---- 3.3 unknown treasure -> loss, no entry ----
-    def test_unknown_treasure_loss(self):
+    def test_unknown_treasure_reconstructed(self):
+        # carry-unknown-treasure-to-print: zero-match treasures are now
+        # synthesized as defaulted entries, not dropped
         treasure = {"name": "Sprocket of Wonder", "type": "treasure",
+                    "system": {"quantity": 1, "category": "trinket",
+                               "description": {"value": "<p>Whirs.</p>"}}}
+        doc, report = self._map(lambda a: self.add_item(a, treasure))
+        entry = next(i for i in doc["state"]["inventory"]
+                     if i["name"] == "Sprocket of Wonder")
+        self.assertEqual(entry["type"], "Trinket (1st echelon)")
+        self.assertTrue(any(l["item"] == "Sprocket of Wonder"
+                            and l["reason"] == "defaulted"
+                            for l in report.losses))
+        self.assertFalse(any(l["item"] == "Sprocket of Wonder"
+                             and l["reason"] == "payload-unavailable"
+                             for l in report.losses))
+
+    def test_blank_name_treasure_stays_loss(self):
+        treasure = {"name": "", "type": "treasure",
                     "system": {"quantity": 1}}
         doc, report = self._map(lambda a: self.add_item(a, treasure))
         self.assertEqual(doc["state"]["inventory"], [])
-        self.assertTrue(any(l["item"] == "Sprocket of Wonder"
-                            and l["reason"] == "payload-unavailable"
+        self.assertTrue(any(l["reason"] == "unmappable"
+                            and "name or no" in l["detail"]
                             for l in report.losses))
 
     # ---- zero case ----

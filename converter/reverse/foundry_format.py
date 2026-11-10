@@ -8,6 +8,7 @@ rather than raising.
 The pinned pack version mirrors the checkout pin in ``draw_steel_repo``
 """
 
+import html
 import json
 import re
 from typing import Any, Dict, List, Optional
@@ -323,8 +324,127 @@ def project_yield_document(item: Dict[str, Any]) -> Optional[str]:
 
 
 def treasure_quantity(item: Dict[str, Any]) -> int:
+    """Stack count with tolerant read (change carry-unknown-treasure-to-print
+    D5): ``system.quantity`` is the single source (only quantity field seen
+    in live exports and packs); string-encoded ints are accepted, anything
+    non-numeric or below 1 falls back to 1."""
     val = _project_system(item).get("quantity")
+    if isinstance(val, bool):
+        val = None
+    if isinstance(val, str):
+        try:
+            val = int(val.strip())
+        except ValueError:
+            val = None
     return val if isinstance(val, int) and val >= 1 else 1
+
+
+_TREASURE_CATEGORY_TYPES = {
+    # Foundry treasure ``system.category`` vocabulary (verified on packs
+    # 1.1.0 and live exports: consumable/leveled/trinket/artifact) mapped to
+    # the ForgeSteel ItemType strings the inventory cards route on.
+    "consumable": "Consumable Item",
+    "artifact": "Artifact",
+    "trinket": "Trinket (1st echelon)",
+}
+
+#: ``leveled`` treasures need a keyword refinement: the category does not
+#: say weapon vs armor vs implement, the keywords do.
+_TREASURE_LEVELED_REFINEMENT = (
+    ("weapon", "Leveled Weapon"),
+    ("armor", "Leveled Armor"),
+    ("implement", "Leveled Implement"),
+)
+
+#: Safe default when category/keywords give nothing better: renders on the
+#: generic inventory card, never a blank type.
+TREASURE_TYPE_FALLBACK = "Leveled Item"
+
+
+def item_effect_summaries(item: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Summaries of the item's Foundry active effects for loss disclosure.
+
+    Each entry: ``{"name": str, "keys": [changed keys], "has_text": bool}``.
+    An effect with changes but no description text is pure mechanics
+    (e.g. ``damage.bonuses.treasure +1``) — nothing textual exists to
+    carry it through a text-fidelity round trip.
+    """
+    out: List[Dict[str, Any]] = []
+    effects = item.get("effects") if isinstance(item, dict) else None
+    if not isinstance(effects, list):
+        return out
+    for eff in effects:
+        if not isinstance(eff, dict):
+            continue
+        sysb = eff.get("system") if isinstance(eff.get("system"), dict) else {}
+        keys: List[str] = []
+        changes = sysb.get("changes")
+        if isinstance(changes, list):
+            for ch in changes:
+                if isinstance(ch, dict) and isinstance(ch.get("key"), str):
+                    keys.append(ch["key"])
+        desc = sysb.get("description")
+        text = desc.get("value") if isinstance(desc, dict) else desc
+        has_text = bool(isinstance(text, str) and text.strip())
+        out.append({"name": str(eff.get("name") or "effect"),
+                    "keys": keys, "has_text": has_text})
+    return out
+
+
+def treasure_category(item: Dict[str, Any]) -> str:
+    val = _project_system(item).get("category")
+    return val if isinstance(val, str) else ""
+
+
+def treasure_keywords(item: Dict[str, Any]) -> List[str]:
+    val = _project_system(item).get("keywords")
+    if isinstance(val, (list, tuple)):
+        return [str(k) for k in val if isinstance(k, (str, int)) and str(k)]
+    return []
+
+
+def treasure_item_type(item: Dict[str, Any]) -> str:
+    """ForgeSteel ItemType string for a treasure (design D4 pinned table).
+    ``leveled`` refines via keywords (Weapon/Armor/Implement); anything
+    unknown or missing falls back to ``Leveled Item``."""
+    category = treasure_category(item).strip().lower()
+    if category == "leveled":
+        keywords = " ".join(kw.lower() for kw in treasure_keywords(item))
+        for needle, fs_type in _TREASURE_LEVELED_REFINEMENT:
+            if needle in keywords:
+                return fs_type
+        return TREASURE_TYPE_FALLBACK
+    return _TREASURE_CATEGORY_TYPES.get(category, TREASURE_TYPE_FALLBACK)
+
+
+def treasure_description_markdown(item: Dict[str, Any]) -> str:
+    """Foundry treasure description (HTML) converted to ForgeSteel
+    markdown (design D2, stdlib-only): block tags become line breaks,
+    emphasis/strong become * / **, list items become '- ' bullets, HTML
+    entities are unescaped. Empty-safe."""
+    value = _project_system(item).get("description")
+    raw = value.get("value") if isinstance(value, dict) else None
+    if not isinstance(raw, str) or not raw.strip():
+        return ""
+    text = raw
+    text = re.sub(r"(?i)<\s*br\s*/?\s*>", "\n", text)
+    text = re.sub(r"(?i)</\s*(p|div|h[1-6]|ul|ol)\s*>", "\n\n", text)
+    text = re.sub(r"(?i)<\s*(?:li|tr)[^>]*>", "\n- ", text)
+    text = re.sub(r"(?i)<\s*(?:em|i)\s*>", "*", text)
+    text = re.sub(r"(?i)<\s*/\s*(?:em|i)\s*>", "*", text)
+    text = re.sub(r"(?i)<\s*(?:strong|b)\s*>", "**", text)
+    text = re.sub(r"(?i)<\s*/\s*(?:strong|b)\s*>", "**", text)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = html.unescape(text)
+    # collapse runs of blank lines and stray whitespace per line
+    lines = [ln.strip() for ln in text.split("\n")]
+    out: List[str] = []
+    for ln in lines:
+        if ln == "" and out and out[-1] == "":
+            continue
+        out.append(" ".join(ln.split()) if ln and not ln.startswith("- ")
+                   else ln)
+    return "\n".join(out).strip()
 
 
 def treasure_project_block(item: Dict[str, Any]) -> Dict[str, Any]:

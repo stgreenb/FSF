@@ -8,6 +8,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from converter.loader import load_compendium_items
+from converter.reverse import foundry_format as ff
 from converter.mapper import convert_character
 from converter.reverse.fs_data_cache import FsData
 
@@ -195,3 +196,56 @@ class TestProjectEmission(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTreasureFormatAccessors(unittest.TestCase):
+    """carry-unknown-treasure-to-print group 1: format-boundary accessors."""
+
+    def _item(self, **system):
+        return {"name": "X", "type": "treasure", "system": system}
+
+    def test_quantity_int_string_fallback(self):
+        self.assertEqual(ff.treasure_quantity(self._item(quantity=3)), 3)
+        self.assertEqual(ff.treasure_quantity(self._item(quantity="4")), 4)
+        self.assertEqual(ff.treasure_quantity(self._item(quantity=0)), 1)
+        self.assertEqual(ff.treasure_quantity(self._item(quantity="x")), 1)
+        self.assertEqual(ff.treasure_quantity(self._item()), 1)
+        self.assertEqual(ff.treasure_quantity(self._item(quantity=True)), 1)
+
+    def test_category_item_type_table(self):
+        cases = [
+            (("consumable", []), "Consumable Item"),
+            (("artifact", []), "Artifact"),
+            (("trinket", []), "Trinket (1st echelon)"),
+            (("leveled", ["Weapon", "Light", "Melee"]), "Leveled Weapon"),
+            (("leveled", ["Armor"]), "Leveled Armor"),
+            (("leveled", ["Implement"]), "Leveled Implement"),
+            (("leveled", []), "Leveled Item"),
+            (("", []), "Leveled Item"),
+            (("mystery", ["Weapon"]), "Leveled Item"),
+        ]
+        for (cat, kws), want in cases:
+            item = self._item(category=cat, keywords=kws)
+            self.assertEqual(ff.treasure_item_type(item), want, (cat, kws))
+
+    def test_description_markdown_conversion(self):
+        item = self._item(description={"value":
+            "<p>A hatchet <em>forged from silver</em>.</p>"
+            "<ul><li>Harms werebeasts</li><li>+ silver shine &amp; glow</li>"
+            "</ul><p><strong>Nimbus</strong> line.<br>Second line.</p>"})
+        md = ff.treasure_description_markdown(item)
+        self.assertIn("*forged from silver*", md)
+        self.assertIn("**Nimbus**", md)
+        self.assertIn("- Harms werebeasts", md)
+        self.assertIn("& glow", md)        # entity unescaped
+        self.assertNotIn("<", md)          # no raw tags remain
+        self.assertIn("Second line.", md)  # <br> break preserved
+
+    def test_description_markdown_empty_safe(self):
+        self.assertEqual(ff.treasure_description_markdown(self._item()), "")
+        self.assertEqual(
+            ff.treasure_description_markdown(
+                self._item(description={"value": "   "})), "")
+        self.assertEqual(
+            ff.treasure_description_markdown(
+                self._item(description={"value": "<p></p>"})), "")

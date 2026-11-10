@@ -23,6 +23,7 @@ WARNING_CODES = frozenset({
     "setting-uncertain",
     "dump-stale",
     "unrepresentable-picture",
+    "mechanical-effects-lost",
 })
 
 

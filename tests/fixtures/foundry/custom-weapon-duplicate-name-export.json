@@ -1,0 +1,2171 @@
+{
+ "name": "Conduit Test Hero",
+ "type": "hero",
+ "img": "icons/svg/mystery-man.svg",
+ "system": {
+  "stamina": {
+   "temporary": 0
+  },
+  "characteristics": {
+   "might": {
+    "value": 0
+   },
+   "agility": {
+    "value": 0
+   },
+   "reason": {
+    "value": 0
+   },
+   "intuition": {
+    "value": 0
+   },
+   "presence": {
+    "value": 0
+   }
+  },
+  "combat": {
+   "save": {
+    "threshold": 6,
+    "bonus": ""
+   },
+   "size": {
+    "value": 1,
+    "letter": "M"
+   },
+   "stability": 0,
+   "turns": 1
+  },
+  "biography": {
+   "value": "",
+   "director": "",
+   "languages": [],
+   "height": {
+    "units": "in",
+    "value": null
+   },
+   "weight": {
+    "units": "lb",
+    "value": null
+   }
+  },
+  "movement": {
+   "value": 5,
+   "types": [
+    "walk"
+   ],
+   "hover": false,
+   "disengage": 1
+  },
+  "damage": {
+   "immunities": {
+    "all": 0,
+    "acid": 0,
+    "cold": 0,
+    "corruption": 0,
+    "fire": 0,
+    "holy": 0,
+    "lightning": 0,
+    "poison": 0,
+    "psychic": 0,
+    "sonic": 0
+   },
+   "weaknesses": {
+    "all": 0,
+    "acid": 0,
+    "cold": 0,
+    "corruption": 0,
+    "fire": 5,
+    "holy": 0,
+    "lightning": 0,
+    "poison": 0,
+    "psychic": 0,
+    "sonic": 0
+   }
+  },
+  "recoveries": {
+   "value": 8,
+   "max": 0
+  },
+  "hero": {
+   "primary": {
+    "value": 0
+   },
+   "epic": {
+    "value": 0
+   },
+   "surges": 0,
+   "xp": 17,
+   "victories": 4,
+   "renown": 0,
+   "wealth": 1,
+   "skills": [],
+   "preferredKit": null
+  },
+  "skills": {
+   "value": [
+    "sneak"
+   ]
+  }
+ },
+ "items": [
+  {
+   "name": "Revenant",
+   "type": "ancestry",
+   "img": "icons/magic/death/hand-dirt-undead-zombie.webp",
+   "system": {
+    "description": {
+     "value": "<p>The dead walk among us. Some of them are happier about it than others.</p><p>Unlike the necromantic rituals that produce wights and wraiths and zombies, revenants rise from the grave through a combination of an unjust death and a burning desire for vengeance. Creatures sustained on pure will, they have no need of food or water or air-and, unlike their zombified cousins, they retain all their memories and personality from life.</p><p>These revenants are rare. Many are hunted by ignorant villagers who see only their dead flesh and assume the worst. Those who survive the pitchfork brigade either choose a solitary life, often as a wandering soul seeking out living company yet constantly in fear of it, or they migrate to a metropolis such as Blackbottom or Capital, where lost souls gather to make a home.</p><h4>Revenant Traits</h4><p>Revenant heroes have access to the following traits.</p><p>Signature Trait:@UUID[Compendium.draw-steel.origins.Item.xXl9h7qyi4z91jYO]{Former Life}</p><p>Signature Trait:@UUID[Compendium.draw-steel.origins.Item.S2OsBBFHqBoHZYUu]{Tough But Withered}</p><h4>Purchased Revenant Traits</h4><p>You have 2 ancestry points to spend on the following traits. (Quick Build: Bloodless, plus Undead Influence if size is 1S.)</p><p>@UUID[Compendium.draw-steel.origins.Item.77tLSEIDpNRpkwnn]{Bloodless (2 Points)}</p><p>@UUID[Compendium.draw-steel.origins.Item.LhqV95QNJKZ4ItIU]{Previous Life: 1 Point (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.M8hcInvmTs5DG902]{Previous Life: 2 Points (2 Points)}</p><p>@UUID[Compendium.draw-steel.origins.Item.UWNCLuMl8DljBsrN]{Undead Influence (1 Point)}</p><p>@UUID[Compendium.draw-steel.origins.Item.4rkruRy4WbjyM7Vx]{Vengeance Mark (2 Points)}</p>",
+     "director": ""
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "46",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "revenant",
+    "advancements": {
+     "6QeV1AgB4VaBXFC9": {
+      "name": "Signature Trait",
+      "img": "icons/magic/death/grave-tombstone-glow-tan.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": null
+      },
+      "_id": "6QeV1AgB4VaBXFC9",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.xXl9h7qyi4z91jYO"
+       },
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.S2OsBBFHqBoHZYUu"
+       }
+      ],
+      "sort": 0,
+      "description": "",
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "wjCnH9cOfQON5aTl": {
+      "name": "Purchased Traits",
+      "img": "icons/skills/social/trading-injustice-scale-gray.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": null
+      },
+      "_id": "wjCnH9cOfQON5aTl",
+      "description": "<p>You have 2 ancestry points to spend on the following traits, or 3 ancestry points if your size is 1S. (Quick Build: Bloodless, plus Undead Influence if size 1S.)</p>",
+      "additional": {
+       "type": "ancestryTrait",
+       "perkType": []
+      },
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.77tLSEIDpNRpkwnn"
+       },
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.LhqV95QNJKZ4ItIU"
+       },
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.M8hcInvmTs5DG902"
+       },
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.UWNCLuMl8DljBsrN"
+       },
+       {
+        "uuid": "Compendium.draw-steel.origins.Item.4rkruRy4WbjyM7Vx"
+       }
+      ],
+      "chooseN": 2,
+      "sort": 0,
+      "repick": {}
+     }
+    }
+   },
+   "effects": [],
+   "sort": 100000,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {
+    "draw-steel": {
+     "advancement": {}
+    }
+   },
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_id": "3z6de295ycbstv1u"
+  },
+  {
+   "folder": "uWYEH9fs5ogusKkP",
+   "name": "Former Life",
+   "type": "ancestryTrait",
+   "_id": "xXl9h7qyi4z91jYO",
+   "img": "icons/magic/death/undead-zombie-grave-green.webp",
+   "system": {
+    "description": {
+     "value": "<p>Choose the ancestry you were before you died. Your size is that ancestry\u2019s size and your speed is 5. Unless you select one of the Previous Life traits (see below), you don\u2019t receive any other ancestral traits from your original ancestry.</p>",
+     "director": ""
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "47",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "former-life",
+    "advancements": {},
+    "points": null,
+    "prerequisites": {
+     "value": "",
+     "dsid": [],
+     "level": null
+    }
+   },
+   "effects": [],
+   "sort": 0,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {},
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_key": "!items!xXl9h7qyi4z91jYO"
+  },
+  {
+   "folder": "uWYEH9fs5ogusKkP",
+   "name": "Tough But Withered",
+   "type": "ancestryTrait",
+   "_id": "S2OsBBFHqBoHZYUu",
+   "img": "icons/magic/death/undead-skeleton-deformed-red.webp",
+   "system": {
+    "description": {
+     "value": "<p>Your undead body grants you immunity to cold, corruption, lightning, and poison damage equal to [[lookup @level]]{your level}, but you have fire weakness 5. You can\u2019t suffocate, and you don\u2019t need to eat or drink to stay alive.</p><p>Additionally, when your Stamina reaches the negative of your winded value, you become inert instead of dying. You fall prone and can\u2019t stand. You continue to observe your surroundings, but you can\u2019t speak, take main actions, maneuvers, move actions, or triggered actions. While inert this way, if you take any fire damage, your body is destroyed and you die. Otherwise, after 12 hours, you [[/heal @recoveries.recoveryValue]]{regain Stamina} equal to your recovery value.</p>",
+     "director": "<p>The immunities that scale will level need to be adjusted manually as the character levels. </p>"
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "47",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "tough-but-withered",
+    "advancements": {},
+    "points": null,
+    "prerequisites": {
+     "value": "",
+     "dsid": [],
+     "level": null
+    }
+   },
+   "effects": [
+    {
+     "name": "Tough But Withered",
+     "origin": "Compendium.draw-steel.origins.Item.S2OsBBFHqBoHZYUu",
+     "img": "icons/magic/death/undead-skeleton-deformed-red.webp",
+     "_id": "o6jQgG4VANoob2XI",
+     "type": "base",
+     "system": {
+      "end": {
+       "roll": "1d10 + @combat.save.bonus"
+      },
+      "changes": [
+       {
+        "key": "system.damage.immunities.cold",
+        "type": "upgrade",
+        "value": "@level",
+        "phase": "initial",
+        "priority": null
+       },
+       {
+        "key": "system.damage.immunities.corruption",
+        "type": "upgrade",
+        "value": "@level",
+        "phase": "initial",
+        "priority": null
+       },
+       {
+        "key": "system.damage.immunities.lightning",
+        "type": "upgrade",
+        "value": "@level",
+        "phase": "initial",
+        "priority": null
+       },
+       {
+        "key": "system.damage.immunities.poison",
+        "type": "upgrade",
+        "value": "@level",
+        "phase": "initial",
+        "priority": null
+       },
+       {
+        "key": "system.damage.weaknesses.fire",
+        "type": "upgrade",
+        "value": 5,
+        "phase": "initial",
+        "priority": null
+       }
+      ],
+      "project": {
+       "prerequisites": "",
+       "source": "",
+       "rollCharacteristic": [],
+       "yield": {
+        "kind": "weapon",
+        "amount": "1",
+        "display": ""
+       }
+      }
+     },
+     "disabled": false,
+     "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+     },
+     "description": "<p>Your undead body grants you immunity to cold, corruption, lightning, and poison damage equal to [[lookup @level]]{your level}, but you have fire weakness 5. You can\u2019t suffocate, and you don\u2019t need to eat or drink to stay alive.</p><p>Additionally, when your Stamina reaches the negative of your winded value, you become inert instead of dying. You fall prone and can\u2019t stand. You continue to observe your surroundings, but you can\u2019t speak, take main actions, maneuvers, move actions, or triggered actions. While inert this way, if you take any fire damage, your body is destroyed and you die. Otherwise, after 12 hours, you [[/heal @recoveries.recoveryValue]]{regain Stamina} equal to your recovery value.</p>",
+     "tint": "#ffffff",
+     "transfer": true,
+     "statuses": [],
+     "sort": 0,
+     "flags": {},
+     "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "14.361",
+      "systemId": "draw-steel",
+      "systemVersion": "1.1.0",
+      "createdTime": 1754628983679,
+      "modifiedTime": null,
+      "lastModifiedBy": null
+     },
+     "start": null,
+     "showIcon": 1,
+     "folder": null,
+     "_key": "!items.effects!S2OsBBFHqBoHZYUu.o6jQgG4VANoob2XI"
+    }
+   ],
+   "sort": 100000,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {},
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_key": "!items!S2OsBBFHqBoHZYUu"
+  },
+  {
+   "name": "Artisan guild",
+   "type": "culture",
+   "img": "icons/skills/trades/smithing-anvil-silver-red.webp",
+   "system": {
+    "description": {
+     "value": "Urban, bureaucratic, creative.",
+     "director": ""
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "53",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "artisan-guild",
+    "advancements": {
+     "anyLang000000000": {
+      "type": "language",
+      "chooseN": 1,
+      "name": "Any Language",
+      "description": "<p>You know the language of your chosen culture.</p>",
+      "requirements": {
+       "level": null
+      },
+      "_id": "anyLang000000000",
+      "img": null,
+      "languages": [],
+      "sort": 0,
+      "repick": {}
+     },
+     "I7sD76O1kt8K2CHJ": {
+      "type": "skill",
+      "name": "Urban",
+      "chooseN": 1,
+      "skills": {
+       "groups": [
+        "interpersonal",
+        "intrigue"
+       ],
+       "choices": []
+      },
+      "_id": "I7sD76O1kt8K2CHJ",
+      "img": null,
+      "sort": 0,
+      "description": "",
+      "requirements": {
+       "level": null
+      },
+      "repick": {}
+     },
+     "0mxjmVHVZGn3TGXC": {
+      "type": "skill",
+      "name": "Bureaucratic",
+      "chooseN": 1,
+      "skills": {
+       "groups": [
+        "interpersonal",
+        "intrigue"
+       ],
+       "choices": []
+      },
+      "_id": "0mxjmVHVZGn3TGXC",
+      "img": null,
+      "sort": 0,
+      "description": "",
+      "requirements": {
+       "level": null
+      },
+      "repick": {}
+     },
+     "XbdlctbG8Y7wqoid": {
+      "type": "skill",
+      "name": "Creative",
+      "chooseN": 1,
+      "skills": {
+       "groups": [
+        "crafting"
+       ],
+       "choices": [
+        "music",
+        "perform"
+       ]
+      },
+      "_id": "XbdlctbG8Y7wqoid",
+      "img": null,
+      "sort": 0,
+      "description": "",
+      "requirements": {
+       "level": null
+      },
+      "repick": {}
+     }
+    }
+   },
+   "effects": [],
+   "sort": 0,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {
+    "draw-steel": {
+     "advancement": {}
+    }
+   },
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_id": "5meqobn3d10h6ww9"
+  },
+  {
+   "name": "Conduit",
+   "type": "class",
+   "img": "icons/magic/holy/chalice-glowing-yellow-blue.webp",
+   "system": {
+    "description": {
+     "value": "<p>The power of the gods flows through you! As a vessel for divine power, you don't just keep your allies in the fight. You make those allies more effective, even as you rain divine energy down upon your foes. Though the deity or saint you serve might have other faithful and clergy, you are special among worshippers, receiving your abilities from the highest source. As a conduit, you heal and buff your allies, and debuff your foes while smiting them with divine magic. The spark of divinity within you shines, filling your enemies with awe and making you more worldly and aware.</p>",
+     "director": ""
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "94",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "conduit",
+    "advancements": {
+     "6UvO0CduzsSOYO6l": {
+      "name": "Skills",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "6UvO0CduzsSOYO6l",
+      "chooseN": 2,
+      "skills": {
+       "groups": [
+        "interpersonal",
+        "lore"
+       ],
+       "choices": []
+      },
+      "description": "<p>Choose any two skills from the interpersonal or lore skill groups (<em>Quick Build:</em> Read Person, Religion.)</p>",
+      "sort": 3000,
+      "repick": {}
+     },
+     "zdVqusQ0Zht3iVDy": {
+      "name": "Skill",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": 7
+      },
+      "_id": "zdVqusQ0Zht3iVDy",
+      "description": "<p>You gain one skill of your choice.</p>",
+      "chooseN": 1,
+      "sort": 19000,
+      "repick": {},
+      "skills": {
+       "groups": [],
+       "choices": []
+      }
+     },
+     "2ceT7sktlDZlNtaM": {
+      "name": "Skill",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": 4
+      },
+      "_id": "2ceT7sktlDZlNtaM",
+      "description": "<p>You gain one skill of your choice.</p>",
+      "chooseN": 1,
+      "sort": 33000,
+      "repick": {},
+      "skills": {
+       "groups": [],
+       "choices": []
+      }
+     },
+     "7eUMqrXMqEXttgbB": {
+      "name": "Skill",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": 10
+      },
+      "_id": "7eUMqrXMqEXttgbB",
+      "description": "<p>You gain one skill of your choice.</p>",
+      "chooseN": 1,
+      "sort": 34000,
+      "repick": {},
+      "skills": {
+       "groups": [],
+       "choices": []
+      }
+     },
+     "evZLo0zeGnoNuDCC": {
+      "name": "Deity and Domains",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "evZLo0zeGnoNuDCC",
+      "chooseN": 2,
+      "description": "<p>Choose a god or saint who your character reveres from Chapter 14: Gods and Religion, or ask your Director about the deities in your campaign world. With the Director\u2019s permission, you can also create your own deity and choose four domains to be part of their portfolio.</p><p>After choosing your deity, pick two domains from their portfolio. The two domains you pick make up your subclass, and your choice of domains determines many of the features you\u2019ll gain as you gain new levels. (<em>Quick Build:</em> Ad\u00fbn for deity, and Life and Protection as domains.)</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.Lh2Xi7UrmnhJO3Ke"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.b8B5pjyAJsywS2pf"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.JW4hfYLH6K5MA0jY"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.dAVcaZ0aBkPqCTN7"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.H9oyYYQA8GNxEhyN"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.KQVARkvjGEpL9iKA"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.8qJlvdyF539WCv4N"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.Be20Uu0siSePSGue"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.mUsjn4Ry2pviXw44"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.AC9Kmtk2KCHiwZH6"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.Hg3pUKdOeLi4LBhn"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.oXK9RDnTuXTu47l1"
+       }
+      ],
+      "sort": 15000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "NTtV2ajZK2aEJd4n": {
+      "name": "Piety",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "NTtV2ajZK2aEJd4n",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.TqhbTvHo0XqK65DW"
+       }
+      ],
+      "description": "<p>Your deity grants you a Heroic Resource called piety, letting you heal and empower your allies, and unleash holy power upon your foes.</p>",
+      "sort": 17000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "p2AwNsp5ySMApdYG": {
+      "name": "Healing Grace",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "p2AwNsp5ySMApdYG",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.S1KR2X2c81VGQqsO"
+       }
+      ],
+      "description": "<p>Your divine energy restores the righteous.</p>",
+      "sort": 24000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "gPyQLALhXOgN0TcX": {
+      "name": "Ray of Wrath",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "gPyQLALhXOgN0TcX",
+      "description": "<p>You unleash a blast of holy light upon your foe.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.4r6uYuaEgmiGsdCf"
+       }
+      ],
+      "sort": 27000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "Sh4U3vDFoMw4jEOG": {
+      "name": "Triggered Action",
+      "img": "icons/magic/time/clock-stopwatch-white-blue.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "Sh4U3vDFoMw4jEOG",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.cIyx6zWZj5c900Ge"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.muoxJzpEMsUwnnap"
+       }
+      ],
+      "chooseN": 1,
+      "description": "<p>Choose one of the following triggered actions. (<em>Quick Build:</em> Word of Guidance.)</p>",
+      "sort": 28000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "DNIjeFW2NgEnvmTA": {
+      "name": "Prayer",
+      "img": "icons/magic/holy/prayer-hands-glowing-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "DNIjeFW2NgEnvmTA",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.ELmjh5zCJIQDHq07"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.6RjkGZBL3BBegXDY"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.fsRyhdp5hrcZPlTV"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.6zBmgbtklqTgsU7R"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.WixZ78HthzRim4Ny"
+       }
+      ],
+      "description": "<p>Your god answers a prayer with enhancements to your body and mind. Choose one of the following prayers. You can change your prayer along with your ward by praying to your god as a respite activity. (<em>Quick Build:</em> Prayer of Distance.)</p>",
+      "sort": 30000,
+      "repick": {
+       "respite": "activity"
+      },
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "kdU2fIwl5Z8XFs5P": {
+      "name": "Conduit Ward",
+      "img": "icons/magic/defensive/shield-barrier-deflect-gold.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "kdU2fIwl5Z8XFs5P",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.JdY0Ntgy9wrrgpkD"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.ELyogKBMJyKG0I41"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.uuea3Ls1q0oP8ZuC"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.YWdkLFG0RZCqrdXy"
+       }
+      ],
+      "description": "<p>Your god grants you a ward that protects you from the faithless. Choose one of the following wards. You can change your ward along with your prayer (see Prayer above) by praying to your god as a respite activity. (<em>Quick Build:</em> Bastion Ward.)</p>",
+      "sort": 31000,
+      "repick": {
+       "respite": "activity"
+      },
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "Fo9985q2yH772eDz": {
+      "name": "Signature Ability",
+      "img": "icons/tools/scribal/pen-steel-grey-brown.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "Fo9985q2yH772eDz",
+      "chooseN": 2,
+      "description": "<p>Choose two signature abilities from the following options. Signature abilities can be used at will. (<em>Quick Build:</em> Blessed Light, Staggering Curse.)</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.vIWsppfqQOUGAxDD"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.yW4SGOUpoTDjHn6E"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.QTLJjtmr87d1VBp2"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.LLebExwIrmMxIhQM"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.BRkOBjM04NYOikPL"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.ex3jLlZsmFfaOrp2"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.uKmLk8ckvS3CGbEA"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.504hBrdvlcWT7yyo"
+       }
+      ],
+      "sort": 32000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "6LpWW8oNYC2i9IXH": {
+      "name": "3 Piety",
+      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "6LpWW8oNYC2i9IXH",
+      "chooseN": 1,
+      "description": "<p>Choose one heroic ability from the following options, each of which costs 3 piety to use. (<em>Quick Build:</em> Violence Will Not Aid Thee.)</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.7IVmZMxN83iSbwJW"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.H9cwQqjpOGwzgpJG"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.UUH2bcsx4XhE1JFj"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.rI89b1iySJEyNHzO"
+       }
+      ],
+      "sort": 36000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "GKLkZYTtIr1w9s6h": {
+      "name": "5 Piety",
+      "img": "icons/magic/symbols/runes-star-blue.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "GKLkZYTtIr1w9s6h",
+      "chooseN": 1,
+      "description": "<p>Choose one heroic ability from the following options, each of which costs 5 piety to use. (<em>Quick Build:</em> Curse of Terror.)</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.5nyzxslMzneoGfTr"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.RsiUpHVACRZNpNHl"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.7VUrfLoetI3NyvIa"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.pOkDQAEsg0drbuO5"
+       }
+      ],
+      "sort": 37000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "JGz4DGEIKk5sHW9E": {
+      "name": "1st-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 1
+      },
+      "_id": "JGz4DGEIKk5sHW9E",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.U1rzb0AN0z9iTs2C"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.23rLeSYbkAzYhPpq"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.21lMiXOy7dWQvNZH"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nowK2klms2t0jEUk"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.kDa1rc6xRuBARDpJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.D0ef3sDvAeB8Tre7"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.NmlU6Bn6uzQtrILs"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.FxXIbGZGvaJNpJ4E"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.bpROA6P35eYnUQIZ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DNfK5Uf55DHX2r9h"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.VRC4QcE3f1ob0drS"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.rSzQM4yL6cWtfxjX"
+       }
+      ],
+      "chooseN": 1,
+      "description": "<p>Choose one of your domains. You gain a domain feature for that domain. Additionally, you gain a skill from the chosen domain, selected from a skill group. <span class=\"fontstyle0\">(</span><span class=\"fontstyle1\"><em>Quick Build:</em> </span><span class=\"fontstyle0\">Revitalizing Ritual and the Heal skill from the Life domain.)</span></p>",
+      "sort": 20000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "YjGnkzTaPpMUxEFy": {
+      "name": "The List of Heaven",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 2
+      },
+      "_id": "YjGnkzTaPpMUxEFy",
+      "description": "<p>You gain the following feature.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.xRRa0ywFLZYQIKAl"
+       }
+      ],
+      "sort": 2000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "QbovibZvxKYD1ybQ": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 2
+      },
+      "_id": "QbovibZvxKYD1ybQ",
+      "description": "<p>You gain one crafting, lore, or supernatural perk of your choice.</p>",
+      "chooseN": 1,
+      "additional": {
+       "type": "perk",
+       "perkType": [
+        "crafting",
+        "lore",
+        "supernatural"
+       ]
+      },
+      "sort": 6000,
+      "repick": {},
+      "pool": []
+     },
+     "vBjjJeBeezefEfdV": {
+      "name": "2nd-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 2
+      },
+      "_id": "vBjjJeBeezefEfdV",
+      "description": "<p>You gain the 1st-level domain feature and ability to choose a skill for the domain you selected at 1st level but whose domain feature you didn\u2019t take at that level.</p>",
+      "sort": 7000,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.rnOmChJZxUMVHGL3"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.yEhOYfiCIa1o1fGc"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.21lMiXOy7dWQvNZH"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nowK2klms2t0jEUk"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.kDa1rc6xRuBARDpJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.D0ef3sDvAeB8Tre7"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.uolRzoBIpSlsbfsZ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.FxXIbGZGvaJNpJ4E"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.bpROA6P35eYnUQIZ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DNfK5Uf55DHX2r9h"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.VRC4QcE3f1ob0drS"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.rSzQM4yL6cWtfxjX"
+       }
+      ],
+      "chooseN": 1,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "spLyeQgoouiT59G2": {
+      "name": "2nd-Level Domain Ability",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 2
+      },
+      "_id": "spLyeQgoouiT59G2",
+      "description": "<p>Choose one of your domains. You gain a heroic ability from that domain, as shown on the 2nd-Level Conduit Domain Abilities table.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.Nx6KHV96yUc5qlCi"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.OqZbt8MOyCeVkd5z"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.tpEhMJt2yZATNnlo"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.NoFwNxcQOyFBZBIT"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.zL3k5GHQeyoSxb8j"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.vMq4N7eRlhDxXbaJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.izUb8dD36TPQcwmC"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.SoSmdyoPB32dhQlz"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.YstGmEeDnNvezcSJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.hyVX7vAE7UfchuVv"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.adYj0xjaSgOflVg2"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.6EufjD3NoSD6xglV"
+       }
+      ],
+      "chooseN": 1,
+      "sort": 11000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "xKonc5DjsElMlvrw": {
+      "name": "Minor Miracle",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 3
+      },
+      "_id": "xKonc5DjsElMlvrw",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.uZeSKxyTMbdyxOBr"
+       }
+      ],
+      "description": "<p>You gain the following features.</p>",
+      "sort": 25000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "el8hxmFuHtCbyRim": {
+      "name": "7 Piety",
+      "img": "icons/magic/symbols/runes-star-pentagon-blue.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 3
+      },
+      "_id": "el8hxmFuHtCbyRim",
+      "description": "<p>Choose one heroic ability from the following options, each of which costs 7 piety to use.</p>",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.XfO8U6RGqLearbE2"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.MIWvaUHJMTQ4HK8D"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.W2Fmn6Iz6QZpvl76"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.eoSLTArMhMz1Z5gg"
+       }
+      ],
+      "sort": 38000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "rqUaqQBjKSONHbyw": {
+      "name": "",
+      "img": null,
+      "type": "characteristic",
+      "requirements": {
+       "level": 4
+      },
+      "_id": "rqUaqQBjKSONHbyw",
+      "description": "<p>Your Intuition score increases to 3. Additionally, you can increase one of your characteristic scores by 1, to a maximum of 3.</p>",
+      "characteristics": {
+       "intuition": 1,
+       "might": 0,
+       "agility": 0,
+       "reason": 0,
+       "presence": 0
+      },
+      "sort": 12000,
+      "repick": {},
+      "max": 3
+     },
+     "HSLYPxSRckoK0qv9": {
+      "name": "",
+      "img": null,
+      "type": "characteristic",
+      "requirements": {
+       "level": 7
+      },
+      "_id": "HSLYPxSRckoK0qv9",
+      "description": "<p>Each of your characteristic scores increases by 1, to a maximum of 4.</p>",
+      "max": 4,
+      "characteristics": {
+       "might": 1,
+       "agility": 1,
+       "reason": 1,
+       "intuition": 1,
+       "presence": 1
+      },
+      "sort": 13000,
+      "repick": {}
+     },
+     "8P2fFC5RAULYjyin": {
+      "name": "",
+      "img": null,
+      "type": "characteristic",
+      "requirements": {
+       "level": 10
+      },
+      "_id": "8P2fFC5RAULYjyin",
+      "description": "<p>Your Intuition score increases to 5. Additionally, you can increase one of your characteristic scores by 1, to a maximum of 5.</p>",
+      "max": 5,
+      "characteristics": {
+       "intuition": 1,
+       "might": 0,
+       "agility": 0,
+       "reason": 0,
+       "presence": 0
+      },
+      "sort": 14000,
+      "repick": {}
+     },
+     "H1gzNlYJ00RU4dh4": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 4
+      },
+      "_id": "H1gzNlYJ00RU4dh4",
+      "description": "<p>You gain one perk of your choice.</p>",
+      "chooseN": 1,
+      "additional": {
+       "type": "perk",
+       "perkType": []
+      },
+      "sort": 26000,
+      "repick": {},
+      "pool": []
+     },
+     "rGjYXz5FYllGrhuR": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 6
+      },
+      "_id": "rGjYXz5FYllGrhuR",
+      "description": "<p>You gain one crafting, lore, or supernatural perk of your choice.</p>",
+      "chooseN": 1,
+      "additional": {
+       "type": "perk",
+       "perkType": [
+        "crafting",
+        "lore",
+        "supernatural"
+       ]
+      },
+      "sort": 5000,
+      "repick": {},
+      "pool": []
+     },
+     "lKJ7geYjMyeGC1Nx": {
+      "name": "6th-Level Domain Ability",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 6
+      },
+      "_id": "lKJ7geYjMyeGC1Nx",
+      "description": "<p>Choose one of your domains. You gain a heroic ability from that domain.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.idV3wRcr2Y2LQxKm"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.R62etIBd2Yeo9sg0"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.yDumCGie3ONcr9K7"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.8zs6wbEeXQrrtrSw"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.2jUF3BFGON6tl3Cd"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.BpV9vREE34LfeqJG"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.SvMx9JfBQTLQFOHP"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.ZC0m20DAm7UVhk75"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.3XLw1ud3MBEK2Zf7"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.JeEHo9msy0O1Qlmy"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.AfksxUc6DEDa9S0H"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.YHCqOWlqzXPL34zs"
+       }
+      ],
+      "chooseN": 1,
+      "sort": 8000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "y2ymCizIs13AIDP0": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 8
+      },
+      "_id": "y2ymCizIs13AIDP0",
+      "description": "<p>You gain one perk of your choice.</p>",
+      "chooseN": 1,
+      "additional": {
+       "type": "perk",
+       "perkType": []
+      },
+      "sort": 4000,
+      "repick": {},
+      "pool": []
+     },
+     "FNrOlKRHEqBlWbWS": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 10
+      },
+      "_id": "FNrOlKRHEqBlWbWS",
+      "description": "<p>You gain one crafting, lore, or supernatural perk of your choice.</p>",
+      "chooseN": 1,
+      "additional": {
+       "type": "perk",
+       "perkType": [
+        "crafting",
+        "lore",
+        "supernatural"
+       ]
+      },
+      "sort": 29000,
+      "repick": {},
+      "pool": []
+     },
+     "jjgoWY8vfIQ733il": {
+      "name": "Blessed Domain",
+      "img": "icons/magic/control/buff-flight-wings-runes-blue-white.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 4
+      },
+      "_id": "jjgoWY8vfIQ733il",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.2QyeED2yGIk5Mcin"
+       }
+      ],
+      "sort": 9000,
+      "description": "",
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "A7WpmiWX7LJcMXXo": {
+      "name": "4th-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 4
+      },
+      "_id": "A7WpmiWX7LJcMXXo",
+      "chooseN": 1,
+      "description": "<p>Choose one of your domains. You gain a domain feature for that domain.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.sMpaxA2yjcxXkY2F"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.C2FXhOcVLxY2sPKr"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nRjI4KBXgZDrEwvi"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.wStjrvdujmmERmqB"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.A8vY0V2WnbeeSvdJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.YtM8UBnfX1ilf3w6"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.sYUewcOmshk2UlZw"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.8aGDQ1btMgk02WRK"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.dohg4J62GQR8Mbd3"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.bPqv99ZpZ2CLp2Rt"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DVJo7Gf5hgHBtMPP"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.KB5V93FFPGUKc9Vp"
+       }
+      ],
+      "sort": 40000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "qHBHn5C5kIaRjTtT": {
+      "name": "5th-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 5
+      },
+      "_id": "qHBHn5C5kIaRjTtT",
+      "description": "<p>You gain the 4th-level domain feature for the domain whose feature you didn\u2019t select at that level.</p>",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.sMpaxA2yjcxXkY2F"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.C2FXhOcVLxY2sPKr"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nRjI4KBXgZDrEwvi"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.wStjrvdujmmERmqB"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.A8vY0V2WnbeeSvdJ"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.YtM8UBnfX1ilf3w6"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.sYUewcOmshk2UlZw"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.8aGDQ1btMgk02WRK"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.dohg4J62GQR8Mbd3"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.bPqv99ZpZ2CLp2Rt"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DVJo7Gf5hgHBtMPP"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.KB5V93FFPGUKc9Vp"
+       }
+      ],
+      "sort": 16000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "RRXGEVaxt5CN4ta3": {
+      "name": "9 Piety",
+      "img": "icons/magic/symbols/runes-star-orange.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 5
+      },
+      "_id": "RRXGEVaxt5CN4ta3",
+      "chooseN": 1,
+      "description": "<p>Choose one heroic ability from the following options, each of which costs 9 piety to use.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.DRLX6riLwugiPMtL"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.aFXmGQ2lqaD1IIUO"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.mxZpod4GbkRjFq91"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.2scW6s7igCc3e8Je"
+       }
+      ],
+      "sort": 39000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "PotQ6ik6DRCg9DfK": {
+      "name": "Burgeoning Saint",
+      "img": null,
+      "type": "itemGrant",
+      "requirements": {
+       "level": 6
+      },
+      "_id": "PotQ6ik6DRCg9DfK",
+      "description": "<p>You are infused with the power your deity reserves for their most worthy instruments. You have the following benefits:</p><ul><li><p>You gain an edge on Presence tests made to interact with other creatures.</p></li><li><p>Whenever you deal damage to an enemy, you can spend a Recovery.</p></li><li><p>You have corruption immunity 10 or holy immunity 10 (your choice).</p></li><li><p>Your clothing and equipment changes in a way that reflects your status as your deity\u2019s chosen champion, such as ordinary robes turning into gold vestments or a simple dagger becoming a wicked blade with intricate etching.</p></li></ul>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.JLLTOWRueiSsVkcf"
+       }
+      ],
+      "sort": 0,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "O6MFwsCGTXuHK8h9": {
+      "name": "Faithful's Reward",
+      "img": "icons/magic/holy/angel-winged-humanoid-blue.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 7
+      },
+      "_id": "O6MFwsCGTXuHK8h9",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.g567VKpuf5xms7bD"
+       }
+      ],
+      "sort": 18000,
+      "description": "",
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "qUO487lNRcs486wL": {
+      "name": "7th-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 7
+      },
+      "_id": "qUO487lNRcs486wL",
+      "description": "<p>Choose one of your domains. You gain a domain feature for that domain.</p>",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nIzGiNdSDEycqOs1"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.0TjibY26FbbF5imH"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DyxvKX5sU17XUjLI"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.hfK4TyZt5lWO38uT"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.lYny6FvVtdKg23bw"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.VAxZIJWZaVpi3ysf"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.82Cp3GIsKGGoNzfO"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.OTgDHrFF8nXCGrCI"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.eSEy7CzAuMZuUqqn"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.jzKRCrTGUCB2psRd"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.oDf3SkXDXjWgbT1S"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.mZm6J8D0XC3s7100"
+       }
+      ],
+      "sort": 21000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "CJBrPOHaWtpFV3FC": {
+      "name": "11 Piety",
+      "img": "icons/magic/symbols/runes-star-pentagon-orange.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 8
+      },
+      "_id": "CJBrPOHaWtpFV3FC",
+      "description": "<p>Choose one heroic ability from the following options, each of which costs 11 piety to use.</p>",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.QLZzCb8KFe8oeGhD"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.4i2sJPIq07X1XpRY"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.aS50VBdXca4C7FMs"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.leyghP2Hazrli1c3"
+       }
+      ],
+      "sort": 35000,
+      "repick": {},
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "ahtUOe2d6VT3qGeE": {
+      "name": "8th-Level Domain Feature",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 8
+      },
+      "_id": "ahtUOe2d6VT3qGeE",
+      "chooseN": 1,
+      "description": "<p>You gain the 7th-level domain feature for the domain whose feature you didn\u2019t select at that level.</p>",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.nIzGiNdSDEycqOs1"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.0TjibY26FbbF5imH"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.DyxvKX5sU17XUjLI"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.hfK4TyZt5lWO38uT"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.lYny6FvVtdKg23bw"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.VAxZIJWZaVpi3ysf"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.82Cp3GIsKGGoNzfO"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.OTgDHrFF8nXCGrCI"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.eSEy7CzAuMZuUqqn"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.jzKRCrTGUCB2psRd"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.oDf3SkXDXjWgbT1S"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.mZm6J8D0XC3s7100"
+       }
+      ],
+      "sort": 23000,
+      "repick": {
+       "respite": ""
+      },
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "ODG9B2VW7ZdTQRsL": {
+      "name": "Features",
+      "img": "icons/magic/symbols/runes-star-magenta.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 10
+      },
+      "_id": "ODG9B2VW7ZdTQRsL",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.xfinWYhR5ah8fnNK"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.O4PMXFggWGo7vn8n"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.3FNNQDOkZktVRQW2"
+       }
+      ],
+      "description": "<p>You gain the following features.</p>",
+      "sort": 22000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "s3KSYqD7az4UFfWi": {
+      "name": "Features",
+      "img": "icons/magic/symbols/runes-star-magenta.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 9
+      },
+      "_id": "s3KSYqD7az4UFfWi",
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.a8QzeQGoAIytnyij"
+       },
+       {
+        "uuid": "Compendium.draw-steel.classes.Item.CYkxQ3HK9V3AE5XZ"
+       }
+      ],
+      "description": "<p>You gain the following features.</p>",
+      "sort": 1000,
+      "repick": {},
+      "chooseN": null,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     },
+     "jpofLM4lPdZ0xsdj": {
+      "name": "9th-Level Domain Ability",
+      "img": "icons/magic/holy/saint-glass-portrait-halo.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": 9
+      },
+      "_id": "jpofLM4lPdZ0xsdj",
+      "chooseN": 1,
+      "pool": [
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.MmTYr3vm2Xidg3d3"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.ttGd98xWPNMgYXIf"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.Y1l3kymyNVrz1rBP"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.EyIjGqQNoPL6WZk2"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.JBK43QtkIOzjGB1i"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.W8GEYrwdpIQp28gD"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.oLAXYRUcUrtUiHVm"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.I6ZdNYnSPM3S6RPc"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.yFrlWMzLGompq7cl"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.zW3l8oIlze4rdW6n"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.0Aedwkye9L721pM4"
+       },
+       {
+        "uuid": "Compendium.draw-steel.abilities.Item.MmWkaTE9KFrGkvwy"
+       }
+      ],
+      "repick": {
+       "respite": ""
+      },
+      "description": "<p>Choose one of your domains. You gain a heroic ability from that domain.</p>",
+      "sort": 10000,
+      "additional": {
+       "type": "",
+       "perkType": []
+      }
+     }
+    },
+    "level": 1,
+    "primary": "Piety",
+    "epic": "Divine Power",
+    "turnGain": "1d3",
+    "minimum": "0",
+    "characteristics": {
+     "core": [
+      "intuition"
+     ]
+    },
+    "stamina": {
+     "starting": 18,
+     "level": 6
+    },
+    "recoveries": 8
+   },
+   "effects": [],
+   "sort": 0,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {
+    "draw-steel": {
+     "advancement": {}
+    }
+   },
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_id": "draws0q2uizn2gdp"
+  },
+  {
+   "name": "Agent",
+   "type": "career",
+   "img": "icons/tools/scribal/magnifying-glass.webp",
+   "system": {
+    "description": {
+     "value": "<p>You worked as a spy for a government or organization. In defining your career, think about the following questions:</p><ul><li><p>Who did you work for?</p></li><li><p>Who did you spy on?</p></li><li><p>Who shouldn't know your true identity and allegiance but does?</p></li><li><p>Who did you burn or leave behind to get a job done?</p></li></ul><p>You gain the following career benefits:</p><p><strong>Skills:</strong> The Sneak skill from the intrigue skill group, plus one skill from the interpersonal group and one other skill from the intrigue group (Quick Build: Disguise, Lie, Sneak.)</p><p><strong>Languages:</strong> Two languages</p><p><strong>Perk:</strong> One intrigue perk (Quick Build: Forgettable Face.)</p><h5>Inciting Incident</h5><p>@UUID[Compendium.draw-steel.tables.RollTable.gJQM1MIN4KsGUXuh]{Agent - Inciting Indicent}</p></u>",
+     "director": ""
+    },
+    "source": {
+     "book": "Heroes",
+     "page": "59",
+     "license": "Draw Steel Creator License"
+    },
+    "_dsid": "agent",
+    "advancements": {
+     "baedeDOYe6K3ZQa9": {
+      "type": "language",
+      "_id": "baedeDOYe6K3ZQa9",
+      "chooseN": 2,
+      "name": "",
+      "img": null,
+      "description": "",
+      "requirements": {
+       "level": null
+      },
+      "languages": [],
+      "sort": 0,
+      "repick": {}
+     },
+     "MaEsyqUb2QzTHZqt": {
+      "name": "Perk",
+      "img": "icons/magic/symbols/fleur-de-lis-yellow.webp",
+      "type": "itemGrant",
+      "requirements": {
+       "level": null
+      },
+      "_id": "MaEsyqUb2QzTHZqt",
+      "chooseN": 1,
+      "pool": [],
+      "description": "<p>One intrigue perk (<em>Quick Build:</em> Forgettable Face.)</p>",
+      "additional": {
+       "type": "perk",
+       "perkType": [
+        "intrigue"
+       ]
+      },
+      "sort": 0,
+      "repick": {}
+     },
+     "PD9JCwqcjmHCBXDV": {
+      "name": "Sneak (Skill)",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": null
+      },
+      "_id": "PD9JCwqcjmHCBXDV",
+      "skills": {
+       "groups": [],
+       "choices": [
+        "sneak"
+       ]
+      },
+      "description": "",
+      "chooseN": null,
+      "sort": 0,
+      "repick": {}
+     },
+     "VXBbKE86rRb6HggJ": {
+      "name": "Skill (Interpersonal)",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": null
+      },
+      "_id": "VXBbKE86rRb6HggJ",
+      "chooseN": 1,
+      "skills": {
+       "groups": [
+        "interpersonal"
+       ],
+       "choices": []
+      },
+      "description": "",
+      "sort": 0,
+      "repick": {}
+     },
+     "5ltfATFcWOf5dJm8": {
+      "name": "Skill (Intrigue)",
+      "img": null,
+      "type": "skill",
+      "requirements": {
+       "level": null
+      },
+      "_id": "5ltfATFcWOf5dJm8",
+      "skills": {
+       "groups": [
+        "intrigue"
+       ],
+       "choices": []
+      },
+      "chooseN": 1,
+      "description": "",
+      "sort": 0,
+      "repick": {}
+     }
+    },
+    "projectPoints": 0,
+    "renown": 0,
+    "wealth": 0
+   },
+   "effects": [],
+   "flags": {
+    "draw-steel": {
+     "advancement": {
+      "VXBbKE86rRb6HggJ": {
+       "selected": [
+        "sneak"
+       ]
+      }
+     }
+    }
+   },
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "ownership": {
+    "default": 0
+   },
+   "sort": 0,
+   "_id": "ukrzxa3kswa1xij2"
+  },
+  {
+   "name": "Advanced Studies",
+   "type": "complication",
+   "system": {
+    "source": {
+     "book": "Heroes",
+     "license": "Draw Steel Creator License",
+     "page": "234"
+    },
+    "description": {
+     "value": "<p>You somehow obtained the notebook of a brilliant but eccentric member of your class. The knowledge held within those notes should help you unlock powerful new abilities-if you can ever figure out what the notes mean.</p><p><strong>Benefit and Drawback:</strong> As a respite activity, you can study the notebook. [[/test M A R I P resultSource=JournalEntry.f8eNK5Pte4CSdex0]]{Make a test} using your highest characteristic score:</p><p>@Embed[Compendium.draw-steel.journals.JournalEntry.f8eNK5Pte4CSdex0.JournalEntryPage.W9ZFFVSptj1xfrJd inline]</p>",
+     "director": ""
+    },
+    "_dsid": "advanced-studies",
+    "advancements": {},
+    "prerequisites": {
+     "value": "",
+     "dsid": [],
+     "level": null
+    }
+   },
+   "img": "icons/sundries/books/book-clasp-spiral-green.webp",
+   "effects": [],
+   "sort": 0,
+   "ownership": {
+    "default": 0
+   },
+   "flags": {},
+   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "draw-steel",
+    "systemVersion": "0.9.2",
+    "createdTime": 1794340649026,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+   },
+   "_id": "va5guyz0uso72p8v"
+  },
+  {
+   "_id": "CuStOmWeap000001",
+   "name": "Widow's Fang",
+   "type": "treasure",
+   "system": {
+    "_dsid": "",
+    "quantity": 1,
+    "category": "leveled",
+    "keywords": [
+     "Weapon",
+     "Light",
+     "Melee"
+    ],
+    "description": {
+     "value": "<p>A jagged knife soaked in <em>widow venom</em>.</p><ul><li>+1 damage vs poisoned targets</li></ul>"
+    },
+    "project": {
+     "goal": 100,
+     "prerequisites": "Level 1+, smithing tools",
+     "source": "Homebrew - GM reward",
+     "rollCharacteristic": [
+      "agility",
+      "reason"
+     ]
+    }
+   },
+   "effects": [
+    {
+     "_id": "VenomEdge0000001",
+     "name": "Venom Edge (1st level)",
+     "system": {
+      "changes": [
+       {
+        "key": "damage.bonuses.treasure",
+        "value": 1
+       }
+      ],
+      "description": {
+       "value": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "_id": "CuStOmPrj0000001",
+   "name": "Craft Widow's Fang",
+   "type": "project",
+   "system": {
+    "_dsid": "craft-widows-fang",
+    "points": 25,
+    "goal": 100,
+    "prerequisites": "Level 1+, smithing tools",
+    "projectSource": "Homebrew - GM reward",
+    "rollCharacteristic": [
+     "agility",
+     "reason"
+    ],
+    "type": "craft"
+   }
+  },
+  {
+   "_id": "BlkOnlyTreasure1",
+   "name": "Lucky Coin",
+   "type": "treasure",
+   "system": {
+    "_dsid": "",
+    "quantity": 2,
+    "category": "trinket",
+    "keywords": [],
+    "description": {
+     "value": "<p>A dented coin. Always lands edge-up.</p>"
+    },
+    "project": {
+     "goal": 25,
+     "prerequisites": "coinage",
+     "source": ""
+    }
+   }
+  },
+  {
+   "_id": "CuStOmWeap000002",
+   "name": "Widow's Fang",
+   "type": "treasure",
+   "system": {
+    "_dsid": "",
+    "quantity": "2",
+    "category": "leveled",
+    "keywords": [
+     "Weapon",
+     "Light",
+     "Melee"
+    ],
+    "description": {
+     "value": "<p>A jagged knife soaked in <em>widow venom</em>.</p><ul><li>+1 damage vs poisoned targets</li></ul>"
+    },
+    "project": {
+     "goal": 100,
+     "prerequisites": "Level 1+, smithing tools",
+     "source": "Homebrew - GM reward",
+     "rollCharacteristic": [
+      "agility",
+      "reason"
+     ]
+    }
+   },
+   "effects": []
+  }
+ ],
+ "_id": "jgjfvnogqkmh0cuh",
+ "_stats": {
+  "compendiumSource": null,
+  "duplicateSource": null,
+  "exportSource": null,
+  "coreVersion": "13.351",
+  "systemId": "draw-steel",
+  "systemVersion": "0.9.2",
+  "createdTime": 1794340649026,
+  "modifiedTime": null,
+  "lastModifiedBy": null
+ }
+}

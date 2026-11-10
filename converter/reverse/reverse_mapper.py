@@ -7,6 +7,7 @@ derived number (stamina, resistances, ...) is recomputed by the app itself.
 """
 
 import copy
+import hashlib
 import json
 import logging
 import random
@@ -827,7 +828,16 @@ class ReverseMapper:
         Satisfaction booleans (progress.prerequisites/source) default False:
         the module schema records no satisfaction state (design D5)."""
         projects: List[Dict[str, Any]] = []
+        seen_names: set = set()
         for item in self.actor.by_type(ff.TYPE_PROJECT):
+            dedupe_key = norm_key(item.name or "")
+            if dedupe_key and dedupe_key in seen_names:
+                self.report.warning(
+                    "project-duplicate",
+                    f"{item.name}: second project item with the same name; "
+                    "kept first (dedupe by name, D6)")
+                continue
+            seen_names.add(dedupe_key)
             payload = None
             if item.dsid:
                 payload, _src = self.provider.get(item.dsid)
@@ -887,6 +897,7 @@ class ReverseMapper:
         items.json canonical via unique name match, sample corpus fallback;
         identity is the name — count is carried state from the export)."""
         inventory: List[Dict[str, Any]] = []
+        self._synth_ids: set = set()
         dump_items = self.fs.data.get("items", {})
         for item in self.actor.by_type(ff.TYPE_TREASURE):
             defn: Optional[Dict[str, Any]] = None
@@ -911,10 +922,16 @@ class ReverseMapper:
                 if isinstance(sample_hit, dict):
                     defn, source = sample_hit, "sample"
                 else:
-                    self.report.loss(item.name, ff.TYPE_TREASURE, item.dsid,
-                                     reason="payload-unavailable", action="dropped",
-                                     detail="no ForgeSteel item definition matches "
-                                            "this treasure")
+                    synthesized = self._synthesize_inventory_item(item)
+                    if synthesized is None:
+                        self.report.loss(item.name, ff.TYPE_TREASURE,
+                                         item.dsid,
+                                         reason="unmappable", action="dropped",
+                                         detail="treasure has no name or no "
+                                                "extractable fields")
+                        continue
+                    inventory.append(synthesized)
+                    self.report.count(ff.TYPE_TREASURE, converted=1)
                     continue
             elif (isinstance(sample_hit, dict) and source == "dump"
                     and _canonical(defn) != _canonical(sample_hit)):
@@ -953,6 +970,84 @@ class ReverseMapper:
             inventory.append(entry)
             self.report.count(ff.TYPE_TREASURE, converted=1)
         return inventory
+
+    def _synthesize_inventory_item(self, item) -> Optional[Dict[str, Any]]:
+        """Build a hero-shape inventory entry from a Foundry treasure with no
+        known definition (change carry-unknown-treasure-to-print, D2-D5).
+
+        Text fidelity only: fields come exclusively from the export (name,
+        description, quantity, category-derived type, crafting block);
+        nothing mechanical is invented. Returns None when nothing usable can
+        be extracted (blank name), leaving the caller to loss-report.
+        """
+        name = (item.name or "").strip()
+        if not name:
+            return None
+        description = ff.treasure_description_markdown(item.raw)
+        if not description:
+            description = f"{name} (custom item; description unavailable " \
+                          "in export)"
+        count = ff.treasure_quantity(item.raw)
+        item_type = ff.treasure_item_type(item.raw)
+        keywords = ff.treasure_keywords(item.raw)
+
+        crafting = None
+        block = ff.treasure_project_block(item.raw)
+        if block:
+            crafting = {
+                "id": "custom-crafting-" + norm_key(name).replace(" ", "-"),
+                "name": f"Craft {name}",
+                "description": f"Craft {name}.",
+                "itemPrerequisites": block.get("prerequisites") or "",
+                "source": block.get("source") or "",
+                "characteristic": [
+                    str(c).capitalize() for c in
+                    (block.get("rollCharacteristic") or [])
+                    if isinstance(c, str)],
+                "goal": block.get("goal")
+                if isinstance(block.get("goal"), int) else None,
+                "isCustom": True,
+            }
+
+        slug = re.sub(r"[^a-z0-9]+", "-",
+                      re.sub(r"['\u2019]", "", name.lower())).strip("-")
+        item_id = f"custom-{slug or hashlib.sha1(name.encode('utf-8')).hexdigest()[:8]}"
+        if item_id in self._synth_ids:
+            item_id += "-" + hashlib.sha1(
+                str(item.raw.get("_id") or name).encode("utf-8")
+            ).hexdigest()[:8]
+        self._synth_ids.add(item_id)
+
+        self.report.loss(
+            name, ff.TYPE_TREASURE, item.dsid, reason="defaulted",
+            action="defaulted",
+            detail=f"custom item synthesized from export fields (text "
+                   f"fidelity): type {item_type}, count {count}; no "
+                   "mechanical effects can be reconstructed")
+        mechanical = [e for e in ff.item_effect_summaries(item.raw)
+                      if e["keys"] and not e["has_text"]]
+        if mechanical:
+            parts = "; ".join(
+                f"\"{e['name']}\" ({', '.join(e['keys'])})" for e in mechanical)
+            self.report.warning(
+                "mechanical-effects-lost",
+                f"{name}: {len(mechanical)} Foundry active effect(s) are "
+                f"pure mechanics with no text — {parts} — and cannot "
+                "round-trip through ForgeSteel; re-apply them manually in "
+                "Foundry after re-import")
+        return {
+            "id": item_id,
+            "name": name,
+            "description": description,
+            "type": item_type,
+            "keywords": keywords,
+            "crafting": crafting,
+            "effect": "",
+            "featuresByLevel": [],
+            "imbuements": [],
+            "count": count,
+            "customizationsByLevel": [],
+        }
 
     # ------------------------------------------------------- skill slots
     #: selection states that are genuine choices (vs. language choices and
